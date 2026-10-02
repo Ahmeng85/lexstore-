@@ -196,7 +196,7 @@
       </div>
     </section>
 
-    <!-- 3. Admin Section (支持多图上传预览) -->
+    <!-- 3. Admin Section (累积追加图片模式) -->
     <section v-if="currentTab === 'admin'" class="max-w-2xl mx-auto bg-white p-4 rounded-lg shadow border text-xs">
       <h2 class="text-base font-bold mb-3 border-b pb-2">📦 Product Management (Admin)</h2>
       
@@ -243,20 +243,21 @@
           <input v-model.number="newProduct.stock" required type="number" placeholder="100" class="w-full border p-2 rounded">
         </div>
 
-        <!-- 支持上传多张图片 -->
+        <!-- 累积上传多张图片区域 -->
         <div>
-          <label class="font-bold block mb-1">Upload Product Images from Device (支持选择多张图片):</label>
+          <label class="font-bold block mb-1">Upload Product Images (点击选择，可分多次点击添加多张):</label>
           
-          <!-- 图片预览区域 -->
-          <div v-if="newProduct.images && newProduct.images.length > 0" class="flex flex-wrap gap-2 mb-2">
-            <div v-for="(img, idx) in newProduct.images" :key="idx" class="relative w-16 h-16 border rounded bg-white overflow-hidden group">
+          <!-- 已选择图片的卡片预览与删除 -->
+          <div v-if="newProduct.images && newProduct.images.length > 0" class="flex flex-wrap gap-2 mb-2 p-2 bg-white border rounded">
+            <div v-for="(img, idx) in newProduct.images" :key="idx" class="relative w-16 h-16 border rounded overflow-hidden group">
               <img v-if="isImageUrl(img)" :src="img" class="w-full h-full object-cover">
               <span v-else class="text-xs flex items-center justify-center h-full">{{ img }}</span>
-              <button type="button" @click="removeUploadedImage(idx)" class="absolute top-0 right-0 bg-red-600 text-white rounded-bl w-4 h-4 text-[10px] flex items-center justify-center font-bold">✕</button>
+              <button type="button" @click="removeUploadedImage(idx)" class="absolute top-0 right-0 bg-red-600 text-white rounded-bl w-5 h-5 text-xs flex items-center justify-center font-bold">✕</button>
             </div>
           </div>
 
-          <input type="file" multiple accept="image/*" @change="handleMultipleImageUpload" class="w-full border p-2 rounded bg-white text-xs">
+          <input ref="fileInput" type="file" accept="image/*" @change="handleMultipleImageUpload" class="w-full border p-2 rounded bg-white text-xs">
+          <p class="text-[10px] text-gray-500 mt-1">💡 选好一张后，可再次点击上传按钮继续添加更多图片。</p>
         </div>
 
         <div>
@@ -380,6 +381,11 @@
           };
           reader.readAsDataURL(file);
         });
+
+        // 重置 input 以便允许再次选择同名或追加选择新图片
+        if (this.$refs.fileInput) {
+          this.$refs.fileInput.value = '';
+        }
       },
       removeUploadedImage(index) {
         this.newProduct.images.splice(index, 1);
