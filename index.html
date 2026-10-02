@@ -4,2082 +4,927 @@
 
 <head>
 
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>LEXSTORE - Hardware Store</title>
+  <title>Hardware & Tools Store</title>
 
-    <style>
+  <!-- Tailwind CSS -->
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        body { background-color: #f4f4f4; color: #333; }
+  <!-- Vue 3 -->
 
-        
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-        /* Navigation / Header */
+  <!-- SheetJS (Excel Export) -->
 
-        header { background-color: #1a1a1a; color: #ffcc00; padding: 20px; text-align: center; }
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-        header h1 { font-size: 28px; letter-spacing: 2px; margin-bottom: 10px; }
+  <style>
 
-        .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+    [v-cloak] { display: none; }
 
-        .nav-btn { background: #333; color: #fff; border: 1px solid #ffcc00; padding: 8px 14px; cursor: pointer; border-radius: 4px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; font-size: 14px; }
+    @keyframes fadeIn {
 
-        .nav-btn.active { background: #ffcc00 !important; color: #1a1a1a !important; border-color: #ffcc00; }
+      from { opacity: 0; transform: scale(0.95); }
 
-        .nav-btn.whatsapp-nav { background: #25d366; color: #fff; border-color: #25d366; }
+      to { opacity: 1; transform: scale(1); }
 
-        .nav-btn.whatsapp-nav:hover { background: #1ebd56; }
+    }
 
+    .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
 
-        /* Pages Control */
-
-        .page { display: none; max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-
-        .page.active { display: block !important; }
-
-
-        /* Store Layout */
-
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-
-        .product-card { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-
-        .product-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; cursor: pointer; transition: opacity 0.2s; }
-
-        .product-card img:hover { opacity: 0.85; }
-
-        .product-card h3 { font-size: 16px; margin: 5px 0; cursor: pointer; color: #1a1a1a; }
-
-        .product-card h3:hover { color: #e67e22; text-decoration: underline; }
-
-        .product-card p { color: #e67e22; font-weight: bold; margin-bottom: 5px; }
-
-        .product-unit { font-size: 12px; color: #666; margin-bottom: 10px; }
-
-        .multi-img-badge { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; }
-
-        
-
-        /* Quantity Selector inside Card */
-
-        .qty-container { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 10px; }
-
-        .qty-btn { background: #ddd; border: none; width: 28px; height: 28px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-
-        .qty-btn:hover { background: #ccc; }
-
-        .qty-input { width: 45px; text-align: center; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; padding: 4px; }
-
-
-        .btn { background-color: #ffcc00; color: #1a1a1a; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; width: 100%; }
-
-        .btn:hover { background-color: #e6b800; }
-
-        
-
-        /* Cart Page Layout */
-
-        .cart-box { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-
-        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-
-        .total-price { font-size: 20px; font-weight: bold; margin: 20px 0; text-align: right; color: #e67e22; }
-
-        .checkout-form { margin-top: 20px; border-top: 2px dashed #ddd; padding-top: 20px; }
-
-        .checkout-form input, .checkout-form select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; background: #fff; }
-
-        .checkout-btn { width: 100%; background-color: #25d366; color: white; padding: 14px; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; }
-
-        .checkout-btn:hover { background-color: #1ebd56; }
-
-
-        /* Admin Box & Sub-tabs */
-
-        .box-container { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-
-        .admin-sub-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; flex-wrap: wrap; }
-
-        .admin-sub-btn { background: #f0f0f0; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 13px; color: #333; }
-
-        .admin-sub-btn.active { background: #1a1a1a !important; color: #ffcc00 !important; }
-
-        .admin-section { display: none; }
-
-        .admin-section.active { display: block !important; }
-
-
-        .stats { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
-
-        .stat-card { background: #ffcc00; padding: 15px; border-radius: 6px; flex: 1; text-align: center; font-weight: bold; font-size: 16px; color: #1a1a1a; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
-
-        th { background-color: #1a1a1a; color: #ffcc00; }
-
-        tr:nth-child(even) { background-color: #f9f9f9; }
-
-        .btn-clear { background: #e74c3c; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-top: 20px; }
-
-        .btn-clear:hover { background: #c0392b; }
-
-
-        /* Admin Form Inputs */
-
-        .admin-form input, .admin-form textarea, .admin-form select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background: #fff; }
-
-
-        /* Admin Login Box */
-
-        #admin-login-box { max-width: 400px; margin: 50px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
-
-        #admin-login-box input { width: 100%; padding: 12px; margin: 10px 0 20px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
-
-
-        /* Image Slots Style */
-
-        .img-slot-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: #fafafa; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-
-        .img-slot-row input[type="file"] { margin-bottom: 0; }
-
-        .btn-add-slot { background: #2980b9; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
-
-        .btn-del-slot { background: #e74c3c; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
-
-
-        /* Thumbnail Bar for Modal */
-
-        .modal-thumbs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-
-        .modal-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid transparent; }
-
-        .modal-thumb.active { border-color: #e67e22; }
-
-
-        /* Modals */
-
-        .modal-overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
-
-        .modal-content { background: #fff; width: 90%; max-width: 500px; padding: 25px; border-radius: 8px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
-
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: #333; }
-
-        .close-btn:hover { color: #e74c3c; }
-
-        #lightbox-content { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 4px 20px rgba(255,255,255,0.2); }
-
-    </style>
+  </style>
 
 </head>
 
-<body>
+<body class="bg-gray-50 text-gray-800">
 
 
-    <header>
+<div id="app" v-cloak class="min-h-screen flex flex-col">
 
-        <h1>LEXSTORE HARDWARE</h1>
+  <!-- Header Navigation -->
 
-        <p>Your Trusted Local Hardware Store</p>
+  <header class="bg-blue-600 text-white shadow-md sticky top-0 z-50">
 
-        <div class="nav-tabs">
+    <div class="container mx-auto px-2 sm:px-4 py-3 flex justify-between items-center">
 
-            <button class="nav-btn active" onclick="switchPage('store', this)">🛒 Store</button>
+      <h1 class="text-base sm:text-xl font-bold cursor-pointer flex items-center gap-1" @click="currentTab = 'shop'">
 
-            <button class="nav-btn" onclick="switchPage('cart', this)">🛍 Shopping Cart <span id="cart-badge" style="background:red; color:white; padding:2px 6px; border-radius:50%; font-size:12px; display:none;">0</span></button>
+        🛠️ Hardware Store
 
-            <button class="nav-btn" onclick="switchPage('orders', this)">📦 My Orders</button>
+      </h1>
 
-            <button class="nav-btn" onclick="switchPage('admin', this)">📊 Admin Panel</button>
+      <div class="flex gap-1.5 sm:gap-4 items-center text-xs sm:text-sm">
 
-            <!-- Contact WhatsApp 按钮 -->
+        <button @click="currentTab = 'shop'" :class="{'underline font-bold': currentTab === 'shop'}">Shop</button>
 
-            <a id="header-whatsapp-btn" href="https://wa.me/60102862797" target="_blank" class="nav-btn whatsapp-nav">💬 Contact: WhatsApp 0102862797</a>
+        <button @click="currentTab = 'cart'" class="relative bg-blue-700 px-2.5 py-1 rounded-full flex items-center gap-1">
 
-        </div>
+          🛒 Cart
 
-    </header>
+          <span v-if="totalCartCount > 0" class="bg-red-500 text-[10px] text-white rounded-full px-1.5 py-0.2 font-bold">
 
+            {{ totalCartCount }}
 
-    <!-- 1. STORE PAGE -->
+          </span>
 
-    <div id="store-page" class="page active">
+        </button>
 
-        <h2>Our Products</h2>
+        <button @click="currentTab = 'admin'" :class="{'underline font-bold': currentTab === 'admin'}" class="border border-white px-2 py-0.5 rounded">
 
-        <div class="product-grid" id="product-grid" style="margin-top: 15px;"></div>
+          Admin
+
+        </button>
+
+      </div>
 
     </div>
 
+  </header>
 
-    <!-- 2. SHOPPING CART PAGE -->
 
-    <div id="cart-page" class="page">
+  <!-- Main Content Area -->
 
-        <div class="cart-box">
+  <main class="w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 flex-1">
 
-            <h2>Your Shopping Cart</h2>
 
-            <div id="cart-items" style="margin-top: 20px;">
+    <!-- 1. Shopping Section -->
 
-                <p>Your cart is empty.</p>
+    <section v-if="currentTab === 'shop'">
+
+      <div class="mb-4 flex flex-col sm:flex-row gap-2">
+
+        <input v-model="searchQuery" type="text" placeholder="Search product name..." class="border p-2 rounded w-full sm:w-2/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        <select v-model="selectedCategory" class="border p-2 rounded w-full sm:w-1/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+
+          <option value="">All Categories</option>
+
+          <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+
+        </select>
+
+      </div>
+
+
+      <!-- 商品网格列表 -->
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+
+        <div v-for="product in filteredProducts" :key="product.id" class="bg-white p-2.5 rounded-lg shadow hover:shadow-md transition flex flex-col justify-between border relative">
+
+          <div @click="openProductModal(product)" class="cursor-pointer group">
+
+            <div class="h-28 bg-blue-50 mb-2 rounded flex items-center justify-center overflow-hidden relative border select-none">
+
+              <img v-if="isImageUrl(getProductImage(product, 0))" :src="getProductImage(product, 0)" class="w-full h-full object-cover group-hover:scale-105 transition" alt="Product Image">
+
+              <span v-else class="text-4xl">{{ getProductImage(product, 0) || '📦' }}</span>
+
+              
+
+              <span v-if="product.images && product.images.length > 1" class="absolute top-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded shadow">
+
+                📷 {{ product.images.length }}
+
+              </span>
 
             </div>
+
+
+            <p class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">{{ product.brand || 'Store' }}</p>
+
+            <h3 class="font-bold text-xs sm:text-sm leading-snug text-gray-900 line-clamp-2">{{ product.name }}</h3>
+
+            <p class="text-[10px] text-gray-400 mt-0.5">{{ product.category }}</p>
 
             
 
-            <div id="cart-summary-box" style="display:none;">
+            <div class="mt-1">
 
-                <div style="text-align: right; font-size: 15px; color: #555; margin-top: 15px;" id="subtotal-display">Subtotal: RM 0.00</div>
+              <p class="text-blue-600 font-bold text-sm sm:text-base">
 
-                <div style="text-align: right; font-size: 15px; color: #555; margin-top: 5px;" id="shipping-display">Delivery Fee: RM 8.00</div>
+                RM {{ product.price ? product.price.toFixed(2) : '0.00' }} 
 
-                <div class="total-price" id="total-price">Total: RM 0.00</div>
+                <span class="text-[10px] text-gray-400 font-normal">/ {{ product.unit }}</span>
+
+              </p>
+
+            </div>
+
+            <p class="text-[10px] mt-0.5" :class="product.stock > 10 ? 'text-gray-400' : 'text-red-500 font-bold'">
+
+              Stock: {{ product.stock }} {{ product.unit }}
+
+            </p>
+
+          </div>
+
+
+          <div class="mt-2">
+
+            <button v-if="getItemQty(product.id) === 0" 
+
+                    @click="addToCart(product)" 
+
+                    :disabled="product.stock <= 0"
+
+                    :class="product.stock > 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'"
+
+                    class="text-white w-full py-1.5 rounded text-xs font-bold transition active:scale-95">
+
+              {{ product.stock > 0 ? '+ Add to Cart' : 'Out of Stock' }}
+
+            </button>
+
+
+            <div v-else class="flex items-center justify-between border border-blue-500 rounded p-0.5 bg-blue-50">
+
+              <button @click="updateQty(product, -1)" class="w-6 h-6 bg-blue-600 text-white font-bold rounded flex items-center justify-center hover:bg-blue-700">-</button>
+
+              <span class="font-bold text-blue-800 text-xs px-1">{{ getItemQty(product.id) }}</span>
+
+              <button @click="updateQty(product, 1)" :disabled="getItemQty(product.id) >= product.stock" class="w-6 h-6 bg-blue-600 text-white font-bold rounded flex items-center justify-center hover:bg-blue-700 disabled:bg-gray-300">+</button>
 
             </div>
 
-
-            <div class="checkout-form" id="checkout-container" style="display:none;">
-
-                <h3>Checkout Details</h3>
-
-                <div style="margin-top: 15px;">
-
-                    <label style="font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px;">Fulfillment Method (取货方式):</label>
-
-                    <select id="checkout-method" onchange="toggleAddressField()">
-
-                        <option value="Delivery">送货上门 (Delivery) [+RM 8]</option>
-
-                        <option value="Self Pickup">到店自取 (Self Pickup) [Free]</option>
-
-                    </select>
-
-
-                    <input type="text" id="customer-name" placeholder="Your Name" required>
-
-                    <input type="text" id="customer-phone" placeholder="Phone Number" required>
-
-                    <input type="text" id="customer-address" placeholder="Delivery Address" required>
-
-                    
-
-                    <button class="checkout-btn" onclick="submitOrder()">
-
-                        💬 Submit Order (WhatsApp)
-
-                    </button>
-
-                    
-
-                    <!-- 温馨提示 -->
-
-                    <div style="margin-top: 12px; background: #fff8e1; border: 1px solid #ffe082; padding: 10px 12px; border-radius: 4px; font-size: 13px; color: #856404; line-height: 1.5;">
-
-                        💡 <strong>温馨提示 (Delivery Notice)：</strong><br>
-
-                        选择送货上门服务将额外收取 <strong>RM 8</strong> 运费。送货服务目前仅涵盖：Damai, Penampang, Likas, Kota Kinabalu, Menggatal, Kolombong, Inanam, Putatan 区域。谢谢您的支持！
-
-                    </div>
-
-                </div>
-
-            </div>
+          </div>
 
         </div>
 
-    </div>
+      </div>
 
-
-    <!-- 3. MY ORDERS PAGE -->
-
-    <div id="orders-page" class="page">
-
-        <div class="box-container">
-
-            <h2>My Purchase History</h2>
-
-            <p style="color: #666; margin-top: 5px; margin-bottom: 15px;">These are the orders saved on your device.</p>
-
-            <div style="overflow-x:auto;">
-
-                <table id="customer-orders-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>Date</th>
-
-                            <th>Fulfillment & Info</th>
-
-                            <th>Items Ordered</th>
-
-                            <th>Total (RM)</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="customer-orders-tbody">
-
-                        <tr><td colspan="4" style="text-align: center;">You have no past orders yet.</td></tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            <button class="btn-clear" onclick="clearCustomerOrders()">Clear My History</button>
-
-        </div>
-
-    </div>
-
-
-    <!-- 4. ADMIN PAGE -->
-
-    <div id="admin-page" class="page">
-
-        <!-- Login Screen -->
-
-        <div id="admin-login-box">
-
-            <h2>Admin Login</h2>
-
-            <p style="color: #666; font-size: 14px; margin-top: 5px;">Enter password to access dashboard</p>
-
-            <input type="password" id="admin-password-input" placeholder="Enter Admin Password">
-
-            <button class="btn" onclick="verifyAdminLogin()">Login</button>
-
-        </div>
-
-
-        <!-- Dashboard Content -->
-
-        <div id="admin-dashboard" class="box-container" style="display: none;">
-
-            
-
-            <!-- Top bar with Title & Logout -->
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
-
-                <h2 id="admin-title">Admin Panel</h2>
-
-                <button class="btn" style="width: auto; background: #e74c3c; color: white;" onclick="adminLogout()">Logout</button>
-
-            </div>
-
-
-            <!-- Admin Sub-Navigation Tabs -->
-
-            <div class="admin-sub-tabs">
-
-                <button class="admin-sub-btn active" onclick="switchAdminSubTab('orders-section', this)">📦 Orders List</button>
-
-                <button class="admin-sub-btn" onclick="switchAdminSubTab('products-list-section', this)">📋 Products List</button>
-
-                <button class="admin-sub-btn" onclick="switchAdminSubTab('add-product-section', this)">➕ Add Products</button>
-
-                <button class="admin-sub-btn" id="super-tab-btn" onclick="switchAdminSubTab('super-settings-section', this)" style="display:none;">🔐 Super Admin Settings</button>
-
-            </div>
-
-
-            <!-- SUB-PAGE 1: Orders List -->
-
-            <div id="orders-section" class="admin-section active">
-
-                <div class="stats">
-
-                    <div class="stat-card" id="total-orders-card">Total Orders: 0</div>
-
-                    <div class="stat-card" id="total-sales-card">Total Sales: RM 0.00</div>
-
-                </div>
-
-
-                <h3>Customer Orders List</h3>
-
-                <div style="overflow-x:auto;">
-
-                    <table id="orders-table">
-
-                        <thead>
-
-                            <tr>
-
-                                <th>Date</th>
-
-                                <th>Fulfillment & Customer Info</th>
-
-                                <th>Order Items</th>
-
-                                <th>Total (RM)</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody id="orders-tbody">
-
-                            <tr><td colspan="4" style="text-align: center;">No orders yet.</td></tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-                <!-- 导出按钮区域 -->
-
-                <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-
-                    <button class="btn" style="width: auto; background: #2980b9; color: white;" onclick="exportOrdersExcel()">📊 导出 Excel (Export Orders Excel)</button>
-
-                    <button class="btn" style="width: auto; background: #8e44ad; color: white;" onclick="exportDataJson()">📦 导出 JSON (Export Data JSON)</button>
-
-                    <button class="btn-clear" style="margin-top:0;" onclick="clearOrders()">Clear All Orders</button>
-
-                </div>
-
-            </div>
-
-
-            <!-- SUB-PAGE 2: Products List -->
-
-            <div id="products-list-section" class="admin-section">
-
-                <h3 style="color: #1a1a1a; margin-bottom: 15px;">Manage Products Inventory & Pricing</h3>
-
-                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Directly edit product name, price, cost, inventory quantity, and select unit from dropdown. Click image to zoom. Click Save for each row.</p>
-
-                <div style="overflow-x:auto;">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th style="width: 60px;">Img</th>
-
-                                <th style="min-width: 200px;">Name</th>
-
-                                <th style="width: 90px;">Price (RM)</th>
-
-                                <th style="width: 90px;">Cost (RM)</th>
-
-                                <th style="width: 100px;">Unit</th>
-
-                                <th style="width: 90px;">Inventory</th>
-
-                                <th style="width: 120px;">Actions</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody id="admin-products-tbody">
-
-                            <!-- Dynamically loaded -->
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-
-            <!-- SUB-PAGE 3: Add Products (支持多图插槽) -->
-
-            <div id="add-product-section" class="admin-section">
-
-                <h3 style="color: #27ae60; margin-bottom: 15px;">Add New Product to Store</h3>
-
-                <div class="admin-form">
-
-                    <label style="font-weight: bold; font-size: 14px;">Product Name:</label>
-
-                    <input type="text" id="new-prod-name" placeholder="e.g. Electric Saw">
-
-
-                    <label style="font-weight: bold; font-size: 14px;">Selling Price (RM):</label>
-
-                    <input type="number" id="new-prod-price" placeholder="e.g. 85.00" step="0.01">
-
-
-                    <label style="font-weight: bold; font-size: 14px;">Cost Price (RM):</label>
-
-                    <input type="number" id="new-prod-cost" placeholder="e.g. 50.00" step="0.01">
-
-
-                    <label style="font-weight: bold; font-size: 14px;">Unit:</label>
-
-                    <select id="new-prod-unit">
-
-                        <option value="pcs">pcs (个)</option>
-
-                        <option value="pack">pack (包)</option>
-
-                        <option value="set">set (套)</option>
-
-                        <option value="bottle">bottle (瓶)</option>
-
-                        <option value="bag">bag (袋)</option>
-
-                        <option value="kg">kg (公斤)</option>
-
-                        <option value="gram">gram (克)</option>
-
-                        <option value="m">m (米)</option>
-
-                        <option value="cm">cm (厘米)</option>
-
-                        <option value="unit">unit (单位)</option>
-
-                    </select>
-
-
-                    <label style="font-weight: bold; font-size: 14px;">Initial Inventory Quantity:</label>
-
-                    <input type="number" id="new-prod-stock" placeholder="e.g. 100" value="100">
-
-
-                    <!-- 动态图片上传卡槽区域 -->
-
-                    <label style="font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px;">Upload Product Images (支持多张图片):</label>
-
-                    <div id="image-slots-container">
-
-                        <div class="img-slot-row">
-
-                            <span style="font-size:12px; font-weight:bold; color:#666;">#1</span>
-
-                            <input type="file" class="new-prod-file-slot" accept="image/*">
-
-                        </div>
-
-                    </div>
-
-                    <button type="button" class="btn-add-slot" onclick="addImageSlot()">➕ Add Another Image Slot (增加图片上传框)</button>
-
-
-                    <label style="font-weight: bold; font-size: 14px; display: block;">Product Description & Details:</label>
-
-                    <textarea id="new-prod-desc" placeholder="Enter product specifications and details" rows="3"></textarea>
-
-
-                    <button class="btn" style="background: #27ae60; color: white; padding: 12px; font-size: 16px;" onclick="addNewProduct()">Add Product Now</button>
-
-                </div>
-
-            </div>
-
-
-            <!-- SUB-PAGE 4: Super Admin Settings -->
-
-            <div id="super-settings-section" class="admin-section">
-
-                <h3 style="color: #c0392b; margin-bottom: 15px;">🔐 Change System Passwords & Settings</h3>
-
-                <div style="display: flex; flex-direction: column; gap: 20px; max-width: 450px;">
-
-                    
-
-                    <!-- 修改密码区块 -->
-
-                    <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #eee;">
-
-                        <h4 style="margin-bottom: 10px; color: #333;">Change System Passwords</h4>
-
-                        <label style="font-size: 13px; font-weight: bold;">New Super Admin Password:</label>
-
-                        <input type="password" id="new-super-pwd" placeholder="Enter new superadmin password" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
-
-                        
-
-                        <label style="font-size: 13px; font-weight: bold;">New Normal Admin Password:</label>
-
-                        <input type="password" id="new-normal-pwd" placeholder="Enter new normal admin password" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
-
-                        
-
-                        <button class="btn" style="background: #2980b9; color: white; padding: 10px;" onclick="updateAdminPasswords()">Save New Passwords</button>
-
-                    </div>
-
-
-                    <!-- 修改 WhatsApp 号码区块 -->
-
-                    <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #eee;">
-
-                        <h4 style="margin-bottom: 10px; color: #27ae60;">💬 Change Store WhatsApp Number</h4>
-
-                        <label style="font-size: 13px; font-weight: bold;">New WhatsApp Number (e.g. 60102862797):</label>
-
-                        <input type="text" id="new-whatsapp-input" placeholder="Enter store whatsapp number" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
-
-                        <button class="btn" style="background: #27ae60; color: white; padding: 10px;" onclick="updateWhatsAppNumber()">Save WhatsApp Number</button>
-
-                    </div>
-
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-    </div>
+    </section>
 
 
     <!-- Product Details Modal -->
 
-    <div id="product-details-modal" class="modal-overlay">
+    <div v-if="selectedProductModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3" @click.self="selectedProductModal = null">
 
-        <div class="modal-content">
+      <div class="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden relative animate-fade-in max-h-[90vh] flex flex-col">
 
-            <span class="close-btn" onclick="closeProductDetails()">&times;</span>
+        <button @click="selectedProductModal = null" class="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-gray-700 font-bold z-10">✕</button>
 
-            <div id="modal-details-body"></div>
+
+        <div class="h-56 sm:h-64 bg-gray-100 flex items-center justify-center p-2 relative cursor-pointer shrink-0" @click="openImageNewTab(getProductImage(selectedProductModal, currentImageIndex))">
+
+          <img v-if="isImageUrl(getProductImage(selectedProductModal, currentImageIndex))" :src="getProductImage(selectedProductModal, currentImageIndex)" class="max-h-full max-w-full object-contain rounded" alt="Product Image">
+
+          <span v-else class="text-6xl">{{ getProductImage(selectedProductModal, currentImageIndex) || '📦' }}</span>
 
         </div>
 
+
+        <!-- 缩略图切换 -->
+
+        <div v-if="selectedProductModal.images && selectedProductModal.images.length > 1" class="flex items-center gap-2 px-3 pt-2 overflow-x-auto shrink-0">
+
+          <div v-for="(img, idx) in selectedProductModal.images" 
+
+               :key="idx" 
+
+               @click="currentImageIndex = idx"
+
+               :class="{'border-blue-600 ring-2 ring-blue-400': currentImageIndex === idx, 'border-gray-200': currentImageIndex !== idx}"
+
+               class="w-10 h-10 border rounded cursor-pointer overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
+
+            <img v-if="isImageUrl(img)" :src="img" class="w-full h-full object-cover">
+
+            <span v-else class="text-xs">{{ img }}</span>
+
+          </div>
+
+        </div>
+
+
+        <div class="p-4 space-y-2 overflow-y-auto">
+
+          <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded">{{ selectedProductModal.category }}</span>
+
+          <h2 class="text-base font-bold text-gray-900">{{ selectedProductModal.name }}</h2>
+
+          <p class="text-xs text-gray-600"><strong>Specs/Brand:</strong> {{ selectedProductModal.brand || 'N/A' }}</p>
+
+          <p class="text-xs text-gray-500"><strong>Stock:</strong> {{ selectedProductModal.stock }} {{ selectedProductModal.unit }}</p>
+
+          <p class="text-xs text-gray-700 whitespace-pre-line bg-gray-50 p-2 rounded border" v-if="selectedProductModal.description">{{ selectedProductModal.description }}</p>
+
+
+          <div class="pt-3 border-t flex items-center justify-between gap-2">
+
+            <div>
+
+              <p class="text-xl font-bold text-blue-600">RM {{ selectedProductModal.price ? selectedProductModal.price.toFixed(2) : '0.00' }}</p>
+
+              <p class="text-[10px] text-gray-400">per {{ selectedProductModal.unit }}</p>
+
+            </div>
+
+
+            <div class="flex items-center gap-2">
+
+              <div v-if="getItemQty(selectedProductModal.id) > 0" class="flex items-center border border-blue-500 rounded bg-blue-50 p-1">
+
+                <button @click="updateQty(selectedProductModal, -1)" class="w-7 h-7 bg-blue-600 text-white font-bold rounded flex items-center justify-center">-</button>
+
+                <span class="font-bold text-blue-800 text-xs px-2">{{ getItemQty(selectedProductModal.id) }}</span>
+
+                <button @click="updateQty(selectedProductModal, 1)" :disabled="getItemQty(selectedProductModal.id) >= selectedProductModal.stock" class="w-7 h-7 bg-blue-600 text-white font-bold rounded flex items-center justify-center disabled:bg-gray-300">+</button>
+
+              </div>
+
+              <button v-else @click="addToCart(selectedProductModal)" :disabled="selectedProductModal.stock <= 0" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-xs shadow">
+
+                + Add to Cart
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
 
 
-    <!-- Lightbox Modal for Image Zoom -->
+    <!-- 2. Shopping Cart Section -->
 
-    <div id="lightbox-modal" class="modal-overlay" onclick="closeLightbox()">
+    <section v-if="currentTab === 'cart'" class="max-w-xl mx-auto bg-white p-4 rounded-lg shadow border">
 
-        <span class="close-btn" style="color:#fff; right: 30px; top: 20px; font-size: 36px;" onclick="closeLightbox()">&times;</span>
+      <h2 class="text-lg font-bold mb-3 flex items-center gap-2">🛒 Your Cart Items</h2>
 
-        <img id="lightbox-content" src="" alt="Enlarged Product">
+      
 
-    </div>
+      <div v-if="cart.length === 0" class="text-gray-500 text-center py-8">
 
+        <p class="text-3xl mb-2">📦</p>
 
-    <script>
+        <p class="text-xs">Your cart is currently empty.</p>
 
-        if (!localStorage.getItem('super_admin_pwd')) {
+        <button @click="currentTab = 'shop'" class="mt-3 bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold">Start Shopping</button>
 
-            localStorage.setItem('super_admin_pwd', 'super123');
+      </div>
 
-        }
 
-        if (!localStorage.getItem('normal_admin_pwd')) {
+      <div v-else>
 
-            localStorage.setItem('normal_admin_pwd', 'admin123');
+        <div v-for="item in cart" :key="item.id" class="border-b py-2 text-xs">
 
-        }
+          <h4 class="font-bold text-gray-900 mb-1.5 break-words">{{ item.name }}</h4>
 
-        if (!localStorage.getItem('store_whatsapp')) {
+          <div class="flex items-center justify-between gap-2">
 
-            localStorage.setItem('store_whatsapp', '60102862797');
+            <div class="flex items-center gap-1 border rounded p-0.5 bg-gray-50">
 
-        }
+              <button @click="updateQty(item, -1)" class="w-5 h-5 bg-gray-200 text-gray-700 font-bold rounded flex items-center justify-center">-</button>
 
+              <span class="w-6 text-center font-bold">{{ item.qty }}</span>
 
-        function initWhatsAppHeader() {
+              <button @click="updateQty(item, 1)" :disabled="item.qty >= item.stock" class="w-5 h-5 bg-gray-200 text-gray-700 font-bold rounded flex items-center justify-center disabled:opacity-50">+</button>
 
-            const currentWa = localStorage.getItem('store_whatsapp') || '60102862797';
+            </div>
 
-            const waBtn = document.getElementById('header-whatsapp-btn');
+            <div class="text-right">
 
-            if (waBtn) {
+              <span class="font-bold text-blue-600">RM {{ (item.price * item.qty).toFixed(2) }}</span>
 
-                waBtn.href = `https://wa.me/${currentWa}`;
+              <button @click="removeFromCart(item.id)" class="text-red-500 text-[10px] ml-2 underline">Remove</button>
 
-                waBtn.innerText = `💬 Contact: WhatsApp ${currentWa}`;
+            </div>
 
-            }
+          </div>
 
-        }
+        </div>
 
-        initWhatsAppHeader();
 
+        <div class="my-3 text-right bg-gray-50 p-2 rounded">
 
-        const defaultProducts = [
+          <p class="text-base font-bold">Total: <span class="text-blue-600">RM {{ cartTotal.toFixed(2) }}</span></p>
 
-            { id: 1, name: "Heavy Duty Hammer", price: 25.00, cost: 15.00, unit: "pcs", stock: 50, images: ["https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=800&q=80"], desc: "High-quality forged steel head with a comfortable shock-absorbing rubber grip." },
+        </div>
 
-            { id: 2, name: "Cordless Drill", price: 150.00, cost: 100.00, unit: "set", stock: 20, images: ["https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80"], desc: "Powerful rechargeable cordless drill with variable speed settings." },
 
-            { id: 3, name: "Stainless Steel Screws", price: 12.50, cost: 6.00, unit: "pack", stock: 100, images: ["https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&q=80"], desc: "Rust-resistant premium stainless steel screws pack of 100 pieces." }
+        <div class="border-t pt-3 space-y-2">
 
-        ];
+          <h3 class="font-bold text-xs">🚚 Delivery Details</h3>
 
+          <input v-model="customerInfo.name" type="text" placeholder="Full Name *" class="w-full border p-2 rounded text-xs">
 
-        let rawProducts = JSON.parse(localStorage.getItem('lexstore_products')) || defaultProducts;
+          <input v-model="customerInfo.phone" type="text" placeholder="WhatsApp Phone Number *" class="w-full border p-2 rounded text-xs">
 
-        // 兼容单图 image 和多图 images
+          <textarea v-model="customerInfo.address" placeholder="Delivery Address *" class="w-full border p-2 rounded text-xs" rows="2"></textarea>
 
-        let products = rawProducts.map(p => {
+          
 
-            if (!p.images) {
+          <button @click="sendWhatsAppOrder" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded text-xs font-bold shadow flex items-center justify-center gap-1">
 
-                p.images = p.image ? [p.image] : ["https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=800&q=80"];
+            📱 Checkout via WhatsApp
 
-            }
+          </button>
 
-            return p;
+        </div>
 
-        });
+      </div>
 
+    </section>
 
-        let cart = [];
 
-        let currentRole = null;
+    <!-- 3. Admin Section (改为插槽式多图上传) -->
 
-        const availableUnits = ["pcs", "pack", "set", "bottle", "bag", "kg", "gram", "m", "cm", "unit"];
+    <section v-if="currentTab === 'admin'" class="max-w-2xl mx-auto bg-white p-4 rounded-lg shadow border text-xs">
 
+      <h2 class="text-base font-bold mb-3 border-b pb-2">📦 Product Management (Admin)</h2>
 
-        function switchPage(pageName, btnElement) {
+      
 
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      <form @submit.prevent="saveProduct" class="space-y-3 mb-6 bg-gray-50 p-3 rounded border">
 
-            document.querySelectorAll('.nav-btn').forEach(b => {
+        <div>
 
-                if(!b.classList.contains('whatsapp-nav')) {
+          <label class="font-bold block mb-1">Product Name:</label>
 
-                    b.classList.remove('active');
+          <input v-model="newProduct.name" required type="text" placeholder="e.g. Cordless Drill / PVC Pipe 20mm" class="w-full border p-2 rounded">
 
-                }
+        </div>
 
-            });
 
+        <div class="grid grid-cols-2 gap-2">
 
-            if (pageName === 'store') {
+          <div>
 
-                document.getElementById('store-page').classList.add('active');
+            <label class="font-bold block mb-1">Category:</label>
 
-                renderProducts();
+            <input v-model="newProduct.category" required type="text" placeholder="e.g. Power Tools" class="w-full border p-2 rounded">
 
-            } else if (pageName === 'cart') {
+          </div>
 
-                document.getElementById('cart-page').classList.add('active');
+          <div>
 
-                updateCart();
+            <label class="font-bold block mb-1">Brand / Specs:</label>
 
-            } else if (pageName === 'orders') {
+            <input v-model="newProduct.brand" type="text" placeholder="e.g. Bosch / Makita" class="w-full border p-2 rounded">
 
-                document.getElementById('orders-page').classList.add('active');
+          </div>
 
-                loadCustomerOrders();
+        </div>
 
-            } else if (pageName === 'admin') {
 
-                document.getElementById('admin-page').classList.add('active');
+        <div class="grid grid-cols-3 gap-2">
 
-                checkAdminSession();
+          <div>
 
-            }
+            <label class="font-bold block mb-1">Selling Price (RM):</label>
 
-            if (btnElement && !btnElement.classList.contains('whatsapp-nav')) {
+            <input v-model.number="newProduct.price" required type="number" step="0.01" placeholder="85.00" class="w-full border p-2 rounded">
 
-                btnElement.classList.add('active');
+          </div>
 
-            }
+          <div>
 
-        }
+            <label class="font-bold block mb-1">Cost Price (RM):</label>
 
+            <input v-model.number="newProduct.cost" type="number" step="0.01" placeholder="50.00" class="w-full border p-2 rounded">
 
-        function switchAdminSubTab(sectionId, btnElement) {
+          </div>
 
-            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+          <div>
 
-            document.querySelectorAll('.admin-sub-btn').forEach(b => b.classList.remove('active'));
+            <label class="font-bold block mb-1">Unit:</label>
 
+            <select v-model="newProduct.unit" class="w-full border p-2 rounded bg-white">
 
-            document.getElementById(sectionId).classList.add('active');
+              <option value="pcs">pcs</option>
 
-            btnElement.classList.add('active');
+              <option value="box">box</option>
 
+              <option value="set">set</option>
 
-            if (sectionId === 'products-list-section') {
+              <option value="meter">meter</option>
 
-                loadAdminProductsTable();
+              <option value="roll">roll</option>
 
-            } else if (sectionId === 'super-settings-section') {
+            </select>
 
-                document.getElementById('new-whatsapp-input').value = localStorage.getItem('store_whatsapp') || '';
+          </div>
 
-            }
+        </div>
 
-        }
 
+        <div>
 
-        function toggleAddressField() {
+          <label class="font-bold block mb-1">Initial Inventory Quantity:</label>
 
-            const method = document.getElementById('checkout-method').value;
+          <input v-model.number="newProduct.stock" required type="number" placeholder="100" class="w-full border p-2 rounded">
 
-            const addressInput = document.getElementById('customer-address');
+        </div>
 
-            if (method === 'Self Pickup') {
 
-                addressInput.style.display = 'none';
+        <!-- 多图片卡槽选择（适合手机使用） -->
 
-                addressInput.value = 'Self Pickup (到店自取)';
+        <div>
 
-            } else {
+          <div class="flex justify-between items-center mb-1">
 
-                addressInput.style.display = 'block';
+            <label class="font-bold">Upload Product Images (支持上传多张照片):</label>
 
-                addressInput.value = '';
+            <button type="button" @click="addImageSlot" class="bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold">
 
-                addressInput.placeholder = 'Delivery Address';
+              + Add Image Slot
 
-            }
+            </button>
 
-            updateCart();
+          </div>
 
-        }
 
+          <div class="space-y-2">
 
-        function renderProducts() {
+            <div v-for="(imgSlot, idx) in imageSlots" :key="idx" class="p-2 border rounded bg-white flex items-center justify-between gap-2">
 
-            const grid = document.getElementById('product-grid');
+              <div class="flex items-center gap-2 flex-1 overflow-hidden">
 
-            grid.innerHTML = '';
-
-            products.forEach(product => {
-
-                const mainImg = (product.images && product.images.length > 0) ? product.images[0] : (product.image || '');
-
-                const imgBadge = (product.images && product.images.length > 1) ? `<span class="multi-img-badge">📷 ${product.images.length}</span>` : '';
-
-
-                grid.innerHTML += `
-
-                    <div class="product-card">
-
-                        ${imgBadge}
-
-                        <div>
-
-                            <img src="${mainImg}" alt="${product.name}" onclick="openLightbox('${mainImg}')" title="Click to zoom image">
-
-                            <h3 onclick="openProductDetails(${product.id})" title="View Product Details">${product.name}</h3>
-
-                            <p>RM ${product.price.toFixed(2)}</p>
-
-                            <div class="product-unit">Unit: ${product.unit || 'pcs'} | Inventory: ${product.stock !== undefined ? product.stock : 0}</div>
-
-                        </div>
-
-                        <div>
-
-                            <div class="qty-container">
-
-                                <button class="qty-btn" onclick="changeQty(${product.id}, -1)">-</button>
-
-                                <input type="number" id="qty-${product.id}" class="qty-input" value="1" min="1">
-
-                                <button class="qty-btn" onclick="changeQty(${product.id}, 1)">+</button>
-
-                            </div>
-
-                            <button class="btn" onclick="addToCartWithQty(${product.id})">Add to Cart</button>
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            });
-
-        }
-
-
-        function loadAdminProductsTable() {
-
-            const tbody = document.getElementById('admin-products-tbody');
-
-            if (products.length === 0) {
-
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No products found.</td></tr>';
-
-                return;
-
-            }
-
-
-            tbody.innerHTML = '';
-
-            products.forEach(product => {
-
-                const mainImg = (product.images && product.images.length > 0) ? product.images[0] : (product.image || '');
-
-                let unitOptions = availableUnits.map(u => `<option value="${u}" ${product.unit === u ? 'selected' : ''}>${u}</option>`).join('');
+                <span class="font-bold text-gray-500 text-xs">#{{ idx + 1 }}</span>
 
                 
 
-                tbody.innerHTML += `
+                <div class="w-10 h-10 border rounded bg-gray-50 flex items-center justify-center shrink-0 overflow-hidden">
 
-                    <tr>
+                  <img v-if="isImageUrl(imgSlot.value)" :src="imgSlot.value" class="w-full h-full object-cover">
 
-                        <td><img src="${mainImg}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="openLightbox('${mainImg}')" title="Click to zoom"></td>
-
-                        <td><input type="text" id="edit-name-${product.id}" value="${product.name}" style="width: 100%; padding: 8px; font-size: 15px; font-weight: bold; border:1px solid #ccc; border-radius:4px;"></td>
-
-                        <td><input type="number" id="edit-price-${product.id}" value="${product.price}" step="0.01" style="width: 80px; padding: 8px; font-size: 14px; border:1px solid #ccc; border-radius:4px;"></td>
-
-                        <td><input type="number" id="edit-cost-${product.id}" value="${product.cost !== undefined ? product.cost : 0.00}" step="0.01" style="width: 80px; padding: 8px; font-size: 14px; border:1px solid #ccc; border-radius:4px;"></td>
-
-                        <td>
-
-                            <select id="edit-unit-${product.id}" style="padding: 8px; font-size: 14px; border:1px solid #ccc; border-radius:4px; background:#fff;">
-
-                                ${unitOptions}
-
-                            </select>
-
-                        </td>
-
-                        <td><input type="number" id="edit-stock-${product.id}" value="${product.stock !== undefined ? product.stock : 100}" style="width: 70px; padding: 8px; font-size: 14px; border:1px solid #ccc; border-radius:4px;"></td>
-
-                        <td>
-
-                            <button onclick="saveProductEdit(${product.id})" style="background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 4px; font-size: 13px;">Save</button>
-
-                            <button onclick="deleteProduct(${product.id})" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">Del</button>
-
-                        </td>
-
-                    </tr>
-
-                `;
-
-            });
-
-        }
-
-
-        function saveProductEdit(productId) {
-
-            const name = document.getElementById(`edit-name-${productId}`).value.trim();
-
-            const price = parseFloat(document.getElementById(`edit-price-${productId}`).value);
-
-            const cost = parseFloat(document.getElementById(`edit-cost-${productId}`).value);
-
-            const unit = document.getElementById(`edit-unit-${productId}`).value;
-
-            const stock = parseInt(document.getElementById(`edit-stock-${productId}`).value);
-
-
-            if (!name || isNaN(price) || price < 0 || isNaN(cost) || cost < 0 || isNaN(stock)) {
-
-                alert('Please check your inputs.');
-
-                return;
-
-            }
-
-
-            const prod = products.find(p => p.id === productId);
-
-            if (prod) {
-
-                prod.name = name;
-
-                prod.price = price;
-
-                prod.cost = cost;
-
-                prod.unit = unit;
-
-                prod.stock = stock;
-
-
-                localStorage.setItem('lexstore_products', JSON.stringify(products));
-
-                alert('Product updated successfully!');
-
-                loadAdminProductsTable();
-
-                renderProducts();
-
-            }
-
-        }
-
-
-        function deleteProduct(productId) {
-
-            if (confirm('Are you sure you want to delete this product?')) {
-
-                products = products.filter(p => p.id !== productId);
-
-                localStorage.setItem('lexstore_products', JSON.stringify(products));
-
-                loadAdminProductsTable();
-
-                renderProducts();
-
-            }
-
-        }
-
-
-        /* 动态增加图片槽位 */
-
-        function addImageSlot() {
-
-            const container = document.getElementById('image-slots-container');
-
-            const count = container.children.length + 1;
-
-            const div = document.createElement('div');
-
-            div.className = 'img-slot-row';
-
-            div.innerHTML = `
-
-                <span style="font-size:12px; font-weight:bold; color:#666;">#${count}</span>
-
-                <input type="file" class="new-prod-file-slot" accept="image/*">
-
-                <button type="button" class="btn-del-slot" onclick="removeImageSlot(this)">✕</button>
-
-            `;
-
-            container.appendChild(div);
-
-        }
-
-
-        function removeImageSlot(btn) {
-
-            btn.parentElement.remove();
-
-        }
-
-
-        /* 添加新商品处理（支持多图异步读取） */
-
-        function addNewProduct() {
-
-            const name = document.getElementById('new-prod-name').value.trim();
-
-            const price = parseFloat(document.getElementById('new-prod-price').value);
-
-            const cost = parseFloat(document.getElementById('new-prod-cost').value) || 0;
-
-            const unit = document.getElementById('new-prod-unit').value;
-
-            const stock = parseInt(document.getElementById('new-prod-stock').value) || 100;
-
-            const desc = document.getElementById('new-prod-desc').value.trim();
-
-            const fileInputs = document.querySelectorAll('.new-prod-file-slot');
-
-
-            if (!name || isNaN(price) || price <= 0) {
-
-                alert('Please enter a valid product name and price!');
-
-                return;
-
-            }
-
-
-            let filePromises = [];
-
-            fileInputs.forEach(input => {
-
-                if (input.files && input.files[0]) {
-
-                    filePromises.push(new Promise((resolve) => {
-
-                        const reader = new FileReader();
-
-                        reader.onload = (e) => resolve(e.target.result);
-
-                        reader.readAsDataURL(input.files[0]);
-
-                    }));
-
-                }
-
-            });
-
-
-            Promise.all(filePromises).then(uploadedImages => {
-
-                if (uploadedImages.length === 0) {
-
-                    uploadedImages.push("https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=800&q=80");
-
-                }
-
-                saveNewProductData(name, price, cost, unit, stock, uploadedImages, desc);
-
-            });
-
-        }
-
-
-        function saveNewProductData(name, price, cost, unit, stock, imagesArray, desc) {
-
-            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-
-            const newProduct = {
-
-                id: newId,
-
-                name: name,
-
-                price: price,
-
-                cost: cost,
-
-                unit: unit,
-
-                stock: stock,
-
-                images: imagesArray,
-
-                desc: desc || 'No additional description provided.'
-
-            };
-
-
-            products.push(newProduct);
-
-            localStorage.setItem('lexstore_products', JSON.stringify(products));
-
-            renderProducts();
-
-
-            document.getElementById('new-prod-name').value = '';
-
-            document.getElementById('new-prod-price').value = '';
-
-            document.getElementById('new-prod-cost').value = '';
-
-            document.getElementById('new-prod-stock').value = '100';
-
-            document.getElementById('new-prod-desc').value = '';
-
-            document.getElementById('image-slots-container').innerHTML = `
-
-                <div class="img-slot-row">
-
-                    <span style="font-size:12px; font-weight:bold; color:#666;">#1</span>
-
-                    <input type="file" class="new-prod-file-slot" accept="image/*">
+                  <span v-else class="text-xs">📷</span>
 
                 </div>
 
-            `;
+
+                <input type="file" accept="image/*" @change="e => handleSingleSlotUpload(e, idx)" class="text-[10px] w-full">
+
+              </div>
 
 
-            alert('New product added successfully!');
+              <button v-if="imageSlots.length > 1" type="button" @click="removeImageSlot(idx)" class="text-red-600 font-bold px-2 text-sm">
 
-            switchPage('store', document.querySelectorAll('.nav-btn')[0]);
+                ✕
+
+              </button>
+
+            </div>
+
+          </div>
+
+          <p class="text-[10px] text-gray-500 mt-1">💡 点击“+ Add Image Slot”可以增加更多上传按钮，分别上传第2张、第3张卡尺照片。</p>
+
+        </div>
+
+
+        <div>
+
+          <label class="font-bold block mb-1">Product Description & Details:</label>
+
+          <textarea v-model="newProduct.description" placeholder="Enter product specifications and details" class="w-full border p-2 rounded" rows="2"></textarea>
+
+        </div>
+
+
+        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-bold shadow transition">
+
+          Add Product Now
+
+        </button>
+
+      </form>
+
+
+      <!-- 已添加商品列表管理 -->
+
+      <h3 class="font-bold border-b pb-1 mb-2">Current Products ({{ products.length }})</h3>
+
+      <div class="space-y-2">
+
+        <div v-for="prod in products" :key="prod.id" class="border p-2 rounded flex justify-between items-center bg-white">
+
+          <div class="flex items-center gap-2">
+
+            <div class="w-10 h-10 border rounded bg-gray-100 flex items-center justify-center overflow-hidden">
+
+              <img v-if="isImageUrl(getProductImage(prod, 0))" :src="getProductImage(prod, 0)" class="w-full h-full object-cover">
+
+              <span v-else class="text-xs">{{ getProductImage(prod, 0) || '📦' }}</span>
+
+            </div>
+
+            <div>
+
+              <p class="font-bold text-gray-900">{{ prod.name }} ({{ prod.images ? prod.images.length : 1 }} 张图)</p>
+
+              <p class="text-[10px] text-gray-500">RM {{ prod.price.toFixed(2) }} | Stock: {{ prod.stock }} {{ prod.unit }}</p>
+
+            </div>
+
+          </div>
+
+          <button @click="deleteProduct(prod.id)" class="text-red-600 hover:text-red-800 font-bold text-xs underline">Delete</button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+</div>
+
+
+<script>
+
+  const { createApp } = Vue;
+
+
+  createApp({
+
+    data() {
+
+      return {
+
+        currentTab: 'shop',
+
+        searchQuery: '',
+
+        selectedCategory: '',
+
+        selectedProductModal: null,
+
+        currentImageIndex: 0,
+
+        customerInfo: { name: '', phone: '', address: '' },
+
+        cart: [],
+
+        imageSlots: [{ value: '' }],
+
+        newProduct: {
+
+          name: '',
+
+          category: '',
+
+          brand: '',
+
+          price: 0,
+
+          cost: 0,
+
+          unit: 'pcs',
+
+          stock: 10,
+
+          images: [],
+
+          description: ''
+
+        },
+
+        products: [
+
+          {
+
+            id: 1,
+
+            name: 'Cordless Impact Drill 18V Kit',
+
+            category: 'Power Tools',
+
+            brand: 'Bosch',
+
+            price: 250.00,
+
+            cost: 180.00,
+
+            unit: 'set',
+
+            stock: 15,
+
+            images: ['🔨', '🔧'],
+
+            description: 'Heavy duty cordless impact drill with 2 batteries and carrying case.'
+
+          }
+
+        ]
+
+      }
+
+    },
+
+    computed: {
+
+      categories() {
+
+        const cats = this.products.map(p => p.category);
+
+        return [...new Set(cats)];
+
+      },
+
+      filteredProducts() {
+
+        return this.products.filter(p => {
+
+          const matchName = p.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+
+          const matchCat = this.selectedCategory === '' || p.category === this.selectedCategory;
+
+          return matchName && matchCat;
+
+        });
+
+      },
+
+      totalCartCount() {
+
+        return this.cart.reduce((sum, item) => sum + item.qty, 0);
+
+      },
+
+      cartTotal() {
+
+        return this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+      }
+
+    },
+
+    methods: {
+
+      getProductImage(product, index = 0) {
+
+        if (!product) return '📦';
+
+        if (product.images && product.images.length > index) {
+
+          return product.images[index];
+
+        }
+
+        return product.image || '📦';
+
+      },
+
+      isImageUrl(str) {
+
+        return str && (str.startsWith('data:image') || str.startsWith('http://') || str.startsWith('https://'));
+
+      },
+
+      openProductModal(product) {
+
+        this.selectedProductModal = product;
+
+        this.currentImageIndex = 0;
+
+      },
+
+      addImageSlot() {
+
+        this.imageSlots.push({ value: '' });
+
+      },
+
+      removeImageSlot(index) {
+
+        this.imageSlots.splice(index, 1);
+
+      },
+
+      handleSingleSlotUpload(event, index) {
+
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+
+          this.imageSlots[index].value = e.target.result;
+
+        };
+
+        reader.readAsDataURL(file);
+
+      },
+
+      saveProduct() {
+
+        const validImages = this.imageSlots
+
+          .map(s => s.value)
+
+          .filter(v => v.trim() !== '');
+
+
+        if (validImages.length === 0) {
+
+          validImages.push('📦');
 
         }
 
 
-        /* 切换模态框中的大图 */
+        const newProd = {
 
-        function switchModalMainImage(src, thumbElement) {
+          ...this.newProduct,
 
-            document.getElementById('modal-main-img').src = src;
+          images: validImages,
 
-            document.querySelectorAll('.modal-thumb').forEach(t => t.classList.remove('active'));
+          id: Date.now()
 
-            if (thumbElement) thumbElement.classList.add('active');
-
-        }
+        };
 
 
-        function openProductDetails(productId) {
+        this.products.unshift(newProd);
 
-            const product = products.find(p => p.id === productId);
+        
 
-            if (!product) return;
+        // 重置表单
 
+        this.newProduct = {
 
-            const imgs = (product.images && product.images.length > 0) ? product.images : [product.image || ''];
+          name: '',
 
-            const mainImg = imgs[0];
+          category: '',
 
+          brand: '',
 
-            let thumbsHtml = '';
+          price: 0,
 
-            if (imgs.length > 1) {
+          cost: 0,
 
-                thumbsHtml = '<div class="modal-thumbs">';
+          unit: 'pcs',
 
-                imgs.forEach((imgSrc, idx) => {
+          stock: 10,
 
-                    thumbsHtml += `<img src="${imgSrc}" class="modal-thumb ${idx===0?'active':''}" onclick="switchModalMainImage('${imgSrc}', this)">`;
+          images: [],
 
-                });
+          description: ''
 
-                thumbsHtml += '</div>';
+        };
 
-            }
+        this.imageSlots = [{ value: '' }];
 
+        alert('Product added successfully!');
 
-            const modalBody = document.getElementById('modal-details-body');
+      },
 
-            modalBody.innerHTML = `
+      deleteProduct(id) {
 
-                <img id="modal-main-img" src="${mainImg}" alt="${product.name}" style="width:100%; height:220px; object-fit:cover; border-radius:6px; margin-bottom:10px; cursor:pointer;" onclick="openLightbox(this.src)" title="Click to zoom">
+        if (confirm('Are you sure you want to delete this product?')) {
 
-                ${thumbsHtml}
-
-                <h2 style="margin-bottom:10px; color:#1a1a1a;">${product.name}</h2>
-
-                <p style="color:#e67e22; font-size:20px; font-weight:bold; margin-bottom:5px;">RM ${product.price.toFixed(2)} <span style="font-size:14px; color:#666;">/ ${product.unit || 'pcs'}</span></p>
-
-                <p style="font-size:13px; color:#555; margin-bottom:15px;">Available Inventory: <strong>${product.stock !== undefined ? product.stock : 0}</strong></p>
-
-                <div style="background:#f9f9f9; padding:12px; border-radius:6px; margin-bottom:20px;">
-
-                    <strong style="display:block; margin-bottom:5px; color:#333;">Product Details & Description:</strong>
-
-                    <p style="color:#555; font-size:14px; line-height:1.5;">${product.desc}</p>
-
-                </div>
-
-                <div class="qty-container" style="justify-content:flex-start; margin-bottom:15px;">
-
-                    <span style="font-weight:bold; font-size:14px;">Quantity:</span>
-
-                    <button class="qty-btn" onclick="changeModalQty(-1)">-</button>
-
-                    <input type="number" id="modal-qty-input" class="qty-input" value="1" min="1">
-
-                    <button class="qty-btn" onclick="changeModalQty(1)">+</button>
-
-                </div>
-
-                <button class="btn" onclick="addToCartFromModal(${product.id})" style="background:#27ae60; color:white; padding:12px; font-size:16px;">Add to Cart</button>
-
-            `;
-
-            document.getElementById('product-details-modal').style.display = 'flex';
+          this.products = this.products.filter(p => p.id !== id);
 
         }
 
+      },
 
-        function closeProductDetails() {
+      addToCart(product) {
 
-            document.getElementById('product-details-modal').style.display = 'none';
+        const existing = this.cart.find(item => item.id === product.id);
 
-        }
+        if (existing) {
 
+          if (existing.qty < product.stock) {
 
-        function changeModalQty(amount) {
+            existing.qty++;
 
-            const input = document.getElementById('modal-qty-input');
+          }
 
-            let val = parseInt(input.value) || 1;
+        } else {
 
-            val += amount;
-
-            if (val < 1) val = 1;
-
-            input.value = val;
+          this.cart.push({ ...product, qty: 1 });
 
         }
 
+      },
 
-        function addToCartFromModal(productId) {
+      updateQty(product, delta) {
 
-            const product = products.find(p => p.id === productId);
+        const item = this.cart.find(i => i.id === product.id);
 
-            const qtyInput = document.getElementById('modal-qty-input');
+        if (item) {
 
-            const quantity = parseInt(qtyInput.value) || 1;
+          item.qty += delta;
 
+          if (item.qty <= 0) {
 
-            const cartItem = cart.find(item => item.id === productId);
+            this.removeFromCart(product.id);
 
-            if (cartItem) {
-
-                cartItem.quantity += quantity;
-
-            } else {
-
-                cart.push({ ...product, quantity: quantity });
-
-            }
-
-            updateCartBadge();
-
-            alert(`Added ${quantity} x "${product.name}" to Shopping Cart!`);
-
-            closeProductDetails();
+          }
 
         }
 
+      },
 
-        function changeQty(productId, amount) {
+      getItemQty(id) {
 
-            const input = document.getElementById(`qty-${productId}`);
+        const item = this.cart.find(i => i.id === id);
 
-            let currentVal = parseInt(input.value) || 1;
+        return item ? item.qty : 0;
 
-            currentVal += amount;
+      },
 
-            if (currentVal < 1) currentVal = 1;
+      removeFromCart(id) {
 
-            input.value = currentVal;
+        this.cart = this.cart.filter(item => item.id !== id);
 
-        }
+      },
 
+      sendWhatsAppOrder() {
 
-        function addToCartWithQty(productId) {
+        if (!this.customerInfo.name || !this.customerInfo.phone) {
 
-            const product = products.find(p => p.id === productId);
+          alert('Please fill in your name and phone number!');
 
-            const qtyInput = document.getElementById(`qty-${productId}`);
-
-            const quantity = parseInt(qtyInput.value) || 1;
-
-
-            const cartItem = cart.find(item => item.id === productId);
-
-            if (cartItem) {
-
-                cartItem.quantity += quantity;
-
-            } else {
-
-                cart.push({ ...product, quantity: quantity });
-
-            }
-
-            updateCartBadge();
-
-            alert(`Added ${quantity} x "${product.name}" to Shopping Cart!`);
-
-            qtyInput.value = 1;
+          return;
 
         }
 
+        let msg = `🛒 *NEW HARDWARE ORDER*\n\n`;
 
-        function openLightbox(imgSrc) {
+        msg += `*Customer:* ${this.customerInfo.name}\n`;
 
-            const modal = document.getElementById('lightbox-modal');
+        msg += `*Phone:* ${this.customerInfo.phone}\n`;
 
-            const modalImg = document.getElementById('lightbox-content');
+        msg += `*Address:* ${this.customerInfo.address || 'Self Pick-up'}\n\n`;
 
-            modal.style.display = 'flex';
+        msg += `*Items Ordered:*\n`;
 
-            modalImg.src = imgSrc;
+        this.cart.forEach((item, idx) => {
 
-        }
+          msg += `${idx + 1}. ${item.name} x ${item.qty} ${item.unit} = RM ${(item.price * item.qty).toFixed(2)}\n`;
 
+        });
 
-        function closeLightbox() {
+        msg += `\n*TOTAL AMOUNT: RM ${this.cartTotal.toFixed(2)}*`;
 
-            document.getElementById('lightbox-modal').style.display = 'none';
 
-        }
+        const encodedMsg = encodeURIComponent(msg);
 
+        window.open(`https://wa.me/60100000000?text=${encodedMsg}`, '_blank');
 
-        function updateCartBadge() {
+      }
 
-            const badge = document.getElementById('cart-badge');
+    }
 
-            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  }).mount('#app');
 
-            if (totalCount > 0) {
-
-                badge.innerText = totalCount;
-
-                badge.style.display = 'inline-block';
-
-            } else {
-
-                badge.style.display = 'none';
-
-            }
-
-        }
-
-
-        function updateCart() {
-
-            const cartContainer = document.getElementById('cart-items');
-
-            const summaryBox = document.getElementById('cart-summary-box');
-
-            const subtotalDisplay = document.getElementById('subtotal-display');
-
-            const shippingDisplay = document.getElementById('shipping-display');
-
-            const totalPriceElement = document.getElementById('total-price');
-
-            const checkoutContainer = document.getElementById('checkout-container');
-
-
-            if (cart.length === 0) {
-
-                cartContainer.innerHTML = '<p>Your cart is empty.</p>';
-
-                summaryBox.style.display = 'none';
-
-                checkoutContainer.style.display = 'none';
-
-                updateCartBadge();
-
-                return;
-
-            }
-
-
-            cartContainer.innerHTML = '';
-
-            let subtotal = 0;
-
-            cart.forEach(item => {
-
-                let itemTotal = item.price * item.quantity;
-
-                subtotal += itemTotal;
-
-                cartContainer.innerHTML += `
-
-                    <div class="cart-item">
-
-                        <div>
-
-                            <strong>${item.name}</strong> (${item.unit || 'pcs'})<br>
-
-                            <small>RM ${item.price.toFixed(2)} x ${item.quantity} = <strong>RM ${itemTotal.toFixed(2)}</strong></small>
-
-                        </div>
-
-                        <button class="btn" style="background:#ff4d4d; color:white; padding:6px 12px; width:auto;" onclick="removeFromCart(${item.id})">Remove</button>
-
-                    </div>
-
-                `;
-
-            });
-
-
-            const method = document.getElementById('checkout-method') ? document.getElementById('checkout-method').value : 'Delivery';
-
-            let shippingFee = (method === 'Delivery') ? 8.00 : 0.00;
-
-            let total = subtotal + shippingFee;
-
-
-            subtotalDisplay.innerText = `Subtotal: RM ${subtotal.toFixed(2)}`;
-
-            shippingDisplay.innerText = `Delivery Fee: RM ${shippingFee.toFixed(2)}`;
-
-            totalPriceElement.innerHTML = `Total: RM ${total.toFixed(2)}`;
-
-
-            summaryBox.style.display = 'block';
-
-            checkoutContainer.style.display = 'block';
-
-            updateCartBadge();
-
-        }
-
-
-        function removeFromCart(productId) {
-
-            cart = cart.filter(item => item.id !== productId);
-
-            updateCart();
-
-        }
-
-
-        function submitOrder() {
-
-            const name = document.getElementById('customer-name').value.trim();
-
-            const phone = document.getElementById('customer-phone').value.trim();
-
-            const method = document.getElementById('checkout-method').value;
-
-            const address = document.getElementById('customer-address').value.trim();
-
-
-            if (!name || !phone || (method === 'Delivery' && !address)) {
-
-                alert('Please fill in all customer details!');
-
-                return;
-
-            }
-
-
-            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-            let shippingFee = (method === 'Delivery') ? 8.00 : 0.00;
-
-            let total = subtotal + shippingFee;
-
-            
-
-            const orderData = {
-
-                name: name,
-
-                phone: phone,
-
-                method: method,
-
-                address: method === 'Self Pickup' ? 'Self Pickup (到店自取)' : address,
-
-                shippingFee: shippingFee,
-
-                items: cart,
-
-                total: total,
-
-                date: new Date().toLocaleString()
-
-            };
-
-
-            let existingOrders = JSON.parse(localStorage.getItem('lexstore_orders')) || [];
-
-            existingOrders.unshift(orderData);
-
-            localStorage.setItem('lexstore_orders', JSON.stringify(existingOrders));
-
-
-            let itemsText = cart.map(i => `- ${i.name} x ${i.quantity} (${i.unit || 'pcs'}) [RM ${(i.price * i.quantity).toFixed(2)}]`).join('\n');
-
-            let waMessage = `*📦 New Order from LEXSTORE*\n\n` +
-
-                            `*Customer Name:* ${name}\n` +
-
-                            `*Phone:* ${phone}\n` +
-
-                            `*Fulfillment:* ${method}\n` +
-
-                            `*Address:* ${orderData.address}\n\n` +
-
-                            `*Items Ordered:*\n${itemsText}\n\n` +
-
-                            `*Subtotal:* RM ${subtotal.toFixed(2)}\n` +
-
-                            `*Delivery Fee:* RM ${shippingFee.toFixed(2)}\n` +
-
-                            `*Total Amount:* *RM ${total.toFixed(2)}*\n\n` +
-
-                            `*Order Time:* ${orderData.date}`;
-
-
-            const storeWhatsApp = localStorage.getItem('store_whatsapp') || '60102862797'; 
-
-            const waUrl = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(waMessage)}`;
-
-            window.open(waUrl, '_blank');
-
-
-            alert('Order submitted and saved successfully! Redirecting to WhatsApp & My Orders...');
-
-            
-
-            cart = [];
-
-            updateCart();
-
-            document.getElementById('customer-name').value = '';
-
-            document.getElementById('customer-phone').value = '';
-
-            document.getElementById('customer-address').value = '';
-
-            document.getElementById('checkout-method').value = 'Delivery';
-
-            toggleAddressField();
-
-            
-
-            switchPage('orders', document.querySelectorAll('.nav-btn')[2]);
-
-        }
-
-
-        function loadCustomerOrders() {
-
-            const orders = JSON.parse(localStorage.getItem('lexstore_orders')) || [];
-
-            const tbody = document.getElementById('customer-orders-tbody');
-
-
-            if (orders.length === 0) {
-
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">You have no past orders yet.</td></tr>';
-
-                return;
-
-            }
-
-
-            tbody.innerHTML = '';
-
-            orders.forEach(order => {
-
-                let itemsList = order.items.map(i => `${i.name} x ${i.quantity} (${i.unit || 'pcs'})`).join('<br>');
-
-                let fulfillmentTag = `<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${order.method || 'Delivery'}</span>`;
-
-                let shippingInfo = (order.shippingFee !== undefined && order.shippingFee > 0) ? `<br><small style="color:#e67e22;">Incl. RM 8.00 Delivery Fee</small>` : '';
-
-                tbody.innerHTML += `
-
-                    <tr>
-
-                        <td>${order.date}</td>
-
-                        <td>${fulfillmentTag}<br><strong>${order.name}</strong><br>${order.phone}<br><small>${order.address}</small>${shippingInfo}</td>
-
-                        <td>${itemsList}</td>
-
-                        <td><strong>RM ${order.total.toFixed(2)}</strong></td>
-
-                    </tr>
-
-                `;
-
-            });
-
-        }
-
-
-        function clearCustomerOrders() {
-
-            if (confirm('Are you sure you want to clear your order history?')) {
-
-                localStorage.removeItem('lexstore_orders');
-
-                loadCustomerOrders();
-
-            }
-
-        }
-
-
-        function checkAdminSession() {
-
-            const sessionRole = sessionStorage.getItem('admin_session');
-
-            if (sessionRole) {
-
-                currentRole = sessionRole;
-
-                showAdminDashboard();
-
-            } else {
-
-                document.getElementById('admin-login-box').style.display = 'block';
-
-                document.getElementById('admin-dashboard').style.display = 'none';
-
-                document.getElementById('admin-password-input').value = '';
-
-            }
-
-        }
-
-
-        function verifyAdminLogin() {
-
-            const pwd = document.getElementById('admin-password-input').value;
-
-            const superPwd = localStorage.getItem('super_admin_pwd');
-
-            const normalPwd = localStorage.getItem('normal_admin_pwd');
-
-
-            if (pwd === superPwd) {
-
-                currentRole = 'super';
-
-                sessionStorage.setItem('admin_session', 'super');
-
-                showAdminDashboard();
-
-            } else if (pwd === normalPwd) {
-
-                currentRole = 'normal';
-
-                sessionStorage.setItem('admin_session', 'normal');
-
-                showAdminDashboard();
-
-            } else {
-
-                alert('Incorrect password! Please try again.');
-
-            }
-
-        }
-
-
-        function adminLogout() {
-
-            sessionStorage.removeItem('admin_session');
-
-            currentRole = null;
-
-            checkAdminSession();
-
-        }
-
-
-        function showAdminDashboard() {
-
-            document.getElementById('admin-login-box').style.display = 'none';
-
-            document.getElementById('admin-dashboard').style.display = 'block';
-
-
-            switchAdminSubTab('orders-section', document.querySelectorAll('.admin-sub-btn')[0]);
-
-
-            if (currentRole === 'super') {
-
-                document.getElementById('admin-title').innerText = 'Super Admin Panel - Full Access';
-
-                document.getElementById('super-tab-btn').style.display = 'inline-block';
-
-            } else {
-
-                document.getElementById('admin-title').innerText = 'Normal Admin Panel - View Only';
-
-                document.getElementById('super-tab-btn').style.display = 'none';
-
-            }
-
-
-            loadOrders();
-
-        }
-
-
-        function updateAdminPasswords() {
-
-            const newSuper = document.getElementById('new-super-pwd').value;
-
-            const newNormal = document.getElementById('new-normal-pwd').value;
-
-
-            if (!newSuper && !newNormal) {
-
-                alert('Please enter at least one new password to update.');
-
-                return;
-
-            }
-
-
-            if (newSuper) {
-
-                localStorage.setItem('super_admin_pwd', newSuper);
-
-            }
-
-            if (newNormal) {
-
-                localStorage.setItem('normal_admin_pwd', newNormal);
-
-            }
-
-
-            alert('Passwords updated successfully!');
-
-            document.getElementById('new-super-pwd').value = '';
-
-            document.getElementById('new-normal-pwd').value = '';
-
-        }
-
-
-        function updateWhatsAppNumber() {
-
-            const newWa = document.getElementById('new-whatsapp-input').value.trim();
-
-            if (!newWa) {
-
-                alert('Please enter a valid WhatsApp number!');
-
-                return;
-
-            }
-
-            localStorage.setItem('store_whatsapp', newWa);
-
-            initWhatsAppHeader();
-
-            alert('WhatsApp number updated successfully!');
-
-        }
-
-
-        function loadOrders() {
-
-            const orders = JSON.parse(localStorage.getItem('lexstore_orders')) || [];
-
-            const tbody = document.getElementById('orders-tbody');
-
-            const totalOrdersCard = document.getElementById('total-orders-card');
-
-            const totalSalesCard = document.getElementById('total-sales-card');
-
-
-            totalOrdersCard.innerText = `Total Orders: ${orders.length}`;
-
-            
-
-            let totalSales = 0;
-
-            orders.forEach(o => totalSales += o.total);
-
-            totalSalesCard.innerText = `Total Sales: RM ${totalSales.toFixed(2)}`;
-
-
-            if (orders.length === 0) {
-
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No orders yet.</td></tr>';
-
-                return;
-
-            }
-
-
-            tbody.innerHTML = '';
-
-            orders.forEach(order => {
-
-                let itemsList = order.items.map(i => `${i.name} x ${i.quantity} (${i.unit || 'pcs'})`).join('<br>');
-
-                let fulfillmentTag = `<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${order.method || 'Delivery'}</span>`;
-
-                let shippingInfo = (order.shippingFee !== undefined && order.shippingFee > 0) ? `<br><small style="color:#e67e22;">Incl. RM 8.00 Delivery Fee</small>` : '';
-
-                tbody.innerHTML += `
-
-                    <tr>
-
-                        <td>${order.date}</td>
-
-                        <td>${fulfillmentTag}<br><strong>${order.name}</strong><br>${order.phone}<br><small>${order.address}</small>${shippingInfo}</td>
-
-                        <td>${itemsList}</td>
-
-                        <td><strong>RM ${order.total.toFixed(2)}</strong></td>
-
-                    </tr>
-
-                `;
-
-            });
-
-        }
-
-
-        function clearOrders() {
-
-            if (currentRole !== 'super') {
-
-                alert('Only Super Admin can clear orders!');
-
-                return;
-
-            }
-
-            if (confirm('Are you sure you want to clear all orders?')) {
-
-                localStorage.removeItem('lexstore_orders');
-
-                loadOrders();
-
-            }
-
-        }
-
-
-        function exportDataJson() {
-
-            const allData = {
-
-                products: products,
-
-                orders: JSON.parse(localStorage.getItem('lexstore_orders')) || [],
-
-                store_whatsapp: localStorage.getItem('store_whatsapp')
-
-            };
-
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData, null, 2));
-
-            const downloadAnchor = document.createElement('a');
-
-            downloadAnchor.setAttribute("href", dataStr);
-
-            downloadAnchor.setAttribute("download", "lexstore_backup.json");
-
-            document.body.appendChild(downloadAnchor);
-
-            downloadAnchor.click();
-
-            downloadAnchor.remove();
-
-        }
-
-
-        function exportOrdersExcel() {
-
-            const orders = JSON.parse(localStorage.getItem('lexstore_orders')) || [];
-
-            if (orders.length === 0) {
-
-                alert('No orders available to export!');
-
-                return;
-
-            }
-
-
-            let html = `
-
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-
-                <head>
-
-                    <meta charset="utf-8">
-
-                    <title>Lexstore Orders Report</title>
-
-                </head>
-
-                <body>
-
-                    <table border="1">
-
-                        <thead>
-
-                            <tr style="background-color: #1a1a1a; color: #ffcc00; font-weight: bold;">
-
-                                <th>Date</th>
-
-                                <th>Fulfillment Method</th>
-
-                                <th>Customer Name</th>
-
-                                <th>Phone Number</th>
-
-                                <th>Address / Details</th>
-
-                                <th>Delivery Fee (RM)</th>
-
-                                <th>Order Items</th>
-
-                                <th>Total (RM)</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-            `;
-
-
-            orders.forEach(order => {
-
-                let itemsList = order.items.map(i => `${i.name} x ${i.quantity} (${i.unit || 'pcs'})`).join('; ');
-
-                let fee = (order.shippingFee !== undefined) ? order.shippingFee.toFixed(2) : "0.00";
-
-                html += `
-
-                    <tr>
-
-                        <td>${order.date}</td>
-
-                        <td>${order.method || 'Delivery'}</td>
-
-                        <td>${order.name}</td>
-
-                        <td>${order.phone}</td>
-
-                        <td>${order.address}</td>
-
-                        <td>${fee}</td>
-
-                        <td>${itemsList}</td>
-
-                        <td>${order.total.toFixed(2)}</td>
-
-                    </tr>
-
-                `;
-
-            });
-
-
-            html += `
-
-                        </tbody>
-
-                    </table>
-
-                </body>
-
-                </html>
-
-            `;
-
-
-            const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
-
-            const url = URL.createObjectURL(blob);
-
-            const a = document.createElement('a');
-
-            a.href = url;
-
-            a.download = 'lexstore_orders_report.xls';
-
-            document.body.appendChild(a);
-
-            a.click();
-
-            document.body.removeChild(a);
-
-            URL.revokeObjectURL(url);
-
-        }
-
-
-        switchPage('store', document.querySelector('.nav-btn'));
-
-    </script>
+</script>
 
 </body>
 
