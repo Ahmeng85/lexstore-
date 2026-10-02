@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hardware & Tools Store</title>
+  <title>Hardware Store</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Vue 3 -->
@@ -17,24 +17,24 @@
     .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 antialiased min-h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-800 antialiased">
 
 <div id="app" v-cloak class="min-h-screen flex flex-col w-full">
   <!-- Header Navigation -->
   <header class="bg-blue-600 text-white shadow-md sticky top-0 z-50 w-full">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="w-full max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
       <h1 class="text-base sm:text-xl font-bold cursor-pointer flex items-center gap-1" @click="currentTab = 'shop'">
         🛠️ Hardware Store
       </h1>
       <div class="flex gap-2 sm:gap-4 items-center text-xs sm:text-sm">
-        <button @click="currentTab = 'shop'" :class="{'underline font-bold': currentTab === 'shop'}" class="px-2 py-1">Shop</button>
-        <button @click="currentTab = 'cart'" class="relative bg-blue-700 px-3 py-1 rounded-full flex items-center gap-1 font-bold">
+        <button @click="currentTab = 'shop'" :class="{'underline font-bold': currentTab === 'shop'}">Shop</button>
+        <button @click="currentTab = 'cart'" class="relative bg-blue-700 px-2.5 py-1 rounded-full flex items-center gap-1">
           🛒 Cart
-          <span v-if="totalCartCount > 0" class="bg-red-500 text-white rounded-full px-1.5 py-0.2 text-[10px]">
+          <span v-if="totalCartCount > 0" class="bg-red-500 text-[10px] text-white rounded-full px-1.5 py-0.2 font-bold">
             {{ totalCartCount }}
           </span>
         </button>
-        <button @click="currentTab = 'admin'" :class="{'underline font-bold': currentTab === 'admin'}" class="border border-white px-2 py-1 rounded">
+        <button @click="currentTab = 'admin'" :class="{'underline font-bold': currentTab === 'admin'}" class="border border-white px-2 py-0.5 rounded">
           Admin
         </button>
       </div>
@@ -42,23 +42,23 @@
   </header>
 
   <!-- Main Content Area -->
-  <main class="w-full max-w-6xl mx-auto px-3 py-4 flex-1">
+  <main class="w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 flex-1">
 
     <!-- 1. Shopping Section -->
     <section v-if="currentTab === 'shop'" class="w-full">
       <div class="mb-4 flex flex-col sm:flex-row gap-2 w-full">
-        <input v-model="searchQuery" type="text" placeholder="Search product name..." class="border p-2 rounded-lg w-full sm:w-2/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-        <select v-model="selectedCategory" class="border p-2 rounded-lg w-full sm:w-1/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+        <input v-model="searchQuery" type="text" placeholder="Search product name..." class="border p-2 rounded w-full sm:w-2/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+        <select v-model="selectedCategory" class="border p-2 rounded w-full sm:w-1/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
           <option value="">All Categories</option>
           <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
         </select>
       </div>
 
       <!-- 商品网格列表 -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 w-full">
-        <div v-for="product in filteredProducts" :key="product.id" class="bg-white rounded-xl shadow border flex flex-col justify-between overflow-hidden">
-          <div @click="openProductModal(product)" class="cursor-pointer group p-2.5">
-            <div class="h-32 sm:h-40 bg-gray-50 mb-2 rounded-lg flex items-center justify-center overflow-hidden relative border select-none">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 w-full">
+        <div v-for="product in filteredProducts" :key="product.id" class="bg-white p-2.5 rounded-lg shadow hover:shadow-md transition flex flex-col justify-between border relative w-full">
+          <div @click="openProductModal(product)" class="cursor-pointer group">
+            <div class="h-28 bg-blue-50 mb-2 rounded flex items-center justify-center overflow-hidden relative border select-none">
               <img v-if="isImageUrl(getProductImage(product, 0))" :src="getProductImage(product, 0)" class="w-full h-full object-cover group-hover:scale-105 transition" alt="Product Image">
               <span v-else class="text-4xl">{{ getProductImage(product, 0) || '📦' }}</span>
               
@@ -68,30 +68,30 @@
             </div>
 
             <p class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">{{ product.brand || 'Store' }}</p>
-            <h3 class="font-bold text-xs sm:text-sm leading-snug text-gray-900 line-clamp-2 mt-0.5">{{ product.name }}</h3>
+            <h3 class="font-bold text-xs sm:text-sm leading-snug text-gray-900 line-clamp-2">{{ product.name }}</h3>
             <p class="text-[10px] text-gray-400 mt-0.5">{{ product.category }}</p>
             
-            <div class="mt-1.5 flex items-baseline gap-1">
+            <div class="mt-1">
               <p class="text-blue-600 font-bold text-sm sm:text-base">
-                RM {{ product.price ? product.price.toFixed(2) : '0.00' }}
+                RM {{ product.price ? product.price.toFixed(2) : '0.00' }} 
+                <span class="text-[10px] text-gray-400 font-normal">/ {{ product.unit }}</span>
               </p>
-              <span class="text-[10px] text-gray-400 font-normal">/ {{ product.unit }}</span>
             </div>
             <p class="text-[10px] mt-0.5" :class="product.stock > 10 ? 'text-gray-400' : 'text-red-500 font-bold'">
               Stock: {{ product.stock }} {{ product.unit }}
             </p>
           </div>
 
-          <div class="p-2.5 pt-0">
+          <div class="mt-2">
             <button v-if="getItemQty(product.id) === 0" 
                     @click="addToCart(product)" 
                     :disabled="product.stock <= 0"
                     :class="product.stock > 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'"
-                    class="text-white w-full py-1.5 rounded-lg text-xs font-bold transition active:scale-95 shadow">
+                    class="text-white w-full py-1.5 rounded text-xs font-bold transition active:scale-95">
               {{ product.stock > 0 ? '+ Add to Cart' : 'Out of Stock' }}
             </button>
 
-            <div v-else class="flex items-center justify-between border border-blue-500 rounded-lg p-0.5 bg-blue-50">
+            <div v-else class="flex items-center justify-between border border-blue-500 rounded p-0.5 bg-blue-50">
               <button @click="updateQty(product, -1)" class="w-6 h-6 bg-blue-600 text-white font-bold rounded flex items-center justify-center hover:bg-blue-700">-</button>
               <span class="font-bold text-blue-800 text-xs px-1">{{ getItemQty(product.id) }}</span>
               <button @click="updateQty(product, 1)" :disabled="getItemQty(product.id) >= product.stock" class="w-6 h-6 bg-blue-600 text-white font-bold rounded flex items-center justify-center hover:bg-blue-700 disabled:bg-gray-300">+</button>
@@ -111,13 +111,12 @@
           <span v-else class="text-6xl">{{ getProductImage(selectedProductModal, currentImageIndex) || '📦' }}</span>
         </div>
 
-        <!-- 缩略图切换 -->
         <div v-if="selectedProductModal.images && selectedProductModal.images.length > 1" class="flex items-center gap-2 px-3 pt-2 overflow-x-auto shrink-0">
           <div v-for="(img, idx) in selectedProductModal.images" 
                :key="idx" 
                @click="currentImageIndex = idx"
                :class="{'border-blue-600 ring-2 ring-blue-400': currentImageIndex === idx, 'border-gray-200': currentImageIndex !== idx}"
-               class="w-10 h-10 border rounded-md cursor-pointer overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
+               class="w-10 h-10 border rounded cursor-pointer overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
             <img v-if="isImageUrl(img)" :src="img" class="w-full h-full object-cover">
             <span v-else class="text-xs">{{ img }}</span>
           </div>
@@ -126,9 +125,9 @@
         <div class="p-4 space-y-2 overflow-y-auto text-xs">
           <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded">{{ selectedProductModal.category }}</span>
           <h2 class="text-base font-bold text-gray-900">{{ selectedProductModal.name }}</h2>
-          <p class="text-gray-600"><strong>Brand:</strong> {{ selectedProductModal.brand || 'N/A' }}</p>
+          <p class="text-gray-600"><strong>Specs/Brand:</strong> {{ selectedProductModal.brand || 'N/A' }}</p>
           <p class="text-gray-500"><strong>Stock:</strong> {{ selectedProductModal.stock }} {{ selectedProductModal.unit }}</p>
-          <p class="text-gray-700 whitespace-pre-line bg-gray-50 p-2 rounded-lg border" v-if="selectedProductModal.description">{{ selectedProductModal.description }}</p>
+          <p class="text-gray-700 whitespace-pre-line bg-gray-50 p-2 rounded border" v-if="selectedProductModal.description">{{ selectedProductModal.description }}</p>
 
           <div class="pt-3 border-t flex items-center justify-between gap-2">
             <div>
@@ -136,32 +135,39 @@
               <p class="text-[10px] text-gray-400">per {{ selectedProductModal.unit }}</p>
             </div>
 
-            <button @click="addToCart(selectedProductModal)" :disabled="selectedProductModal.stock <= 0" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-xs shadow">
-              + Add to Cart
-            </button>
+            <div class="flex items-center gap-2">
+              <div v-if="getItemQty(selectedProductModal.id) > 0" class="flex items-center border border-blue-500 rounded bg-blue-50 p-1">
+                <button @click="updateQty(selectedProductModal, -1)" class="w-7 h-7 bg-blue-600 text-white font-bold rounded flex items-center justify-center">-</button>
+                <span class="font-bold text-blue-800 text-xs px-2">{{ getItemQty(selectedProductModal.id) }}</span>
+                <button @click="updateQty(selectedProductModal, 1)" :disabled="getItemQty(selectedProductModal.id) >= selectedProductModal.stock" class="w-7 h-7 bg-blue-600 text-white font-bold rounded flex items-center justify-center disabled:bg-gray-300">+</button>
+              </div>
+              <button v-else @click="addToCart(selectedProductModal)" :disabled="selectedProductModal.stock <= 0" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-xs shadow">
+                + Add to Cart
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 2. Cart Tab -->
-    <section v-if="currentTab === 'cart'" class="max-w-xl mx-auto bg-white p-4 rounded-xl shadow border">
-      <h2 class="text-base font-bold mb-3 border-b pb-2">🛒 Your Cart</h2>
+    <!-- 2. Shopping Cart Section -->
+    <section v-if="currentTab === 'cart'" class="max-w-xl mx-auto bg-white p-4 rounded-lg shadow border w-full">
+      <h2 class="text-lg font-bold mb-3 flex items-center gap-2">🛒 Your Cart Items</h2>
       
       <div v-if="cart.length === 0" class="text-gray-500 text-center py-8">
         <p class="text-3xl mb-2">📦</p>
         <p class="text-xs">Your cart is currently empty.</p>
-        <button @click="currentTab = 'shop'" class="mt-3 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Start Shopping</button>
+        <button @click="currentTab = 'shop'" class="mt-3 bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold">Start Shopping</button>
       </div>
 
       <div v-else>
         <div v-for="item in cart" :key="item.id" class="border-b py-2 text-xs">
           <h4 class="font-bold text-gray-900 mb-1.5 break-words">{{ item.name }}</h4>
           <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-1 border rounded-lg p-0.5 bg-gray-50">
-              <button @click="updateQty(item, -1)" class="w-6 h-6 bg-gray-200 text-gray-700 font-bold rounded flex items-center justify-center">-</button>
+            <div class="flex items-center gap-1 border rounded p-0.5 bg-gray-50">
+              <button @click="updateQty(item, -1)" class="w-5 h-5 bg-gray-200 text-gray-700 font-bold rounded flex items-center justify-center">-</button>
               <span class="w-6 text-center font-bold">{{ item.qty }}</span>
-              <button @click="updateQty(item, 1)" :disabled="item.qty >= item.stock" class="w-6 h-6 bg-gray-200 text-gray-700 font-bold rounded flex items-center justify-center disabled:opacity-50">+</button>
+              <button @click="updateQty(item, 1)" :disabled="item.qty >= item.stock" class="w-5 h-5 bg-gray-200 text-gray-700 font-bold rounded flex items-center justify-center disabled:opacity-50">+</button>
             </div>
             <div class="text-right">
               <span class="font-bold text-blue-600">RM {{ (item.price * item.qty).toFixed(2) }}</span>
@@ -170,56 +176,56 @@
           </div>
         </div>
 
-        <div class="my-3 text-right bg-gray-50 p-2 rounded-lg border">
+        <div class="my-3 text-right bg-gray-50 p-2 rounded">
           <p class="text-base font-bold">Total: <span class="text-blue-600">RM {{ cartTotal.toFixed(2) }}</span></p>
         </div>
 
         <div class="border-t pt-3 space-y-2 text-xs">
           <h3 class="font-bold">🚚 Delivery Details</h3>
-          <input v-model="customerInfo.name" type="text" placeholder="Full Name *" class="w-full border p-2 rounded-lg">
-          <input v-model="customerInfo.phone" type="text" placeholder="WhatsApp Phone Number *" class="w-full border p-2 rounded-lg">
-          <textarea v-model="customerInfo.address" placeholder="Delivery Address *" class="w-full border p-2 rounded-lg" rows="2"></textarea>
+          <input v-model="customerInfo.name" type="text" placeholder="Full Name *" class="w-full border p-2 rounded">
+          <input v-model="customerInfo.phone" type="text" placeholder="WhatsApp Phone Number *" class="w-full border p-2 rounded">
+          <textarea v-model="customerInfo.address" placeholder="Delivery Address *" class="w-full border p-2 rounded" rows="2"></textarea>
           
-          <button @click="sendWhatsAppOrder" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-xs font-bold shadow">
+          <button @click="sendWhatsAppOrder" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-bold shadow flex items-center justify-center gap-1">
             📱 Checkout via WhatsApp
           </button>
         </div>
       </div>
     </section>
 
-    <!-- 3. Admin Section (独立多槽上传) -->
-    <section v-if="currentTab === 'admin'" class="max-w-2xl mx-auto bg-white p-4 rounded-xl shadow border text-xs">
+    <!-- 3. Admin Section -->
+    <section v-if="currentTab === 'admin'" class="max-w-2xl mx-auto bg-white p-4 rounded-lg shadow border text-xs w-full">
       <h2 class="text-base font-bold mb-3 border-b pb-2">📦 Product Management (Admin)</h2>
       
-      <form @submit.prevent="saveProduct" class="space-y-3 mb-6 bg-gray-50 p-3 rounded-xl border">
+      <form @submit.prevent="saveProduct" class="space-y-3 mb-6 bg-gray-50 p-3 rounded border">
         <div>
           <label class="font-bold block mb-1">Product Name:</label>
-          <input v-model="newProduct.name" required type="text" placeholder="e.g. Vernier Caliper 150mm" class="w-full border p-2 rounded-lg bg-white">
+          <input v-model="newProduct.name" required type="text" placeholder="e.g. Vernier Caliper 150mm" class="w-full border p-2 rounded bg-white">
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="font-bold block mb-1">Category:</label>
-            <input v-model="newProduct.category" required type="text" placeholder="e.g. Measuring Tools" class="w-full border p-2 rounded-lg bg-white">
+            <input v-model="newProduct.category" required type="text" placeholder="e.g. Measuring Tools" class="w-full border p-2 rounded bg-white">
           </div>
           <div>
             <label class="font-bold block mb-1">Brand / Specs:</label>
-            <input v-model="newProduct.brand" type="text" placeholder="e.g. Stainless Steel" class="w-full border p-2 rounded-lg bg-white">
+            <input v-model="newProduct.brand" type="text" placeholder="e.g. Stainless Steel" class="w-full border p-2 rounded bg-white">
           </div>
         </div>
 
         <div class="grid grid-cols-3 gap-2">
           <div>
-            <label class="font-bold block mb-1">Price (RM):</label>
-            <input v-model.number="newProduct.price" required type="number" step="0.01" class="w-full border p-2 rounded-lg bg-white">
+            <label class="font-bold block mb-1">Selling Price (RM):</label>
+            <input v-model.number="newProduct.price" required type="number" step="0.01" placeholder="85.00" class="w-full border p-2 rounded bg-white">
           </div>
           <div>
-            <label class="font-bold block mb-1">Cost (RM):</label>
-            <input v-model.number="newProduct.cost" type="number" step="0.01" class="w-full border p-2 rounded-lg bg-white">
+            <label class="font-bold block mb-1">Cost Price (RM):</label>
+            <input v-model.number="newProduct.cost" type="number" step="0.01" placeholder="50.00" class="w-full border p-2 rounded bg-white">
           </div>
           <div>
             <label class="font-bold block mb-1">Unit:</label>
-            <select v-model="newProduct.unit" class="w-full border p-2 rounded-lg bg-white">
+            <select v-model="newProduct.unit" class="w-full border p-2 rounded bg-white">
               <option value="pcs">pcs</option>
               <option value="box">box</option>
               <option value="set">set</option>
@@ -228,21 +234,21 @@
         </div>
 
         <div>
-          <label class="font-bold block mb-1">Stock Qty:</label>
-          <input v-model.number="newProduct.stock" required type="number" class="w-full border p-2 rounded-lg bg-white">
+          <label class="font-bold block mb-1">Initial Inventory Quantity:</label>
+          <input v-model.number="newProduct.stock" required type="number" placeholder="100" class="w-full border p-2 rounded bg-white">
         </div>
 
-        <!-- 槽位多图上传 -->
+        <!-- 多图上传 (槽位模式) -->
         <div>
           <div class="flex justify-between items-center mb-1">
-            <label class="font-bold">Product Images:</label>
+            <label class="font-bold">Product Images (多照片上传):</label>
             <button type="button" @click="addImageSlot" class="bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold">
               + 增加一张图片槽
             </button>
           </div>
 
           <div class="space-y-2">
-            <div v-for="(imgSlot, idx) in imageSlots" :key="idx" class="p-2 border rounded-lg bg-white flex items-center justify-between gap-2">
+            <div v-for="(imgSlot, idx) in imageSlots" :key="idx" class="p-2 border rounded bg-white flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 flex-1 overflow-hidden">
                 <span class="font-bold text-gray-500 text-xs">#{{ idx + 1 }}</span>
                 
@@ -259,15 +265,15 @@
               </button>
             </div>
           </div>
-          <p class="text-[10px] text-gray-500 mt-1">💡 点击“+ 增加一张图片槽”，可单独选择上传第 2 张、第 3 张照片。</p>
+          <p class="text-[10px] text-gray-500 mt-1">💡 点击“+ 增加一张图片槽”，可分别选择上传第 2 张、第 3 张卡尺照片！</p>
         </div>
 
         <div>
-          <label class="font-bold block mb-1">Description:</label>
-          <textarea v-model="newProduct.description" class="w-full border p-2 rounded-lg bg-white" rows="2"></textarea>
+          <label class="font-bold block mb-1">Product Description & Details:</label>
+          <textarea v-model="newProduct.description" placeholder="Enter product specifications and details" class="w-full border p-2 rounded bg-white" rows="2"></textarea>
         </div>
 
-        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg font-bold shadow transition">
+        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-bold shadow transition">
           Add Product Now
         </button>
       </form>
@@ -275,7 +281,7 @@
       <!-- 已添加商品列表 -->
       <h3 class="font-bold border-b pb-1 mb-2">Current Products ({{ products.length }})</h3>
       <div class="space-y-2">
-        <div v-for="prod in products" :key="prod.id" class="border p-2 rounded-lg flex justify-between items-center bg-white">
+        <div v-for="prod in products" :key="prod.id" class="border p-2 rounded flex justify-between items-center bg-white">
           <div class="flex items-center gap-2">
             <div class="w-10 h-10 border rounded bg-gray-100 flex items-center justify-center overflow-hidden">
               <img v-if="isImageUrl(getProductImage(prod, 0))" :src="getProductImage(prod, 0)" class="w-full h-full object-cover">
@@ -308,15 +314,37 @@
         customerInfo: { name: '', phone: '', address: '' },
         cart: [],
         imageSlots: [{ value: '' }],
-        newProduct: { name: '', category: '', brand: '', price: 0, cost: 0, unit: 'pcs', stock: 10, images: [], description: '' },
+        newProduct: {
+          name: '',
+          category: '',
+          brand: '',
+          price: 0,
+          cost: 0,
+          unit: 'pcs',
+          stock: 10,
+          images: [],
+          description: ''
+        },
         products: [
-          { id: 1, name: 'Cordless Impact Drill 18V Kit', category: 'Power Tools', brand: 'Bosch', price: 250.00, cost: 180.00, unit: 'set', stock: 15, images: ['🔨', '🔧'], description: 'Heavy duty cordless impact drill.' }
+          {
+            id: 1,
+            name: 'Cordless Impact Drill 18V Kit',
+            category: 'Power Tools',
+            brand: 'Bosch',
+            price: 250.00,
+            cost: 180.00,
+            unit: 'set',
+            stock: 15,
+            images: ['🔨', '🔧'],
+            description: 'Heavy duty cordless impact drill with 2 batteries and carrying case.'
+          }
         ]
       }
     },
     computed: {
       categories() {
-        return [...new Set(this.products.map(p => p.category))];
+        const cats = this.products.map(p => p.category);
+        return [...new Set(cats)];
       },
       filteredProducts() {
         return this.products.filter(p => {
@@ -335,7 +363,9 @@
     methods: {
       getProductImage(product, index = 0) {
         if (!product) return '📦';
-        if (product.images && product.images.length > index) return product.images[index];
+        if (product.images && product.images.length > index) {
+          return product.images[index];
+        }
         return product.image || '📦';
       },
       isImageUrl(str) {
@@ -354,21 +384,41 @@
       handleSingleSlotUpload(event, index) {
         const file = event.target.files[0];
         if (!file) return;
+
         const reader = new FileReader();
-        reader.onload = (e) => { this.imageSlots[index].value = e.target.result; };
+        reader.onload = (e) => {
+          this.imageSlots[index].value = e.target.result;
+        };
         reader.readAsDataURL(file);
       },
       saveProduct() {
-        const validImages = this.imageSlots.map(s => s.value).filter(v => v.trim() !== '');
-        if (validImages.length === 0) validImages.push('📦');
+        const validImages = this.imageSlots
+          .map(s => s.value)
+          .filter(v => v.trim() !== '');
 
-        this.products.unshift({
+        if (validImages.length === 0) {
+          validImages.push('📦');
+        }
+
+        const newProd = {
           ...this.newProduct,
           images: validImages,
           id: Date.now()
-        });
+        };
 
-        this.newProduct = { name: '', category: '', brand: '', price: 0, cost: 0, unit: 'pcs', stock: 10, images: [], description: '' };
+        this.products.unshift(newProd);
+        
+        this.newProduct = {
+          name: '',
+          category: '',
+          brand: '',
+          price: 0,
+          cost: 0,
+          unit: 'pcs',
+          stock: 10,
+          images: [],
+          description: ''
+        };
         this.imageSlots = [{ value: '' }];
         alert('Product added successfully!');
       },
@@ -379,14 +429,21 @@
       },
       addToCart(product) {
         const existing = this.cart.find(item => item.id === product.id);
-        if (existing) { if (existing.qty < product.stock) existing.qty++; }
-        else { this.cart.push({ ...product, qty: 1 }); }
+        if (existing) {
+          if (existing.qty < product.stock) {
+            existing.qty++;
+          }
+        } else {
+          this.cart.push({ ...product, qty: 1 });
+        }
       },
       updateQty(product, delta) {
         const item = this.cart.find(i => i.id === product.id);
         if (item) {
           item.qty += delta;
-          if (item.qty <= 0) this.removeFromCart(product.id);
+          if (item.qty <= 0) {
+            this.removeFromCart(product.id);
+          }
         }
       },
       getItemQty(id) {
@@ -398,11 +455,21 @@
       },
       sendWhatsAppOrder() {
         if (!this.customerInfo.name || !this.customerInfo.phone) {
-          alert('Please fill in name and phone number!');
+          alert('Please fill in your name and phone number!');
           return;
         }
-        let msg = `🛒 *NEW ORDER*\nName: ${this.customerInfo.name}\nPhone: ${this.customerInfo.phone}\nTotal: RM ${this.cartTotal.toFixed(2)}`;
-        window.open(`https://wa.me/60100000000?text=${encodeURIComponent(msg)}`, '_blank');
+        let msg = `🛒 *NEW HARDWARE ORDER*\n\n`;
+        msg += `*Customer:* ${this.customerInfo.name}\n`;
+        msg += `*Phone:* ${this.customerInfo.phone}\n`;
+        msg += `*Address:* ${this.customerInfo.address || 'Self Pick-up'}\n\n`;
+        msg += `*Items Ordered:*\n`;
+        this.cart.forEach((item, idx) => {
+          msg += `${idx + 1}. ${item.name} x ${item.qty} ${item.unit} = RM ${(item.price * item.qty).toFixed(2)}\n`;
+        });
+        msg += `\n*TOTAL AMOUNT: RM ${this.cartTotal.toFixed(2)}*`;
+
+        const encodedMsg = encodeURIComponent(msg);
+        window.open(`https://wa.me/60100000000?text=${encodedMsg}`, '_blank');
       }
     }
   }).mount('#app');
