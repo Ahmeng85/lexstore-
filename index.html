@@ -4,231 +4,251 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hardware Store</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
   <!-- Vue 3 -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <!-- SheetJS -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     [v-cloak] { display: none; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f3f4f6; color: #1f2937; }
+
+    /* Header Navigation */
+    header { background-color: #2563eb; color: white; padding: 12px 16px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .header-container { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; items-center; }
+    .header-title { font-size: 18px; font-weight: bold; cursor: pointer; }
+    .header-nav { display: flex; gap: 12px; align-items: center; }
+    .nav-btn { background: none; border: none; color: white; font-size: 14px; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+    .nav-btn.active { font-weight: bold; text-decoration: underline; }
+    .cart-btn { background-color: #1d4ed8; padding: 6px 12px; border-radius: 20px; font-weight: bold; position: relative; }
+    .cart-badge { background-color: #ef4444; color: white; font-size: 10px; border-radius: 10px; padding: 1px 6px; margin-left: 4px; }
+    .admin-btn { border: 1px solid white; }
+
+    /* Main Container */
+    main { max-width: 1000px; margin: 0 auto; padding: 16px; }
+
+    /* Search & Filter */
+    .filter-box { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    @media (min-width: 640px) { .filter-box { flex-direction: row; } }
+    .filter-input, .filter-select { padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%; background: white; }
+
+    /* Product Grid */
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .product-card { background: white; border-radius: 10px; border: 1px solid #e5e7eb; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .img-box { height: 160px; background-color: #f9fafb; border-radius: 8px; border: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; margin-bottom: 10px; cursor: pointer; }
+    .img-box img { width: 100%; height: 100%; object-fit: cover; }
+    .badge-count { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.6); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; }
+    .prod-brand { font-size: 10px; color: #2563eb; font-weight: bold; text-transform: uppercase; }
+    .prod-name { font-size: 14px; font-weight: bold; color: #111827; margin: 2px 0; }
+    .prod-cat { font-size: 11px; color: #9ca3af; }
+    .prod-price { font-size: 16px; font-weight: bold; color: #2563eb; margin-top: 6px; }
+    .prod-unit { font-size: 11px; color: #6b7280; font-weight: normal; }
+    .prod-stock { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+    /* Buttons */
+    .btn-add { width: 100%; background-color: #2563eb; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; margin-top: 8px; }
+    .btn-add:disabled { background-color: #d1d5db; cursor: not-allowed; }
+    .qty-control { display: flex; align-items: center; justify-content: space-between; border: 1px solid #3b82f6; background-color: #eff6ff; border-radius: 6px; padding: 2px; margin-top: 8px; }
+    .btn-qty { width: 28px; height: 28px; background-color: #2563eb; color: white; border: none; font-weight: bold; border-radius: 4px; cursor: pointer; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; p: 16px; z-index: 100; }
+    .modal-card { background: white; border-radius: 12px; width: 100%; max-width: 420px; overflow: hidden; position: relative; max-height: 90vh; display: flex; flex-direction: column; }
+    .modal-close { position: absolute; top: 10px; right: 10px; background: #e5e7eb; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 10; }
+    .modal-img-box { height: 220px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .modal-img-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .modal-thumbs { display: flex; gap: 8px; padding: 10px; overflow-x: auto; background: #fafafa; border-bottom: 1px solid #eee; }
+    .thumb-item { width: 44px; height: 44px; border: 2px solid #ddd; border-radius: 6px; overflow: hidden; cursor: pointer; flex-shrink: 0; }
+    .thumb-item.active { border-color: #2563eb; }
+    .thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-body { padding: 16px; overflow-y: auto; font-size: 13px; }
+
+    /* Form Section */
+    .admin-card { background: white; padding: 16px; border-radius: 10px; border: 1px solid #e5e7eb; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-weight: bold; font-size: 12px; margin-bottom: 4px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+    .slot-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 6px; background: #fafafa; }
+    .slot-thumb { width: 36px; height: 36px; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: white; flex-shrink: 0; }
+    .slot-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .btn-add-slot { background: #2563eb; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+    .btn-save { width: 100%; background: #16a34a; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 10px; }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body>
 
-<div id="app" v-cloak class="min-h-screen flex flex-col">
+<div id="app" v-cloak>
   <!-- Header Navigation -->
-  <header class="bg-blue-600 text-white shadow-md sticky top-0 z-50">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <h1 class="text-lg font-bold cursor-pointer flex items-center gap-1" @click="currentTab = 'shop'">
-        🛠️ Hardware Store
-      </h1>
-      <div class="flex gap-2 items-center text-xs sm:text-sm">
-        <button @click="currentTab = 'shop'" :class="{'underline font-bold': currentTab === 'shop'}" class="px-2 py-1">Shop</button>
-        <button @click="currentTab = 'cart'" class="relative bg-blue-700 px-3 py-1 rounded-full flex items-center gap-1 font-bold">
-          🛒 Cart
-          <span v-if="totalCartCount > 0" class="bg-red-500 text-white rounded-full px-1.5 py-0.2 text-[10px]">
-            {{ totalCartCount }}
-          </span>
+  <header>
+    <div class="header-container">
+      <div class="header-title" @click="currentTab = 'shop'">🛠️ Hardware Store</div>
+      <div class="header-nav">
+        <button @click="currentTab = 'shop'" class="nav-btn" :class="{active: currentTab === 'shop'}">Shop</button>
+        <button @click="currentTab = 'cart'" class="nav-btn cart-btn">
+          🛒 Cart <span v-if="totalCartCount > 0" class="cart-badge">{{ totalCartCount }}</span>
         </button>
-        <button @click="currentTab = 'admin'" :class="{'underline font-bold': currentTab === 'admin'}" class="border border-white px-2 py-1 rounded">
-          Admin
-        </button>
+        <button @click="currentTab = 'admin'" class="nav-btn admin-btn" :class="{active: currentTab === 'admin'}">Admin</button>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Area -->
-  <main class="w-full max-w-6xl mx-auto px-3 py-4 flex-1">
-
-    <!-- 1. Shopping Section -->
+  <!-- Main Content -->
+  <main>
+    <!-- 1. Shop Tab -->
     <section v-if="currentTab === 'shop'">
-      <div class="mb-4 flex flex-col sm:flex-row gap-2">
-        <input v-model="searchQuery" type="text" placeholder="Search product name..." class="border p-2 rounded w-full sm:w-2/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-        <select v-model="selectedCategory" class="border p-2 rounded w-full sm:w-1/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+      <div class="filter-box">
+        <input v-model="searchQuery" type="text" placeholder="Search product name..." class="filter-input">
+        <select v-model="selectedCategory" class="filter-select">
           <option value="">All Categories</option>
           <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
         </select>
       </div>
 
-      <!-- 商品网格列表（还原正确比例与排版） -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div v-for="product in filteredProducts" :key="product.id" class="bg-white rounded-lg shadow-sm hover:shadow-md transition border flex flex-col justify-between overflow-hidden">
-          <div @click="openProductModal(product)" class="cursor-pointer group p-2.5">
-            <div class="h-36 sm:h-40 bg-gray-50 mb-2 rounded flex items-center justify-center overflow-hidden relative border select-none">
-              <img v-if="isImageUrl(getProductImage(product, 0))" :src="getProductImage(product, 0)" class="w-full h-full object-cover group-hover:scale-105 transition" alt="Product Image">
-              <span v-else class="text-4xl">{{ getProductImage(product, 0) || '📦' }}</span>
-              
-              <span v-if="product.images && product.images.length > 1" class="absolute top-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded shadow">
-                📷 {{ product.images.length }}
-              </span>
+      <div class="product-grid">
+        <div v-for="product in filteredProducts" :key="product.id" class="product-card">
+          <div>
+            <div class="img-box" @click="openProductModal(product)">
+              <img v-if="isImageUrl(getProductImage(product, 0))" :src="getProductImage(product, 0)">
+              <span v-else style="font-size: 40px;">{{ getProductImage(product, 0) || '📦' }}</span>
+              <span v-if="product.images && product.images.length > 1" class="badge-count">📷 {{ product.images.length }}</span>
             </div>
 
-            <p class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">{{ product.brand || 'Store' }}</p>
-            <h3 class="font-bold text-xs sm:text-sm leading-snug text-gray-900 line-clamp-2 mt-0.5">{{ product.name }}</h3>
-            <p class="text-[10px] text-gray-400 mt-0.5">{{ product.category }}</p>
+            <div class="prod-brand">{{ product.brand || 'Store' }}</div>
+            <div class="prod-name">{{ product.name }}</div>
+            <div class="prod-cat">{{ product.category }}</div>
             
-            <div class="mt-1.5 flex items-baseline gap-1">
-              <p class="text-blue-600 font-bold text-sm sm:text-base">
-                RM {{ product.price ? product.price.toFixed(2) : '0.00' }}
-              </p>
-              <span class="text-[10px] text-gray-400 font-normal">/ {{ product.unit }}</span>
+            <div class="prod-price">
+              RM {{ product.price ? product.price.toFixed(2) : '0.00' }}
+              <span class="prod-unit">/ {{ product.unit }}</span>
             </div>
-            <p class="text-[10px] mt-0.5" :class="product.stock > 10 ? 'text-gray-400' : 'text-red-500 font-bold'">
-              Stock: {{ product.stock }} {{ product.unit }}
-            </p>
+            <div class="prod-stock">Stock: {{ product.stock }} {{ product.unit }}</div>
           </div>
 
-          <div class="p-2.5 pt-0">
-            <button v-if="getItemQty(product.id) === 0" 
-                    @click="addToCart(product)" 
-                    :disabled="product.stock <= 0"
-                    :class="product.stock > 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'"
-                    class="text-white w-full py-1.5 rounded text-xs font-bold transition active:scale-95 shadow">
+          <div>
+            <button v-if="getItemQty(product.id) === 0" @click="addToCart(product)" :disabled="product.stock <= 0" class="btn-add">
               {{ product.stock > 0 ? '+ Add to Cart' : 'Out of Stock' }}
             </button>
 
-            <div v-else class="flex items-center justify-between border border-blue-500 rounded p-0.5 bg-blue-50">
-              <button @click="updateQty(product, -1)" class="w-6 h-6 bg-blue-600 text-white font-bold rounded flex items-center justify-center hover:bg-blue-700">-</button>
-              <span class="font-bold text-blue-800 text-xs px-1">{{ getItemQty(product.id) }}</span>
-              <button @click="updateQty(product, 1)" :disabled="getItemQty(product.id) >= product.stock" class="w-6 h-6 bg-blue-600 text-white font-bold rounded flex items-center justify-center hover:bg-blue-700 disabled:bg-gray-300">+</button>
+            <div v-else class="qty-control">
+              <button @click="updateQty(product, -1)" class="btn-qty">-</button>
+              <span style="font-weight: bold; font-size: 12px;">{{ getItemQty(product.id) }}</span>
+              <button @click="updateQty(product, 1)" :disabled="getItemQty(product.id) >= product.stock" class="btn-qty">+</button>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Product Details Modal -->
-    <div v-if="selectedProductModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3" @click.self="selectedProductModal = null">
-      <div class="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden relative animate-fade-in max-h-[90vh] flex flex-col">
-        <button @click="selectedProductModal = null" class="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-gray-700 font-bold z-10">✕</button>
+    <!-- Modal -->
+    <div v-if="selectedProductModal" class="modal-overlay" @click.self="selectedProductModal = null">
+      <div class="modal-card">
+        <button @click="selectedProductModal = null" class="modal-close">✕</button>
 
-        <div class="h-56 sm:h-64 bg-gray-100 flex items-center justify-center p-2 relative shrink-0">
-          <img v-if="isImageUrl(getProductImage(selectedProductModal, currentImageIndex))" :src="getProductImage(selectedProductModal, currentImageIndex)" class="max-h-full max-w-full object-contain rounded" alt="Product Image">
-          <span v-else class="text-6xl">{{ getProductImage(selectedProductModal, currentImageIndex) || '📦' }}</span>
+        <div class="modal-img-box">
+          <img v-if="isImageUrl(getProductImage(selectedProductModal, currentImageIndex))" :src="getProductImage(selectedProductModal, currentImageIndex)">
+          <span v-else style="font-size: 60px;">{{ getProductImage(selectedProductModal, currentImageIndex) || '📦' }}</span>
         </div>
 
-        <!-- 缩略图切换 -->
-        <div v-if="selectedProductModal.images && selectedProductModal.images.length > 1" class="flex items-center gap-2 px-3 pt-2 overflow-x-auto shrink-0">
-          <div v-for="(img, idx) in selectedProductModal.images" 
-               :key="idx" 
-               @click="currentImageIndex = idx"
-               :class="{'border-blue-600 ring-2 ring-blue-400': currentImageIndex === idx, 'border-gray-200': currentImageIndex !== idx}"
-               class="w-10 h-10 border rounded cursor-pointer overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
-            <img v-if="isImageUrl(img)" :src="img" class="w-full h-full object-cover">
-            <span v-else class="text-xs">{{ img }}</span>
+        <div v-if="selectedProductModal.images && selectedProductModal.images.length > 1" class="modal-thumbs">
+          <div v-for="(img, idx) in selectedProductModal.images" :key="idx" @click="currentImageIndex = idx" class="thumb-item" :class="{active: currentImageIndex === idx}">
+            <img v-if="isImageUrl(img)" :src="img">
+            <span v-else style="font-size: 10px;">{{ img }}</span>
           </div>
         </div>
 
-        <div class="p-4 space-y-2 overflow-y-auto">
-          <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded">{{ selectedProductModal.category }}</span>
-          <h2 class="text-base font-bold text-gray-900">{{ selectedProductModal.name }}</h2>
-          <p class="text-xs text-gray-600"><strong>Specs/Brand:</strong> {{ selectedProductModal.brand || 'N/A' }}</p>
-          <p class="text-xs text-gray-500"><strong>Stock:</strong> {{ selectedProductModal.stock }} {{ selectedProductModal.unit }}</p>
-          <p class="text-xs text-gray-700 whitespace-pre-line bg-gray-50 p-2 rounded border" v-if="selectedProductModal.description">{{ selectedProductModal.description }}</p>
+        <div class="modal-body">
+          <span style="background: #e0e7ff; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">{{ selectedProductModal.category }}</span>
+          <h2 style="font-size: 16px; margin: 6px 0;">{{ selectedProductModal.name }}</h2>
+          <p><strong>Brand:</strong> {{ selectedProductModal.brand || 'N/A' }}</p>
+          <p><strong>Stock:</strong> {{ selectedProductModal.stock }} {{ selectedProductModal.unit }}</p>
+          <p v-if="selectedProductModal.description" style="margin-top: 8px; background: #f9fafb; padding: 8px; border-radius: 6px; border: 1px solid #eee;">
+            {{ selectedProductModal.description }}
+          </p>
 
-          <div class="pt-3 border-t flex items-center justify-between gap-2">
-            <div>
-              <p class="text-xl font-bold text-blue-600">RM {{ selectedProductModal.price ? selectedProductModal.price.toFixed(2) : '0.00' }}</p>
-              <p class="text-[10px] text-gray-400">per {{ selectedProductModal.unit }}</p>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <div v-if="getItemQty(selectedProductModal.id) > 0" class="flex items-center border border-blue-500 rounded bg-blue-50 p-1">
-                <button @click="updateQty(selectedProductModal, -1)" class="w-7 h-7 bg-blue-600 text-white font-bold rounded flex items-center justify-center">-</button>
-                <span class="font-bold text-blue-800 text-xs px-2">{{ getItemQty(selectedProductModal.id) }}</span>
-                <button @click="updateQty(selectedProductModal, 1)" :disabled="getItemQty(selectedProductModal.id) >= selectedProductModal.stock" class="w-7 h-7 bg-blue-600 text-white font-bold rounded flex items-center justify-center disabled:bg-gray-300">+</button>
-              </div>
-              <button v-else @click="addToCart(selectedProductModal)" :disabled="selectedProductModal.stock <= 0" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-xs shadow">
-                + Add to Cart
-              </button>
-            </div>
+          <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 10px;">
+            <div style="font-size: 18px; font-weight: bold; color: #2563eb;">RM {{ selectedProductModal.price ? selectedProductModal.price.toFixed(2) : '0.00' }}</div>
+            <button @click="addToCart(selectedProductModal)" class="btn-add" style="width: auto; padding: 6px 12px;">+ Add to Cart</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 2. Shopping Cart Section -->
-    <section v-if="currentTab === 'cart'" class="max-w-xl mx-auto bg-white p-4 rounded-lg shadow border">
-      <h2 class="text-lg font-bold mb-3 flex items-center gap-2">🛒 Your Cart Items</h2>
+    <!-- 2. Cart Tab -->
+    <section v-if="currentTab === 'cart'" class="admin-card">
+      <h2 style="font-size: 16px; font-weight: bold; margin-bottom: 12px;">🛒 Your Cart</h2>
       
-      <div v-if="cart.length === 0" class="text-gray-500 text-center py-8">
-        <p class="text-3xl mb-2">📦</p>
-        <p class="text-xs">Your cart is currently empty.</p>
-        <button @click="currentTab = 'shop'" class="mt-3 bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold">Start Shopping</button>
+      <div v-if="cart.length === 0" style="text-align: center; color: #6b7280; padding: 20px;">
+        <p style="font-size: 30px;">📦</p>
+        <p style="font-size: 12px;">Your cart is empty.</p>
       </div>
 
       <div v-else>
-        <div v-for="item in cart" :key="item.id" class="border-b py-2 text-xs">
-          <h4 class="font-bold text-gray-900 mb-1.5 break-words">{{ item.name }}</h4>
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-1 border rounded p-0.5 bg-gray-50">
-              <button @click="updateQty(item, -1)" class="w-5 h-5 bg-gray-200 text-gray-700 font-bold rounded flex items-center justify-center">-</button>
-              <span class="w-6 text-center font-bold">{{ item.qty }}</span>
-              <button @click="updateQty(item, 1)" :disabled="item.qty >= item.stock" class="w-5 h-5 bg-gray-200 text-gray-700 font-bold rounded flex items-center justify-center disabled:opacity-50">+</button>
+        <div v-for="item in cart" :key="item.id" style="border-bottom: 1px solid #eee; padding: 8px 0; font-size: 12px;">
+          <div style="font-weight: bold; font-size: 13px;">{{ item.name }}</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+            <div class="qty-control" style="margin-top: 0; width: 90px;">
+              <button @click="updateQty(item, -1)" class="btn-qty">-</button>
+              <span>{{ item.qty }}</span>
+              <button @click="updateQty(item, 1)" :disabled="item.qty >= item.stock" class="btn-qty">+</button>
             </div>
-            <div class="text-right">
-              <span class="font-bold text-blue-600">RM {{ (item.price * item.qty).toFixed(2) }}</span>
-              <button @click="removeFromCart(item.id)" class="text-red-500 text-[10px] ml-2 underline">Remove</button>
+            <div>
+              <span style="font-weight: bold; color: #2563eb;">RM {{ (item.price * item.qty).toFixed(2) }}</span>
+              <button @click="removeFromCart(item.id)" style="color: #ef4444; background: none; border: none; margin-left: 8px; cursor: pointer; text-decoration: underline;">Remove</button>
             </div>
           </div>
         </div>
 
-        <div class="my-3 text-right bg-gray-50 p-2 rounded">
-          <p class="text-base font-bold">Total: <span class="text-blue-600">RM {{ cartTotal.toFixed(2) }}</span></p>
+        <div style="text-align: right; margin-top: 12px; font-weight: bold; font-size: 16px;">
+          Total: <span style="color: #2563eb;">RM {{ cartTotal.toFixed(2) }}</span>
         </div>
 
-        <div class="border-t pt-3 space-y-2">
-          <h3 class="font-bold text-xs">🚚 Delivery Details</h3>
-          <input v-model="customerInfo.name" type="text" placeholder="Full Name *" class="w-full border p-2 rounded text-xs">
-          <input v-model="customerInfo.phone" type="text" placeholder="WhatsApp Phone Number *" class="w-full border p-2 rounded text-xs">
-          <textarea v-model="customerInfo.address" placeholder="Delivery Address *" class="w-full border p-2 rounded text-xs" rows="2"></textarea>
+        <div style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;" class="form-group">
+          <label>Full Name *</label>
+          <input v-model="customerInfo.name" type="text" placeholder="e.g. John Doe" style="margin-bottom: 8px;">
+          <label>WhatsApp Phone *</label>
+          <input v-model="customerInfo.phone" type="text" placeholder="e.g. 0123456789" style="margin-bottom: 8px;">
+          <label>Delivery Address *</label>
+          <textarea v-model="customerInfo.address" placeholder="Address"></textarea>
           
-          <button @click="sendWhatsAppOrder" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded text-xs font-bold shadow flex items-center justify-center gap-1">
-            📱 Checkout via WhatsApp
-          </button>
+          <button @click="sendWhatsAppOrder" class="btn-save" style="background: #16a34a;">📱 Checkout via WhatsApp</button>
         </div>
       </div>
     </section>
 
-    <!-- 3. Admin Section -->
-    <section v-if="currentTab === 'admin'" class="max-w-2xl mx-auto bg-white p-4 rounded-lg shadow border text-xs">
-      <h2 class="text-base font-bold mb-3 border-b pb-2">📦 Product Management (Admin)</h2>
+    <!-- 3. Admin Tab -->
+    <section v-if="currentTab === 'admin'" class="admin-card">
+      <h2 style="font-size: 16px; font-weight: bold; margin-bottom: 12px;">📦 Product Management (Admin)</h2>
       
-      <form @submit.prevent="saveProduct" class="space-y-3 mb-6 bg-gray-50 p-3 rounded border">
-        <div>
-          <label class="font-bold block mb-1">Product Name:</label>
-          <input v-model="newProduct.name" required type="text" placeholder="e.g. Vernier Caliper 150mm" class="w-full border p-2 rounded">
+      <form @submit.prevent="saveProduct">
+        <div class="form-group">
+          <label>Product Name:</label>
+          <input v-model="newProduct.name" required type="text" placeholder="e.g. Vernier Caliper 150mm">
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="font-bold block mb-1">Category:</label>
-            <input v-model="newProduct.category" required type="text" placeholder="e.g. Measuring Tools" class="w-full border p-2 rounded">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Category:</label>
+            <input v-model="newProduct.category" required type="text" placeholder="e.g. Measuring Tools">
           </div>
-          <div>
-            <label class="font-bold block mb-1">Brand / Specs:</label>
-            <input v-model="newProduct.brand" type="text" placeholder="e.g. Stainless Steel" class="w-full border p-2 rounded">
+          <div class="form-group">
+            <label>Brand / Specs:</label>
+            <input v-model="newProduct.brand" type="text" placeholder="e.g. Stainless Steel">
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-2">
-          <div>
-            <label class="font-bold block mb-1">Selling Price (RM):</label>
-            <input v-model.number="newProduct.price" required type="number" step="0.01" placeholder="85.00" class="w-full border p-2 rounded">
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>Price (RM):</label>
+            <input v-model.number="newProduct.price" required type="number" step="0.01">
           </div>
-          <div>
-            <label class="font-bold block mb-1">Cost Price (RM):</label>
-            <input v-model.number="newProduct.cost" type="number" step="0.01" placeholder="50.00" class="w-full border p-2 rounded">
+          <div class="form-group">
+            <label>Cost (RM):</label>
+            <input v-model.number="newProduct.cost" type="number" step="0.01">
           </div>
-          <div>
-            <label class="font-bold block mb-1">Unit:</label>
-            <select v-model="newProduct.unit" class="w-full border p-2 rounded bg-white">
+          <div class="form-group">
+            <label>Unit:</label>
+            <select v-model="newProduct.unit">
               <option value="pcs">pcs</option>
               <option value="box">box</option>
               <option value="set">set</option>
@@ -236,70 +256,37 @@
           </div>
         </div>
 
-        <div>
-          <label class="font-bold block mb-1">Initial Inventory Quantity:</label>
-          <input v-model.number="newProduct.stock" required type="number" placeholder="100" class="w-full border p-2 rounded">
+        <div class="form-group">
+          <label>Stock Qty:</label>
+          <input v-model.number="newProduct.stock" required type="number">
         </div>
 
-        <!-- 针对手机端优化的【多张图片卡槽上传】 -->
-        <div>
-          <div class="flex justify-between items-center mb-1">
-            <label class="font-bold">Product Images (支持上传多张照片):</label>
-            <button type="button" @click="addImageSlot" class="bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold">
-              + 增加一张图片槽
-            </button>
+        <!-- 图片多槽位上传 -->
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="margin:0;">Product Images:</label>
+            <button type="button" @click="addImageSlot" class="btn-add-slot">+ 增加一张图片槽</button>
           </div>
 
-          <div class="space-y-2">
-            <div v-for="(imgSlot, idx) in imageSlots" :key="idx" class="p-2 border rounded bg-white flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2 flex-1 overflow-hidden">
-                <span class="font-bold text-gray-500 text-xs">#{{ idx + 1 }}</span>
-                
-                <div class="w-10 h-10 border rounded bg-gray-50 flex items-center justify-center shrink-0 overflow-hidden">
-                  <img v-if="isImageUrl(imgSlot.value)" :src="imgSlot.value" class="w-full h-full object-cover">
-                  <span v-else class="text-xs">📷</span>
-                </div>
-
-                <input type="file" accept="image/*" @change="e => handleSingleSlotUpload(e, idx)" class="text-[10px] w-full">
-              </div>
-
-              <button v-if="imageSlots.length > 1" type="button" @click="removeImageSlot(idx)" class="text-red-600 font-bold px-2 text-sm">
-                ✕
-              </button>
+          <div v-for="(imgSlot, idx) in imageSlots" :key="idx" class="slot-item">
+            <span style="font-weight: bold; font-size: 11px;">#{{ idx + 1 }}</span>
+            <div class="slot-thumb">
+              <img v-if="isImageUrl(imgSlot.value)" :src="imgSlot.value">
+              <span v-else style="font-size: 10px;">📷</span>
             </div>
+            <input type="file" accept="image/*" @change="e => handleSingleSlotUpload(e, idx)" style="font-size: 11px;">
+            <button v-if="imageSlots.length > 1" type="button" @click="removeImageSlot(idx)" style="color: red; border: none; background: none; font-weight: bold; cursor: pointer;">✕</button>
           </div>
-          <p class="text-[10px] text-gray-500 mt-1">💡 点击“+ 增加一张图片槽”，就可以单独选择第 2 张、第 3 张照片！</p>
         </div>
 
-        <div>
-          <label class="font-bold block mb-1">Product Description & Details:</label>
-          <textarea v-model="newProduct.description" placeholder="Enter product specifications and details" class="w-full border p-2 rounded" rows="2"></textarea>
+        <div class="form-group">
+          <label>Description:</label>
+          <textarea v-model="newProduct.description" rows="2"></textarea>
         </div>
 
-        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-bold shadow transition">
-          Add Product Now
-        </button>
+        <button type="submit" class="btn-save">Add Product Now</button>
       </form>
-
-      <!-- 已添加商品列表 -->
-      <h3 class="font-bold border-b pb-1 mb-2">Current Products ({{ products.length }})</h3>
-      <div class="space-y-2">
-        <div v-for="prod in products" :key="prod.id" class="border p-2 rounded flex justify-between items-center bg-white">
-          <div class="flex items-center gap-2">
-            <div class="w-10 h-10 border rounded bg-gray-100 flex items-center justify-center overflow-hidden">
-              <img v-if="isImageUrl(getProductImage(prod, 0))" :src="getProductImage(prod, 0)" class="w-full h-full object-cover">
-              <span v-else class="text-xs">{{ getProductImage(prod, 0) || '📦' }}</span>
-            </div>
-            <div>
-              <p class="font-bold text-gray-900">{{ prod.name }} ({{ prod.images ? prod.images.length : 1 }} 张图)</p>
-              <p class="text-[10px] text-gray-500">RM {{ prod.price.toFixed(2) }} | Stock: {{ prod.stock }} {{ prod.unit }}</p>
-            </div>
-          </div>
-          <button @click="deleteProduct(prod.id)" class="text-red-600 hover:text-red-800 font-bold text-xs underline">Delete</button>
-        </div>
-      </div>
     </section>
-
   </main>
 </div>
 
@@ -316,40 +303,16 @@
         currentImageIndex: 0,
         customerInfo: { name: '', phone: '', address: '' },
         cart: [],
-        imageSlots: [
-          { value: '' }
-        ],
-        newProduct: {
-          name: '',
-          category: '',
-          brand: '',
-          price: 0,
-          cost: 0,
-          unit: 'pcs',
-          stock: 10,
-          images: [],
-          description: ''
-        },
+        imageSlots: [{ value: '' }],
+        newProduct: { name: '', category: '', brand: '', price: 0, cost: 0, unit: 'pcs', stock: 10, images: [], description: '' },
         products: [
-          {
-            id: 1,
-            name: 'Cordless Impact Drill 18V Kit',
-            category: 'Power Tools',
-            brand: 'Bosch',
-            price: 250.00,
-            cost: 180.00,
-            unit: 'set',
-            stock: 15,
-            images: ['🔨', '🔧'],
-            description: 'Heavy duty cordless impact drill with 2 batteries and carrying case.'
-          }
+          { id: 1, name: 'Cordless Impact Drill 18V Kit', category: 'Power Tools', brand: 'Bosch', price: 250.00, cost: 180.00, unit: 'set', stock: 15, images: ['🔨', '🔧'], description: 'Heavy duty cordless impact drill.' }
         ]
       }
     },
     computed: {
       categories() {
-        const cats = this.products.map(p => p.category);
-        return [...new Set(cats)];
+        return [...new Set(this.products.map(p => p.category))];
       },
       filteredProducts() {
         return this.products.filter(p => {
@@ -368,9 +331,7 @@
     methods: {
       getProductImage(product, index = 0) {
         if (!product) return '📦';
-        if (product.images && product.images.length > index) {
-          return product.images[index];
-        }
+        if (product.images && product.images.length > index) return product.images[index];
         return product.image || '📦';
       },
       isImageUrl(str) {
@@ -389,66 +350,34 @@
       handleSingleSlotUpload(event, index) {
         const file = event.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
-        reader.onload = (e) => {
-          this.imageSlots[index].value = e.target.result;
-        };
+        reader.onload = (e) => { this.imageSlots[index].value = e.target.result; };
         reader.readAsDataURL(file);
       },
       saveProduct() {
-        const validImages = this.imageSlots
-          .map(s => s.value)
-          .filter(v => v.trim() !== '');
+        const validImages = this.imageSlots.map(s => s.value).filter(v => v.trim() !== '');
+        if (validImages.length === 0) validImages.push('📦');
 
-        if (validImages.length === 0) {
-          validImages.push('📦');
-        }
-
-        const newProd = {
+        this.products.unshift({
           ...this.newProduct,
           images: validImages,
           id: Date.now()
-        };
+        });
 
-        this.products.unshift(newProd);
-        
-        this.newProduct = {
-          name: '',
-          category: '',
-          brand: '',
-          price: 0,
-          cost: 0,
-          unit: 'pcs',
-          stock: 10,
-          images: [],
-          description: ''
-        };
+        this.newProduct = { name: '', category: '', brand: '', price: 0, cost: 0, unit: 'pcs', stock: 10, images: [], description: '' };
         this.imageSlots = [{ value: '' }];
         alert('Product added successfully!');
       },
-      deleteProduct(id) {
-        if (confirm('Are you sure you want to delete this product?')) {
-          this.products = this.products.filter(p => p.id !== id);
-        }
-      },
       addToCart(product) {
         const existing = this.cart.find(item => item.id === product.id);
-        if (existing) {
-          if (existing.qty < product.stock) {
-            existing.qty++;
-          }
-        } else {
-          this.cart.push({ ...product, qty: 1 });
-        }
+        if (existing) { if (existing.qty < product.stock) existing.qty++; }
+        else { this.cart.push({ ...product, qty: 1 }); }
       },
       updateQty(product, delta) {
         const item = this.cart.find(i => i.id === product.id);
         if (item) {
           item.qty += delta;
-          if (item.qty <= 0) {
-            this.removeFromCart(product.id);
-          }
+          if (item.qty <= 0) this.removeFromCart(product.id);
         }
       },
       getItemQty(id) {
@@ -460,21 +389,11 @@
       },
       sendWhatsAppOrder() {
         if (!this.customerInfo.name || !this.customerInfo.phone) {
-          alert('Please fill in your name and phone number!');
+          alert('Please fill in name and phone number!');
           return;
         }
-        let msg = `🛒 *NEW HARDWARE ORDER*\n\n`;
-        msg += `*Customer:* ${this.customerInfo.name}\n`;
-        msg += `*Phone:* ${this.customerInfo.phone}\n`;
-        msg += `*Address:* ${this.customerInfo.address || 'Self Pick-up'}\n\n`;
-        msg += `*Items Ordered:*\n`;
-        this.cart.forEach((item, idx) => {
-          msg += `${idx + 1}. ${item.name} x ${item.qty} ${item.unit} = RM ${(item.price * item.qty).toFixed(2)}\n`;
-        });
-        msg += `\n*TOTAL AMOUNT: RM ${this.cartTotal.toFixed(2)}*`;
-
-        const encodedMsg = encodeURIComponent(msg);
-        window.open(`https://wa.me/60100000000?text=${encodedMsg}`, '_blank');
+        let msg = `🛒 *NEW ORDER*\nName: ${this.customerInfo.name}\nPhone: ${this.customerInfo.phone}\nTotal: RM ${this.cartTotal.toFixed(2)}`;
+        window.open(`https://wa.me/60100000000?text=${encodeURIComponent(msg)}`, '_blank');
       }
     }
   }).mount('#app');
