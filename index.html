@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hardware & Tools Store</title>
+  <title>Hardware Store</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Vue 3 -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <!-- SheetJS (Excel Export) -->
+  <!-- SheetJS -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     [v-cloak] { display: none; }
@@ -19,24 +19,24 @@
     .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-100 text-gray-800">
 
 <div id="app" v-cloak class="min-h-screen flex flex-col">
   <!-- Header Navigation -->
   <header class="bg-blue-600 text-white shadow-md sticky top-0 z-50">
-    <div class="container mx-auto px-2 sm:px-4 py-3 flex justify-between items-center">
-      <h1 class="text-base sm:text-xl font-bold cursor-pointer flex items-center gap-1" @click="currentTab = 'shop'">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <h1 class="text-lg font-bold cursor-pointer flex items-center gap-1" @click="currentTab = 'shop'">
         🛠️ Hardware Store
       </h1>
-      <div class="flex gap-1.5 sm:gap-4 items-center text-xs sm:text-sm">
-        <button @click="currentTab = 'shop'" :class="{'underline font-bold': currentTab === 'shop'}">Shop</button>
-        <button @click="currentTab = 'cart'" class="relative bg-blue-700 px-2.5 py-1 rounded-full flex items-center gap-1">
+      <div class="flex gap-2 items-center text-xs sm:text-sm">
+        <button @click="currentTab = 'shop'" :class="{'underline font-bold': currentTab === 'shop'}" class="px-2 py-1">Shop</button>
+        <button @click="currentTab = 'cart'" class="relative bg-blue-700 px-3 py-1 rounded-full flex items-center gap-1 font-bold">
           🛒 Cart
-          <span v-if="totalCartCount > 0" class="bg-red-500 text-[10px] text-white rounded-full px-1.5 py-0.2 font-bold">
+          <span v-if="totalCartCount > 0" class="bg-red-500 text-white rounded-full px-1.5 py-0.2 text-[10px]">
             {{ totalCartCount }}
           </span>
         </button>
-        <button @click="currentTab = 'admin'" :class="{'underline font-bold': currentTab === 'admin'}" class="border border-white px-2 py-0.5 rounded">
+        <button @click="currentTab = 'admin'" :class="{'underline font-bold': currentTab === 'admin'}" class="border border-white px-2 py-1 rounded">
           Admin
         </button>
       </div>
@@ -44,23 +44,23 @@
   </header>
 
   <!-- Main Content Area -->
-  <main class="w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 flex-1">
+  <main class="w-full max-w-6xl mx-auto px-3 py-4 flex-1">
 
     <!-- 1. Shopping Section -->
     <section v-if="currentTab === 'shop'">
       <div class="mb-4 flex flex-col sm:flex-row gap-2">
-        <input v-model="searchQuery" type="text" placeholder="Search product name..." class="border p-2 rounded w-full sm:w-2/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input v-model="searchQuery" type="text" placeholder="Search product name..." class="border p-2 rounded w-full sm:w-2/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
         <select v-model="selectedCategory" class="border p-2 rounded w-full sm:w-1/3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
           <option value="">All Categories</option>
           <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
         </select>
       </div>
 
-      <!-- 商品网格列表 -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-        <div v-for="product in filteredProducts" :key="product.id" class="bg-white p-2.5 rounded-lg shadow hover:shadow-md transition flex flex-col justify-between border relative">
-          <div @click="openProductModal(product)" class="cursor-pointer group">
-            <div class="h-28 bg-blue-50 mb-2 rounded flex items-center justify-center overflow-hidden relative border select-none">
+      <!-- 商品网格列表（还原正确比例与排版） -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div v-for="product in filteredProducts" :key="product.id" class="bg-white rounded-lg shadow-sm hover:shadow-md transition border flex flex-col justify-between overflow-hidden">
+          <div @click="openProductModal(product)" class="cursor-pointer group p-2.5">
+            <div class="h-36 sm:h-40 bg-gray-50 mb-2 rounded flex items-center justify-center overflow-hidden relative border select-none">
               <img v-if="isImageUrl(getProductImage(product, 0))" :src="getProductImage(product, 0)" class="w-full h-full object-cover group-hover:scale-105 transition" alt="Product Image">
               <span v-else class="text-4xl">{{ getProductImage(product, 0) || '📦' }}</span>
               
@@ -70,26 +70,26 @@
             </div>
 
             <p class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">{{ product.brand || 'Store' }}</p>
-            <h3 class="font-bold text-xs sm:text-sm leading-snug text-gray-900 line-clamp-2">{{ product.name }}</h3>
+            <h3 class="font-bold text-xs sm:text-sm leading-snug text-gray-900 line-clamp-2 mt-0.5">{{ product.name }}</h3>
             <p class="text-[10px] text-gray-400 mt-0.5">{{ product.category }}</p>
             
-            <div class="mt-1">
+            <div class="mt-1.5 flex items-baseline gap-1">
               <p class="text-blue-600 font-bold text-sm sm:text-base">
-                RM {{ product.price ? product.price.toFixed(2) : '0.00' }} 
-                <span class="text-[10px] text-gray-400 font-normal">/ {{ product.unit }}</span>
+                RM {{ product.price ? product.price.toFixed(2) : '0.00' }}
               </p>
+              <span class="text-[10px] text-gray-400 font-normal">/ {{ product.unit }}</span>
             </div>
             <p class="text-[10px] mt-0.5" :class="product.stock > 10 ? 'text-gray-400' : 'text-red-500 font-bold'">
               Stock: {{ product.stock }} {{ product.unit }}
             </p>
           </div>
 
-          <div class="mt-2">
+          <div class="p-2.5 pt-0">
             <button v-if="getItemQty(product.id) === 0" 
                     @click="addToCart(product)" 
                     :disabled="product.stock <= 0"
                     :class="product.stock > 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'"
-                    class="text-white w-full py-1.5 rounded text-xs font-bold transition active:scale-95">
+                    class="text-white w-full py-1.5 rounded text-xs font-bold transition active:scale-95 shadow">
               {{ product.stock > 0 ? '+ Add to Cart' : 'Out of Stock' }}
             </button>
 
@@ -196,7 +196,7 @@
       </div>
     </section>
 
-    <!-- 3. Admin Section (多槽位/多按钮图片上传) -->
+    <!-- 3. Admin Section -->
     <section v-if="currentTab === 'admin'" class="max-w-2xl mx-auto bg-white p-4 rounded-lg shadow border text-xs">
       <h2 class="text-base font-bold mb-3 border-b pb-2">📦 Product Management (Admin)</h2>
       
@@ -255,17 +255,14 @@
               <div class="flex items-center gap-2 flex-1 overflow-hidden">
                 <span class="font-bold text-gray-500 text-xs">#{{ idx + 1 }}</span>
                 
-                <!-- 预览图 -->
                 <div class="w-10 h-10 border rounded bg-gray-50 flex items-center justify-center shrink-0 overflow-hidden">
                   <img v-if="isImageUrl(imgSlot.value)" :src="imgSlot.value" class="w-full h-full object-cover">
                   <span v-else class="text-xs">📷</span>
                 </div>
 
-                <!-- 单独的图片文件选择器 -->
                 <input type="file" accept="image/*" @change="e => handleSingleSlotUpload(e, idx)" class="text-[10px] w-full">
               </div>
 
-              <!-- 删除此图片槽按钮 -->
               <button v-if="imageSlots.length > 1" type="button" @click="removeImageSlot(idx)" class="text-red-600 font-bold px-2 text-sm">
                 ✕
               </button>
@@ -284,7 +281,7 @@
         </button>
       </form>
 
-      <!-- 已添加商品列表管理 -->
+      <!-- 已添加商品列表 -->
       <h3 class="font-bold border-b pb-1 mb-2">Current Products ({{ products.length }})</h3>
       <div class="space-y-2">
         <div v-for="prod in products" :key="prod.id" class="border p-2 rounded flex justify-between items-center bg-white">
@@ -400,7 +397,6 @@
         reader.readAsDataURL(file);
       },
       saveProduct() {
-        // 收集所有已上传的图片
         const validImages = this.imageSlots
           .map(s => s.value)
           .filter(v => v.trim() !== '');
@@ -417,7 +413,6 @@
 
         this.products.unshift(newProd);
         
-        // 重置表单
         this.newProduct = {
           name: '',
           category: '',
