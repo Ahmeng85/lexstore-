@@ -4,6 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEXSTORE - Hardware Store</title>
+    
+    <!-- 1. Firebase SDK (Compat Version for browser direct use) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Config (Singapore Region Database)
+        const firebaseConfig = {
+            apiKey: "AIzaSyArWWVX5abPo-zZ-OJcR6M45eRikqFZNMA",
+            authDomain: "lexstore-55d84.firebaseapp.com",
+            databaseURL: "https://lexstore-55d84-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "lexstore-55d84",
+            storageBucket: "lexstore-55d84.firebasestorage.app",
+            messagingSenderId: "149887218467",
+            appId: "1:149887218467:web:891e5af721129f97225296"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+    </script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background-color: #f4f4f4; color: #333; }
@@ -361,17 +383,40 @@
             { id: 3, name: "Stainless Steel Screws", price: 12.50, cost: 6.00, unit: "pack", stock: 100, images: ["https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&q=80"], desc: "Rust-resistant premium stainless steel screws pack of 100 pieces." }
         ];
 
-        let rawProducts = JSON.parse(localStorage.getItem('lexstore_products')) || defaultProducts;
-        let products = rawProducts.map(p => {
-            if (!p.images || !Array.isArray(p.images)) {
-                p.images = p.image ? [p.image] : ["https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=800&q=80"];
-            }
-            return p;
-        });
-
+        let products = [];
         let cart = [];
         let currentRole = null;
         const availableUnits = ["pcs", "pack", "set", "bottle", "bag", "kg", "gram", "m", "cm", "unit"];
+
+        // 🌟 核心修改：从 Firebase Realtime Database 实时读取商品列表
+        db.ref('products').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                if (Array.isArray(data)) {
+                    products = data.filter(Boolean);
+                } else {
+                    products = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                }
+            } else {
+                // 如果云端是空的，自动写入默认数据初始化
+                products = defaultProducts;
+                db.ref('products').set(defaultProducts);
+            }
+
+            // 规范化 images 数据结构
+            products = products.map(p => {
+                if (!p.images || !Array.isArray(p.images)) {
+                    p.images = p.image ? [p.image] : ["https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=800&q=80"];
+                }
+                return p;
+            });
+
+            // 重新渲染页面
+            renderProducts();
+            if (document.getElementById('products-list-section').classList.contains('active')) {
+                loadAdminProductsTable();
+            }
+        });
 
         function switchPage(pageName, btnElement) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -434,23 +479,22 @@
                 const mainImg = (product.images && product.images.length > 0) ? product.images[0] : (product.image || '');
                 const imgBadge = (product.images && product.images.length > 1) ? `<span class="multi-img-badge">📷 ${product.images.length}</span>` : '';
 
-                /* 优化：修改点击事件，点击图片和标题都打开详情弹窗 Modal */
                 grid.innerHTML += `
                     <div class="product-card">
                         ${imgBadge}
                         <div>
-                            <img src="${mainImg}" alt="${product.name}" onclick="openProductDetails(${product.id})" title="Click to view details">
-                            <h3 onclick="openProductDetails(${product.id})" title="View Product Details">${product.name}</h3>
-                            <p>RM ${product.price.toFixed(2)}</p>
+                            <img src="${mainImg}" alt="${product.name}" onclick="openProductDetails('${product.id}')" title="Click to view details">
+                            <h3 onclick="openProductDetails('${product.id}')" title="View Product Details">${product.name}</h3>
+                            <p>RM ${parseFloat(product.price).toFixed(2)}</p>
                             <div class="product-unit">Unit: ${product.unit || 'pcs'} | Inventory: ${product.stock !== undefined ? product.stock : 0}</div>
                         </div>
                         <div>
                             <div class="qty-container">
-                                <button class="qty-btn" onclick="changeQty(${product.id}, -1)">-</button>
+                                <button class="qty-btn" onclick="changeQty('${product.id}', -1)">-</button>
                                 <input type="number" id="qty-${product.id}" class="qty-input" value="1" min="1">
-                                <button class="qty-btn" onclick="changeQty(${product.id}, 1)">+</button>
+                                <button class="qty-btn" onclick="changeQty('${product.id}', 1)">+</button>
                             </div>
-                            <button class="btn" onclick="addToCartWithQty(${product.id})">Add to Cart</button>
+                            <button class="btn" onclick="addToCartWithQty('${product.id}')">Add to Cart</button>
                         </div>
                     </div>
                 `;
@@ -482,14 +526,15 @@
                         </td>
                         <td><input type="number" id="edit-stock-${product.id}" value="${product.stock !== undefined ? product.stock : 100}" style="width: 70px; padding: 8px; font-size: 14px; border:1px solid #ccc; border-radius:4px;"></td>
                         <td>
-                            <button onclick="saveProductEdit(${product.id})" style="background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 4px; font-size: 13px;">Save</button>
-                            <button onclick="deleteProduct(${product.id})" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">Del</button>
+                            <button onclick="saveProductEdit('${product.id}')" style="background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 4px; font-size: 13px;">Save</button>
+                            <button onclick="deleteProduct('${product.id}')" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">Del</button>
                         </td>
                     </tr>
                 `;
             });
         }
 
+        // 🌟 修改：修改商品更新保存到 Firebase
         function saveProductEdit(productId) {
             const name = document.getElementById(`edit-name-${productId}`).value.trim();
             const price = parseFloat(document.getElementById(`edit-price-${productId}`).value);
@@ -502,27 +547,25 @@
                 return;
             }
 
-            const prod = products.find(p => p.id === productId);
-            if (prod) {
-                prod.name = name;
-                prod.price = price;
-                prod.cost = cost;
-                prod.unit = unit;
-                prod.stock = stock;
-
-                localStorage.setItem('lexstore_products', JSON.stringify(products));
-                alert('Product updated successfully!');
-                loadAdminProductsTable();
-                renderProducts();
-            }
+            db.ref('products/' + productId).update({
+                name: name,
+                price: price,
+                cost: cost,
+                unit: unit,
+                stock: stock
+            }).then(() => {
+                alert('✅ Product updated and synced to all devices!');
+            }).catch(err => {
+                alert('Update error: ' + err.message);
+            });
         }
 
+        // 🌟 修改：删除商品同步至 Firebase
         function deleteProduct(productId) {
             if (confirm('Are you sure you want to delete this product?')) {
-                products = products.filter(p => p.id !== productId);
-                localStorage.setItem('lexstore_products', JSON.stringify(products));
-                loadAdminProductsTable();
-                renderProducts();
+                db.ref('products/' + productId).remove()
+                    .then(() => alert('Product deleted!'))
+                    .catch(err => alert('Delete error: ' + err.message));
             }
         }
 
@@ -604,7 +647,7 @@
 
                 if (submitBtn) {
                     submitBtn.disabled = true;
-                    submitBtn.innerText = "⏳ Adding Product...";
+                    submitBtn.innerText = "⏳ Adding Product to Cloud...";
                 }
 
                 let uploadedImages = [];
@@ -639,10 +682,11 @@
             }
         }
 
+        // 🌟 修改：新增商品保存至 Firebase 云端数据库
         function saveNewProductData(name, price, cost, unit, stock, imagesArray, desc) {
-            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+            const newRef = db.ref('products').push();
             const newProduct = {
-                id: newId,
+                id: newRef.key,
                 name: name,
                 price: price,
                 cost: cost,
@@ -652,24 +696,24 @@
                 desc: desc || 'No additional description provided.'
             };
 
-            products.push(newProduct);
-            localStorage.setItem('lexstore_products', JSON.stringify(products));
-            renderProducts();
+            newRef.set(newProduct).then(() => {
+                document.getElementById('new-prod-name').value = '';
+                document.getElementById('new-prod-price').value = '';
+                document.getElementById('new-prod-cost').value = '';
+                document.getElementById('new-prod-stock').value = '100';
+                document.getElementById('new-prod-desc').value = '';
+                document.getElementById('image-slots-container').innerHTML = `
+                    <div class="img-slot-row">
+                        <span style="font-size:12px; font-weight:bold; color:#666;">#1</span>
+                        <input type="file" class="new-prod-file-slot" accept="image/*">
+                    </div>
+                `;
 
-            document.getElementById('new-prod-name').value = '';
-            document.getElementById('new-prod-price').value = '';
-            document.getElementById('new-prod-cost').value = '';
-            document.getElementById('new-prod-stock').value = '100';
-            document.getElementById('new-prod-desc').value = '';
-            document.getElementById('image-slots-container').innerHTML = `
-                <div class="img-slot-row">
-                    <span style="font-size:12px; font-weight:bold; color:#666;">#1</span>
-                    <input type="file" class="new-prod-file-slot" accept="image/*">
-                </div>
-            `;
-
-            alert('✅ New product added successfully!');
-            switchPage('store', document.querySelectorAll('.nav-btn')[0]);
+                alert('✅ New product added & synced across all mobile devices!');
+                switchPage('store', document.querySelectorAll('.nav-btn')[0]);
+            }).catch(err => {
+                alert("Cloud Sync Error: " + err.message);
+            });
         }
 
         function switchModalMainImage(src, thumbElement) {
@@ -679,7 +723,7 @@
         }
 
         function openProductDetails(productId) {
-            const product = products.find(p => p.id === productId);
+            const product = products.find(p => String(p.id) === String(productId));
             if (!product) return;
 
             const imgs = (product.images && product.images.length > 0) ? product.images : [product.image || ''];
@@ -699,7 +743,7 @@
                 <img id="modal-main-img" src="${mainImg}" alt="${product.name}" style="width:100%; height:220px; object-fit:cover; border-radius:6px; margin-bottom:10px; cursor:pointer;" onclick="openLightbox(this.src)" title="Click to zoom">
                 ${thumbsHtml}
                 <h2 style="margin-bottom:10px; color:#1a1a1a;">${product.name}</h2>
-                <p style="color:#e67e22; font-size:20px; font-weight:bold; margin-bottom:5px;">RM ${product.price.toFixed(2)} <span style="font-size:14px; color:#666;">/ ${product.unit || 'pcs'}</span></p>
+                <p style="color:#e67e22; font-size:20px; font-weight:bold; margin-bottom:5px;">RM ${parseFloat(product.price).toFixed(2)} <span style="font-size:14px; color:#666;">/ ${product.unit || 'pcs'}</span></p>
                 <p style="font-size:13px; color:#555; margin-bottom:15px;">Available Inventory: <strong>${product.stock !== undefined ? product.stock : 0}</strong></p>
                 <div style="background:#f9f9f9; padding:12px; border-radius:6px; margin-bottom:20px;">
                     <strong style="display:block; margin-bottom:5px; color:#333;">Product Details & Description:</strong>
@@ -711,7 +755,7 @@
                     <input type="number" id="modal-qty-input" class="qty-input" value="1" min="1">
                     <button class="qty-btn" onclick="changeModalQty(1)">+</button>
                 </div>
-                <button class="btn" onclick="addToCartFromModal(${product.id})" style="background:#27ae60; color:white; padding:12px; font-size:16px;">Add to Cart</button>
+                <button class="btn" onclick="addToCartFromModal('${product.id}')" style="background:#27ae60; color:white; padding:12px; font-size:16px;">Add to Cart</button>
             `;
             document.getElementById('product-details-modal').style.display = 'flex';
         }
@@ -729,11 +773,11 @@
         }
 
         function addToCartFromModal(productId) {
-            const product = products.find(p => p.id === productId);
+            const product = products.find(p => String(p.id) === String(productId));
             const qtyInput = document.getElementById('modal-qty-input');
             const quantity = parseInt(qtyInput.value) || 1;
 
-            const cartItem = cart.find(item => item.id === productId);
+            const cartItem = cart.find(item => String(item.id) === String(productId));
             if (cartItem) {
                 cartItem.quantity += quantity;
             } else {
@@ -753,11 +797,11 @@
         }
 
         function addToCartWithQty(productId) {
-            const product = products.find(p => p.id === productId);
+            const product = products.find(p => String(p.id) === String(productId));
             const qtyInput = document.getElementById(`qty-${productId}`);
             const quantity = parseInt(qtyInput.value) || 1;
 
-            const cartItem = cart.find(item => item.id === productId);
+            const cartItem = cart.find(item => String(item.id) === String(productId));
             if (cartItem) {
                 cartItem.quantity += quantity;
             } else {
@@ -809,15 +853,15 @@
             cartContainer.innerHTML = '';
             let subtotal = 0;
             cart.forEach(item => {
-                let itemTotal = item.price * item.quantity;
+                let itemTotal = parseFloat(item.price) * item.quantity;
                 subtotal += itemTotal;
                 cartContainer.innerHTML += `
                     <div class="cart-item">
                         <div>
                             <strong>${item.name}</strong> (${item.unit || 'pcs'})<br>
-                            <small>RM ${item.price.toFixed(2)} x ${item.quantity} = <strong>RM ${itemTotal.toFixed(2)}</strong></small>
+                            <small>RM ${parseFloat(item.price).toFixed(2)} x ${item.quantity} = <strong>RM ${itemTotal.toFixed(2)}</strong></small>
                         </div>
-                        <button class="btn" style="background:#ff4d4d; color:white; padding:6px 12px; width:auto;" onclick="removeFromCart(${item.id})">Remove</button>
+                        <button class="btn" style="background:#ff4d4d; color:white; padding:6px 12px; width:auto;" onclick="removeFromCart('${item.id}')">Remove</button>
                     </div>
                 `;
             });
@@ -836,7 +880,7 @@
         }
 
         function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
+            cart = cart.filter(item => String(item.id) !== String(productId));
             updateCart();
         }
 
@@ -851,7 +895,7 @@
                 return;
             }
 
-            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            let subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
             let shippingFee = (method === 'Delivery') ? 8.00 : 0.00;
             let total = subtotal + shippingFee;
             
@@ -870,7 +914,7 @@
             existingOrders.unshift(orderData);
             localStorage.setItem('lexstore_orders', JSON.stringify(existingOrders));
 
-            let itemsText = cart.map(i => `- ${i.name} x ${i.quantity} (${i.unit || 'pcs'}) [RM ${(i.price * i.quantity).toFixed(2)}]`).join('\n');
+            let itemsText = cart.map(i => `- ${i.name} x ${i.quantity} (${i.unit || 'pcs'}) [RM ${(parseFloat(i.price) * i.quantity).toFixed(2)}]`).join('\n');
             let waMessage = `*📦 New Order from LEXSTORE*\n\n` +
                             `*Customer Name:* ${name}\n` +
                             `*Phone:* ${phone}\n` +
@@ -918,7 +962,7 @@
                         <td>${order.date}</td>
                         <td>${fulfillmentTag}<br><strong>${order.name}</strong><br>${order.phone}<br><small>${order.address}</small>${shippingInfo}</td>
                         <td>${itemsList}</td>
-                        <td><strong>RM ${order.total.toFixed(2)}</strong></td>
+                        <td><strong>RM ${parseFloat(order.total).toFixed(2)}</strong></td>
                     </tr>
                 `;
             });
@@ -1025,7 +1069,7 @@
             totalOrdersCard.innerText = `Total Orders: ${orders.length}`;
             
             let totalSales = 0;
-            orders.forEach(o => totalSales += o.total);
+            orders.forEach(o => totalSales += parseFloat(o.total));
             totalSalesCard.innerText = `Total Sales: RM ${totalSales.toFixed(2)}`;
 
             if (orders.length === 0) {
@@ -1043,7 +1087,7 @@
                         <td>${order.date}</td>
                         <td>${fulfillmentTag}<br><strong>${order.name}</strong><br>${order.phone}<br><small>${order.address}</small>${shippingInfo}</td>
                         <td>${itemsList}</td>
-                        <td><strong>RM ${order.total.toFixed(2)}</strong></td>
+                        <td><strong>RM ${parseFloat(order.total).toFixed(2)}</strong></td>
                     </tr>
                 `;
             });
@@ -1107,7 +1151,7 @@
 
             orders.forEach(order => {
                 let itemsList = order.items.map(i => `${i.name} x ${i.quantity} (${i.unit || 'pcs'})`).join('; ');
-                let fee = (order.shippingFee !== undefined) ? order.shippingFee.toFixed(2) : "0.00";
+                let fee = (order.shippingFee !== undefined) ? parseFloat(order.shippingFee).toFixed(2) : "0.00";
                 html += `
                     <tr>
                         <td>${order.date}</td>
@@ -1117,7 +1161,7 @@
                         <td>${order.address}</td>
                         <td>${fee}</td>
                         <td>${itemsList}</td>
-                        <td>${order.total.toFixed(2)}</td>
+                        <td>${parseFloat(order.total).toFixed(2)}</td>
                     </tr>
                 `;
             });
