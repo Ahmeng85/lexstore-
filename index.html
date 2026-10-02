@@ -179,7 +179,7 @@
     <div id="orders-page" class="page">
         <div class="box-container">
             <h2>My Purchase History</h2>
-            <p style="color: #666; margin-top: 5px; margin-bottom: 15px;">These are the orders saved on your device.</p>
+            <p style="color: #666; margin-top: 5px; margin-bottom: 15px;">These are the orders saved in the cloud.</p>
             <div style="overflow-x:auto;">
                 <table id="customer-orders-table">
                     <thead>
@@ -227,7 +227,7 @@
                     <div class="stat-card" id="total-sales-card">Total Sales: RM 0.00</div>
                 </div>
 
-                <h3>Customer Orders List</h3>
+                <h3>Customer Orders List (Cloud Synced)</h3>
                 <div style="overflow-x:auto;">
                     <table id="orders-table">
                         <thead>
@@ -384,11 +384,12 @@
         ];
 
         let products = [];
+        let orders = [];
         let cart = [];
         let currentRole = null;
         const availableUnits = ["pcs", "pack", "set", "bottle", "bag", "kg", "gram", "m", "cm", "unit"];
 
-        // 🌟 从 Firebase 实时读取并监听所有设备的变动
+        // 🌟 1. 实时监听 Firebase：商品列表同步
         db.ref('products').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -398,7 +399,6 @@
                     products = Object.keys(data).map(key => ({ ...data[key], id: key }));
                 }
             } else {
-                // 如果云端空了，把默认数据初始化上去
                 defaultProducts.forEach(p => {
                     db.ref('products/' + p.id).set(p);
                 });
@@ -415,6 +415,22 @@
             renderProducts();
             if (document.getElementById('products-list-section').classList.contains('active')) {
                 loadAdminProductsTable();
+            }
+        });
+
+        // 🌟 2. 实时监听 Firebase：订单列表同步（解决不同手机Admin看到订单不一致的问题）
+        db.ref('orders').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                orders = Object.keys(data).map(key => ({ ...data[key], id: key })).reverse();
+            } else {
+                orders = [];
+            }
+            if (document.getElementById('orders-section').classList.contains('active')) {
+                loadOrders();
+            }
+            if (document.getElementById('orders-page').classList.contains('active')) {
+                loadCustomerOrders();
             }
         });
 
@@ -453,6 +469,8 @@
 
             if (sectionId === 'products-list-section') {
                 loadAdminProductsTable();
+            } else if (sectionId === 'orders-section') {
+                loadOrders();
             } else if (sectionId === 'super-settings-section') {
                 document.getElementById('new-whatsapp-input').value = localStorage.getItem('store_whatsapp') || '';
             }
@@ -584,7 +602,6 @@
             btn.parentElement.remove();
         }
 
-        // 🌟 超强高压缩图片算法（限制 500px，压缩率 0.5，防止超过数据库传输限制）
         function compressImage(file, maxWidth = 500) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -888,6 +905,7 @@
             updateCart();
         }
 
+        // 🌟 3. 提交订单并同步保存至 Firebase 云端数据库
         function submitOrder() {
             const name = document.getElementById('customer-name').value.trim();
             const phone = document.getElementById('customer-phone').value.trim();
@@ -914,41 +932,41 @@
                 date: new Date().toLocaleString()
             };
 
-            let existingOrders = JSON.parse(localStorage.getItem('lexstore_orders')) || [];
-            existingOrders.unshift(orderData);
-            localStorage.setItem('lexstore_orders', JSON.stringify(existingOrders));
+            // 写入 Firebase 云端数据库
+            db.ref('orders').push(orderData).then(() => {
+                let itemsText = cart.map(i => `- ${i.name} x ${i.quantity} (${i.unit || 'pcs'}) [RM ${(parseFloat(i.price) * i.quantity).toFixed(2)}]`).join('\n');
+                let waMessage = `*📦 New Order from LEXSTORE*\n\n` +
+                                `*Customer Name:* ${name}\n` +
+                                `*Phone:* ${phone}\n` +
+                                `*Fulfillment:* ${method}\n` +
+                                `*Address:* ${orderData.address}\n\n` +
+                                `*Items Ordered:*\n${itemsText}\n\n` +
+                                `*Subtotal:* RM ${subtotal.toFixed(2)}\n` +
+                                `*Delivery Fee:* RM ${shippingFee.toFixed(2)}\n` +
+                                `*Total Amount:* *RM ${total.toFixed(2)}*\n\n` +
+                                `*Order Time:* ${orderData.date}`;
 
-            let itemsText = cart.map(i => `- ${i.name} x ${i.quantity} (${i.unit || 'pcs'}) [RM ${(parseFloat(i.price) * i.quantity).toFixed(2)}]`).join('\n');
-            let waMessage = `*📦 New Order from LEXSTORE*\n\n` +
-                            `*Customer Name:* ${name}\n` +
-                            `*Phone:* ${phone}\n` +
-                            `*Fulfillment:* ${method}\n` +
-                            `*Address:* ${orderData.address}\n\n` +
-                            `*Items Ordered:*\n${itemsText}\n\n` +
-                            `*Subtotal:* RM ${subtotal.toFixed(2)}\n` +
-                            `*Delivery Fee:* RM ${shippingFee.toFixed(2)}\n` +
-                            `*Total Amount:* *RM ${total.toFixed(2)}*\n\n` +
-                            `*Order Time:* ${orderData.date}`;
+                const storeWhatsApp = localStorage.getItem('store_whatsapp') || '60102862797'; 
+                const waUrl = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(waMessage)}`;
+                window.open(waUrl, '_blank');
 
-            const storeWhatsApp = localStorage.getItem('store_whatsapp') || '60102862797'; 
-            const waUrl = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(waMessage)}`;
-            window.open(waUrl, '_blank');
-
-            alert('Order submitted and saved successfully! Redirecting to WhatsApp & My Orders...');
-            
-            cart = [];
-            updateCart();
-            document.getElementById('customer-name').value = '';
-            document.getElementById('customer-phone').value = '';
-            document.getElementById('customer-address').value = '';
-            document.getElementById('checkout-method').value = 'Delivery';
-            toggleAddressField();
-            
-            switchPage('orders', document.querySelectorAll('.nav-btn')[2]);
+                alert('Order submitted and synced to cloud! Redirecting to WhatsApp & My Orders...');
+                
+                cart = [];
+                updateCart();
+                document.getElementById('customer-name').value = '';
+                document.getElementById('customer-phone').value = '';
+                document.getElementById('customer-address').value = '';
+                document.getElementById('checkout-method').value = 'Delivery';
+                toggleAddressField();
+                
+                switchPage('orders', document.querySelectorAll('.nav-btn')[2]);
+            }).catch(err => {
+                alert("Order sync failed: " + err.message);
+            });
         }
 
         function loadCustomerOrders() {
-            const orders = JSON.parse(localStorage.getItem('lexstore_orders')) || [];
             const tbody = document.getElementById('customer-orders-tbody');
 
             if (orders.length === 0) {
@@ -974,8 +992,7 @@
 
         function clearCustomerOrders() {
             if (confirm('Are you sure you want to clear your order history?')) {
-                localStorage.removeItem('lexstore_orders');
-                loadCustomerOrders();
+                db.ref('orders').remove().then(() => loadCustomerOrders());
             }
         }
 
@@ -1065,7 +1082,6 @@
         }
 
         function loadOrders() {
-            const orders = JSON.parse(localStorage.getItem('lexstore_orders')) || [];
             const tbody = document.getElementById('orders-tbody');
             const totalOrdersCard = document.getElementById('total-orders-card');
             const totalSalesCard = document.getElementById('total-sales-card');
@@ -1102,16 +1118,15 @@
                 alert('Only Super Admin can clear orders!');
                 return;
             }
-            if (confirm('Are you sure you want to clear all orders?')) {
-                localStorage.removeItem('lexstore_orders');
-                loadOrders();
+            if (confirm('Are you sure you want to clear all orders from the cloud?')) {
+                db.ref('orders').remove().then(() => loadOrders());
             }
         }
 
         function exportDataJson() {
             const allData = {
                 products: products,
-                orders: JSON.parse(localStorage.getItem('lexstore_orders')) || [],
+                orders: orders,
                 store_whatsapp: localStorage.getItem('store_whatsapp')
             };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData, null, 2));
@@ -1124,7 +1139,6 @@
         }
 
         function exportOrdersExcel() {
-            const orders = JSON.parse(localStorage.getItem('lexstore_orders')) || [];
             if (orders.length === 0) {
                 alert('No orders available to export!');
                 return;
