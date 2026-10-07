@@ -23,7 +23,6 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
         body { background-color: #f5f5f5; color: #333; }
-        
         header { background-color: #2ecc71; color: #fff; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         header h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; margin-bottom: 5px; }
         header p { font-size: 12px; color: #e8f5e9; margin-bottom: 12px; }
@@ -34,10 +33,8 @@
         .nav-btn.whatsapp-nav:hover { background: #1ebd56; }
         .nav-btn.member-nav { background: #f39c12; color: #fff; }
         .nav-btn.member-nav:hover { background: #e67e22; }
-        
         .page { display: none; max-width: 1200px; margin: 15px auto; padding: 0 10px; }
         .page.active { display: block !important; }
-        
         .member-banner { background: linear-gradient(135deg, #f39c12, #e67e22); color: #fff; padding: 15px 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3); transition: transform 0.2s, box-shadow 0.2s; flex-wrap: wrap; gap: 10px; }
         .member-banner:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(243, 156, 18, 0.4); }
         .member-banner-text { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 200px; }
@@ -47,21 +44,17 @@
         .member-banner.logged-in { background: linear-gradient(135deg, #2ecc71, #27ae60); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); }
         .member-banner.logged-in:hover { box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4); }
         .member-banner.logged-in .member-banner-btn { color: #27ae60; }
-
         .affiliate-box { background: #e8f5e9; border: 1px dashed #2ecc71; padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 13px; line-height: 1.6; }
         .affiliate-box .aff-link { background: #fff; padding: 8px; border-radius: 4px; word-break: break-all; font-weight: bold; color: #2ecc71; margin: 8px 0; border: 1px solid #c8e6c9; }
         .btn-aff-share { background: #e67e22; color: #fff; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; font-size: 14px; }
         .btn-aff-share:hover { background: #d35400; }
-
         .category-bar { display: flex; gap: 8px; overflow-x: auto; padding: 12px 0; margin-bottom: 12px; border-bottom: 2px solid #eee; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .category-bar::-webkit-scrollbar { display: none; }
         .category-tab { padding: 8px 16px; background: #fff; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; font-weight: bold; color: #555; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
         .category-tab.active { background: #2ecc71; color: #fff; border-color: #2ecc71; }
         .category-tab:hover:not(.active) { border-color: #2ecc71; color: #2ecc71; }
-        
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(4, 1fr); gap: 12px; } }
-        
         .product-card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; position: relative; cursor: pointer; transition: transform 0.2s; }
         .product-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .product-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
@@ -71,7 +64,6 @@
         .price-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
         .price { color: #ee4d2d; font-size: 16px; font-weight: bold; }
         .sold-count { font-size: 11px; color: #757575; }
-        
         .cart-box { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
         .total-price { font-size: 22px; font-weight: 800; margin: 20px 0; text-align: right; color: #ee4d2d; }
@@ -79,14 +71,12 @@
         .checkout-form input, .checkout-form select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; background: #fafafa; }
         .checkout-btn { width: 100%; background-color: #25d366; color: white; padding: 14px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .checkout-btn:hover { background-color: #1ebd56; }
-        
         .box-container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
         .admin-sub-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 12px; flex-wrap: wrap; }
         .admin-sub-btn { background: #f8f9fa; border: none; padding: 8px 14px; cursor: pointer; border-radius: 20px; font-weight: bold; font-size: 13px; color: #555; transition: all 0.2s; }
         .admin-sub-btn.active { background: #2ecc71 !important; color: #fff !important; }
         .admin-section { display: none; }
         .admin-section.active { display: block !important; }
-        
         .stats { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         .stat-card { background: #e8f5e9; padding: 15px; border-radius: 8px; flex: 1; text-align: center; font-weight: bold; font-size: 15px; color: #2ecc71; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -95,17 +85,14 @@
         tr:nth-child(even) { background-color: #f9fdfa; }
         #orders-table tbody tr { cursor: pointer; transition: background 0.2s; }
         #orders-table tbody tr:hover { background-color: #e8f5e9; }
-
         .btn-clear { background: #e74c3c; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 6px; font-weight: bold; margin-top: 20px; }
         .admin-form input, .admin-form textarea, .admin-form select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: #fafafa; }
         .admin-form label { font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px; }
         #admin-login-box { max-width: 400px; margin: 50px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
         #admin-login-box input { width: 100%; padding: 12px; margin: 10px 0 20px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
-        
         .img-slot-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: #fafafa; padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
         .btn-add-slot { background: #3498db; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
         .btn-del-slot { background: #e74c3c; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; }
-        
         .modal-thumbs { display: flex; gap: 8px; margin-top: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
         .modal-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid #ddd; flex-shrink: 0; }
         .modal-thumb.active { border-color: #2ecc71; box-shadow: 0 0 6px rgba(46, 204, 113, 0.5); }
@@ -114,15 +101,12 @@
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; color: #999; z-index: 1010; }
         .close-btn:hover { color: #e74c3c; }
         #lightbox-content { max-width: 90%; max-height: 90%; border-radius: 8px; }
-        
         .qty-container { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 15px; }
         .qty-btn { background: #f0f0f0; border: 1px solid #ddd; width: 32px; height: 32px; font-weight: bold; cursor: pointer; border-radius: 4px; color: #555; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .qty-btn:hover { background: #e0e0e0; }
         .qty-input { width: 45px; text-align: center; font-size: 14px; border: 1px solid #ddd; border-radius: 4px; padding: 4px; }
-        
         .btn-change-img { background-color: #3498db; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; margin-top: 5px; width: 100%; }
         .btn-change-img:hover { background-color: #2980b9; }
-        
         .fb-share-btn { background-color: transparent; border: none; padding: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s; }
         .fb-share-btn:hover { transform: scale(1.1); }
         .fb-share-btn svg { width: 32px; height: 32px; }
@@ -134,16 +118,13 @@
         .fb-step-btn.step1 { background-color: #f39c12; }
         .fb-step-btn.step2 { background-color: #27ae60; }
         .fb-step-btn.step3 { background-color: #1877f2; }
-        
         .status-select { padding: 5px; border-radius: 4px; border: 1px solid #ddd; font-weight: bold; cursor: pointer; width: 100%; min-width: 90px; text-align: center; }
         .status-pending { background-color: #fff8e1; color: #e67e22; border-color: #ffe082; }
         .status-complete { background-color: #e8f5e9; color: #2ecc71; border-color: #c8e6c9; }
         .status-cash { background-color: #e3f2fd; color: #1976d2; border-color: #bbdefb; }
         .status-qrcode { background-color: #f3e5f5; color: #8e44ad; border-color: #e1bee7; }
         .status-cancel { background-color: #ffebee; color: #c62828; border-color: #ffcdd2; }
-        
         .cart-item-img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: #f0f0f0; }
-
         .receipt-box { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 700px; margin: 0 auto; font-family: 'Courier New', Courier, monospace; color: #000; }
         .receipt-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 20px; }
         .receipt-header h2 { font-size: 22px; color: #000; text-align: center; flex: 1; margin: 0; }
@@ -177,19 +158,16 @@
         .btn-print:hover { background-color: #2980b9; }
         .btn-save-copy { background-color: #9b59b6; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; flex: 1; min-width: 120px; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: Arial, Helvetica, sans-serif; }
         .btn-save-copy:hover { background-color: #8e44ad; }
-
         .spec-section { margin-bottom: 15px; }
         .spec-label { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 8px; }
         .spec-card { display: flex; flex-wrap: wrap; gap: 8px; }
         .spec-option { padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; background: #fafafa; font-size: 13px; cursor: pointer; transition: all 0.2s; color: #555; line-height: 1.4; }
         .spec-option.selected { border-color: #ee4d2d; background: #fff5f2; color: #ee4d2d; font-weight: bold; }
         .spec-option:hover { border-color: #ee4d2d; }
-
         .btn-icon-action { background: #f0f0f0; border: 1px solid #ddd; border-radius: 6px; padding: 6px 10px; font-size: 16px; cursor: pointer; font-weight: bold; margin-right: 4px; vertical-align: middle; }
         .btn-icon-action:hover { background: #e0e0e0; }
         .btn-icon-action.delete { background: #ffebee; border-color: #ffcdd2; }
         .btn-icon-action.delete:hover { background: #ffcdd2; }
-
         .member-box { max-width: 420px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .member-box h2 { font-size: 22px; color: #2ecc71; text-align: center; margin-bottom: 20px; }
         .member-tabs { display: flex; gap: 0; margin-bottom: 25px; border-bottom: 2px solid #eee; }
@@ -206,27 +184,14 @@
         .member-info-box p { font-size: 14px; color: #555; margin-bottom: 5px; }
         .member-logout-btn { background: #e74c3c; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .member-logout-btn:hover { background: #c0392b; }
-
         .bank-box { max-width: 600px; margin: 20px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; }
         .bank-box h2 { color: #2ecc71; font-size: 22px; margin-bottom: 20px; }
         .bank-box .bank-detail { font-size: 16px; color: #333; margin-bottom: 20px; white-space: pre-wrap; line-height: 1.6; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
         .bank-box .qr-img { max-width: 250px; width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 10px; cursor: zoom-in; }
-
-        @media print {
-            body * { visibility: hidden; }
-            header, .nav-tabs, .btn-back-orders, .btn-save-receipt, .btn-print, .btn-save-copy, .btn-add-item, .btn-remove, .receipt-actions, .footer-note { display: none !important; }
-            .page, .receipt-box, .receipt-box * { visibility: visible; }
-            .receipt-box { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; padding: 0; max-width: 100%; border-radius: 0; }
-            .receipt-section { border-bottom: none; margin-bottom: 10px; }
-            .receipt-section input, .receipt-section select { border: none; background: transparent; padding: 0; font-weight: bold; color: #000; margin-bottom: 5px; }
-            .receipt-item-row { border-bottom: 1px solid #eee; background: transparent; padding: 5px 0; }
-            .receipt-item-row input { border: none; background: transparent; padding: 0; font-weight: bold; color: #000; }
-            .receipt-total-section { border-top: 2px solid #000; color: #000; }
-        }
+        @media print { body * { visibility: hidden; } header, .nav-tabs, .btn-back-orders, .btn-save-receipt, .btn-print, .btn-save-copy, .btn-add-item, .btn-remove, .receipt-actions, .footer-note { display: none !important; } .page, .receipt-box, .receipt-box * { visibility: visible; } .receipt-box { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; padding: 0; max-width: 100%; border-radius: 0; } .receipt-section { border-bottom: none; margin-bottom: 10px; } .receipt-section input, .receipt-section select { border: none; background: transparent; padding: 0; font-weight: bold; color: #000; margin-bottom: 5px; } .receipt-item-row { border-bottom: 1px solid #eee; background: transparent; padding: 5px 0; } .receipt-item-row input { border: none; background: transparent; padding: 0; font-weight: bold; color: #000; } .receipt-total-section { border-top: 2px solid #000; color: #000; } }
     </style>
 </head>
 <body>
-
     <header>
         <h1>LEXSTORE HARDWARE</h1>
         <p>Your Trusted Local Hardware Store</p>
@@ -249,7 +214,6 @@
             </div>
             <button class="member-banner-btn">立即登录 / 注册 →</button>
         </div>
-        
         <div class="category-bar" id="category-bar"></div>
         <div class="product-grid" id="product-grid"></div>
     </div>
@@ -311,7 +275,6 @@
                 <div class="member-tab active" id="tab-login" onclick="switchMemberTab('login')">Login 登录</div>
                 <div class="member-tab" id="tab-register" onclick="switchMemberTab('register')">Register 注册</div>
             </div>
-
             <div class="member-form" id="member-login-form">
                 <label>Phone 手机号:</label>
                 <input type="text" id="login-phone" placeholder="e.g. 0123456789">
@@ -319,7 +282,6 @@
                 <input type="password" id="login-password" placeholder="Your password">
                 <button class="member-submit" onclick="memberLogin()">🔐 Login 登录</button>
             </div>
-
             <div class="member-form" id="member-register-form" style="display:none;">
                 <label>Full Name 姓名:</label>
                 <input type="text" id="register-name" placeholder="e.g. Ah Meng">
@@ -332,25 +294,28 @@
                 <button class="member-submit" onclick="memberRegister()">✅ Register 注册</button>
             </div>
         </div>
-
         <div class="member-box" id="member-logged-in" style="display:none;">
             <div class="member-info-box">
                 <h3>✅ Welcome, <span id="member-display-name">-</span>!</h3>
                 <p>📞 <span id="member-display-phone">-</span></p>
             </div>
-            <div style="background:#f9f9f9; padding:15px; border-radius:8px; font-size:13px; color:#555; line-height:1.7;">
-                💡 登录后，结账时姓名和电话会自动填入。<br>
-                💡 你依然可以使用本网站的所有功能。
-            </div>
-            
             <div class="affiliate-box">
-                <h4 style="color:#2ecc71; margin-bottom:5px;">💰 推广赚取 3% 提成</h4>
-                <p>分享下方专属链接给朋友，他们购买后你可以获得订单总额的 <strong>3%</strong> 提成！Admin 会通过你的注册手机号联系你结算。</p>
-                <div class="aff-link" id="member-aff-link">正在生成链接...</div>
-                <button class="btn-aff-share" onclick="copyAffiliateLink()">📋 复制专属推广链接</button>
-            </div>
+                <h4 style="color:#2ecc71; margin-bottom:5px;">💰 Earn 1% Commission</h4>
+                <p>Share your exclusive link with friends. When someone registers, you earn 1% commission on all their future purchases! *Requirement: You must purchase at least once in the current month to qualify for the commission.*</p>
+                <div class="aff-link" id="member-aff-link">Generating link...</div>
+                
+                <!-- 新增：Total 提成显示 -->
+                <div style="margin-top:15px; padding:12px; background:#fff; border-radius:6px; border:1px solid #c8e6c9; text-align:center;">
+                    <h5 style="color:#27ae60; margin-bottom:5px; font-size:14px;">📊 My Stats</h5>
+                    <div style="font-size:15px; font-weight:bold; color:#e67e22;">Total Commission: <span id="my-total-commission">RM 0.00</span></div>
+                </div>
 
-            <button class="member-logout-btn" onclick="memberLogout()" style="width:100%;">🚪 Logout 登出</button>
+                <!-- 新增：我的下线列表 -->
+                <div id="my-downline-list" style="margin-top:15px; border-top:1px dashed #c8e6c9; padding-top:10px;"></div>
+                
+                <button class="btn-aff-share" onclick="copyAffiliateLink()" style="margin-top:15px;">Share to earn 1%</button>
+            </div>
+            <button class="member-logout-btn" onclick="memberLogout()" style="width:100%;">🚪 Log out</button>
         </div>
     </div>
 
@@ -361,13 +326,11 @@
             <input type="password" id="admin-password-input" placeholder="Enter Admin Password">
             <button class="btn" onclick="verifyAdminLogin()" style="padding: 12px; font-size: 16px;">Login</button>
         </div>
-
         <div id="admin-dashboard" class="box-container" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
                 <h2 id="admin-title" style="font-size: 18px;">Admin Panel</h2>
                 <button class="btn" style="width: auto; background: #e74c3c; color: white; padding: 8px 14px; font-size: 13px;" onclick="adminLogout()">Logout</button>
             </div>
-
             <div class="admin-sub-tabs">
                 <button class="admin-sub-btn active" onclick="switchAdminSubTab('orders-section', this)">📦 Orders List</button>
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('products-list-section', this)">📋 Products List</button>
@@ -377,7 +340,6 @@
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('bank-settings-section', this)">🏦 Bank Settings</button>
                 <button class="admin-sub-btn" id="super-tab-btn" onclick="switchAdminSubTab('super-settings-section', this)" style="display:none;">🔐 Super Admin Settings</button>
             </div>
-
             <div id="orders-section" class="admin-section active">
                 <div class="stats">
                     <div class="stat-card" id="total-orders-card">Total Orders: 0</div>
@@ -387,15 +349,7 @@
                 <p style="font-size:12px; color:#888; margin-bottom:10px;">💡 Click on any order row to view and edit the receipt.</p>
                 <div style="overflow-x:auto;">
                     <table id="orders-table">
-                        <thead>
-                            <tr>
-                                <th>Date & Customer Info</th>
-                                <th>Order Items</th>
-                                <th>Total (RM)</th>
-                                <th>推荐人 / 提成</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Date & Customer Info</th><th>Order Items</th><th>Total (RM)</th><th>推荐人 / 提成</th><th>Status</th></tr></thead>
                         <tbody id="orders-tbody"><tr><td colspan="5" style="text-align: center;">No orders yet.</td></tr></tbody>
                     </table>
                 </div>
@@ -405,71 +359,33 @@
                     <button class="btn-clear" style="margin-top:0; font-size: 13px; padding: 8px 12px;" onclick="clearOrders()">Clear All Orders</button>
                 </div>
             </div>
-
             <div id="products-list-section" class="admin-section">
                 <h3 style="font-size: 16px; margin-bottom: 10px;">Product List</h3>
                 <div style="overflow-x:auto;">
                     <table style="min-width: 900px;">
-                        <thead>
-                            <tr>
-                                <th style="width: 70px;">Img</th>
-                                <th style="min-width: 180px;">Name</th>
-                                <th style="width: 90px;">Price (RM)</th>
-                                <th style="width: 90px;">Cost (RM)</th>
-                                <th style="width: 170px;">Category</th>
-                                <th style="width: 140px;">Unit</th>
-                                <th style="width: 80px;">Stock</th>
-                                <th style="width: 90px;">Actions</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th style="width: 70px;">Img</th><th style="min-width: 180px;">Name</th><th style="width: 90px;">Price (RM)</th><th style="width: 90px;">Cost (RM)</th><th style="width: 170px;">Category</th><th style="width: 140px;">Unit</th><th style="width: 80px;">Stock</th><th style="width: 90px;">Actions</th></tr></thead>
                         <tbody id="admin-products-tbody"></tbody>
                     </table>
                 </div>
             </div>
-
             <div id="add-product-section" class="admin-section">
                 <h3 style="color: #27ae60; font-size: 16px; margin-bottom: 15px;">Add New Product to Store</h3>
                 <div class="admin-form">
-                    <label>Product Name *:</label>
-                    <input type="text" id="new-prod-name" placeholder="e.g. Electric Saw">
-                    <label>Selling Price (RM) *:</label>
-                    <input type="number" id="new-prod-price" placeholder="e.g. 85.00" step="any">
-                    <label>Cost Price (RM):</label>
-                    <input type="number" id="new-prod-cost" placeholder="e.g. 50.00" step="any">
-                    <label>Category (分类):</label>
-                    <select id="new-prod-category"></select>
-                    <label>Unit:</label>
-                    <select id="new-prod-unit">
-                        <option value="pcs">pcs (个)</option>
-                        <option value="pack">pack (包)</option>
-                        <option value="set">set (套)</option>
-                        <option value="bottle">bottle (瓶)</option>
-                        <option value="bag">bag (袋)</option>
-                        <option value="kg">kg (公斤)</option>
-                        <option value="gram">gram (克)</option>
-                        <option value="m">m (米)</option>
-                        <option value="cm">cm (厘米)</option>
-                        <option value="unit">unit (单位)</option>
-                    </select>
-                    <label>Initial Inventory Quantity:</label>
-                    <input type="number" id="new-prod-stock" placeholder="e.g. 100" value="100">
-                    <label>Model Options (用逗号分隔，选填):</label>
-                    <input type="text" id="new-prod-model" placeholder="e.g. 黑色带拉链,红色不带拉链">
-                    <label>Size Options (用逗号分隔，选填):</label>
-                    <input type="text" id="new-prod-size" placeholder="e.g. 5XL - 适合155-175cm,7XL - 适合175-190cm">
+                    <label>Product Name *:</label><input type="text" id="new-prod-name" placeholder="e.g. Electric Saw">
+                    <label>Selling Price (RM) *:</label><input type="number" id="new-prod-price" placeholder="e.g. 85.00" step="any">
+                    <label>Cost Price (RM):</label><input type="number" id="new-prod-cost" placeholder="e.g. 50.00" step="any">
+                    <label>Category (分类):</label><select id="new-prod-category"></select>
+                    <label>Unit:</label><select id="new-prod-unit"><option value="pcs">pcs (个)</option><option value="pack">pack (包)</option><option value="set">set (套)</option><option value="bottle">bottle (瓶)</option><option value="bag">bag (袋)</option><option value="kg">kg (公斤)</option><option value="gram">gram (克)</option><option value="m">m (米)</option><option value="cm">cm (厘米)</option><option value="unit">unit (单位)</option></select>
+                    <label>Initial Inventory Quantity:</label><input type="number" id="new-prod-stock" placeholder="e.g. 100" value="100">
+                    <label>Model Options (用逗号分隔，选填):</label><input type="text" id="new-prod-model" placeholder="e.g. 黑色带拉链,红色不带拉链">
+                    <label>Size Options (用逗号分隔，选填):</label><input type="text" id="new-prod-size" placeholder="e.g. 5XL - 适合155-175cm,7XL - 适合175-190cm">
                     <label style="display:block; margin-bottom: 5px;">Upload Product Images (支持多张图片):</label>
-                    <div id="image-slots-container">
-                        <div class="img-slot-row">
-                            <span style="font-size:12px; font-weight:bold; color:#666;">#1</span>
-                            <input type="file" class="new-prod-file-slot" accept="image/*">
-                        </div>
-                    </div>
+                    <div id="image-slots-container"><div class="img-slot-row"><span style="font-size:12px; font-weight:bold; color:#666;">#1</span><input type="file" class="new-prod-file-slot" accept="image/*"></div></div>
                     <button type="button" class="btn-add-slot" onclick="addImageSlot()">➕ Add Another Image Slot</button>
                     <button class="btn" style="background:#27ae60; color:#fff; padding:14px; font-size:16px; margin-top:10px;" onclick="addNewProduct()">✅ Save New Product</button>
                     <button class="btn" style="background:#95a5a6; color:#fff; margin-top:8px;" onclick="resetProductForm()">↺ Reset Form</button>
                 </div>
             </div>
-
             <div id="categories-section" class="admin-section">
                 <h3 style="color: #2ecc71; font-size: 16px; margin-bottom: 15px;">🏷 分类管理 / Category Management</h3>
                 <p style="font-size: 13px; color: #666; margin-bottom: 15px;">新增、修改或删除分类。修改后会立即显示在商店首页顶部。删除分类不会删除产品，但产品会变成未分类。</p>
@@ -483,45 +399,29 @@
                 <h4 style="margin-bottom: 10px;">现有分类：</h4>
                 <div id="admin-categories-list"></div>
             </div>
-
             <div id="members-section" class="admin-section">
                 <h3 style="color: #f39c12; font-size: 16px; margin-bottom: 15px;">👥 Member List</h3>
-                <div class="stats">
-                    <div class="stat-card" style="background: #fff8e1; color: #e67e22;" id="total-members-card">Total Members: 0</div>
-                </div>
+                <div class="stats"><div class="stat-card" style="background: #fff8e1; color: #e67e22;" id="total-members-card">Total Members: 0</div></div>
                 <div style="overflow-x:auto;">
-                    <table>
-                        <thead><tr><th>Register Date</th><th>Name</th><th>Contact</th></tr></thead>
-                        <tbody id="members-tbody"><tr><td colspan="3" style="text-align:center; color:#888;">暂无会员</td></tr></tbody>
-                    </table>
+                    <table><thead><tr><th>Register Date</th><th>Name</th><th>Contact</th></tr></thead><tbody id="members-tbody"><tr><td colspan="3" style="text-align:center; color:#888;">暂无会员</td></tr></tbody></table>
                 </div>
             </div>
-
             <div id="bank-settings-section" class="admin-section">
                 <h3 style="color: #2ecc71; font-size: 16px; margin-bottom: 15px;">🏦 Bank Details Management</h3>
                 <p style="font-size: 13px; color: #666; margin-bottom: 15px;">修改后，前台顾客点击“Bank”栏目会立即看到最新的银行信息。</p>
                 <div class="admin-form" style="max-width: 500px;">
-                    <label>Company Name 公司名字:</label>
-                    <input type="text" id="bank-company-name" placeholder="e.g. LEXSTORE HARDWARE">
-                    
-                    <label>Bank Details 银行详情:</label>
-                    <textarea id="bank-details" rows="4" placeholder="Bank: Maybank&#10;Account Name: LEXSTORE HARDWARE&#10;Account No: 1234 5678 9012" style="resize:vertical;"></textarea>
-                    
-                    <label style="display:block; margin-bottom: 5px;">QR Code Upload (支持上传二维码):</label>
-                    <input type="file" id="bank-qr-upload" accept="image/*" onchange="handleQrUpload(event)" style="margin-bottom: 10px;">
+                    <label>Company Name 公司名字:</label><input type="text" id="bank-company-name" placeholder="e.g. LEXSTORE HARDWARE">
+                    <label>Bank Details 银行详情:</label><textarea id="bank-details" rows="4" placeholder="Bank: Maybank&#10;Account Name: LEXSTORE HARDWARE&#10;Account No: 1234 5678 9012" style="resize:vertical;"></textarea>
+                    <label style="display:block; margin-bottom: 5px;">QR Code Upload (支持上传二维码):</label><input type="file" id="bank-qr-upload" accept="image/*" onchange="handleQrUpload(event)" style="margin-bottom: 10px;">
                     <div id="qr-preview" style="margin-bottom: 15px;"></div>
-                    
                     <button class="btn" style="background:#2ecc71; color:#fff;" onclick="saveBankSettings()">💾 Save Bank Settings</button>
                 </div>
             </div>
-
             <div id="super-settings-section" class="admin-section">
                 <h3 style="color:#8e44ad; font-size: 16px; margin-bottom:15px;">🔐 Super Admin Settings</h3>
                 <div class="admin-form" style="max-width:520px;">
-                    <label style="font-weight:bold; font-size:14px;">Change Admin Password:</label>
-                    <input type="text" id="new-admin-pw" placeholder="New admin password">
-                    <label style="font-weight:bold; font-size:14px;">Change Super Admin Password:</label>
-                    <input type="text" id="new-super-pw" placeholder="New super admin password">
+                    <label style="font-weight:bold; font-size:14px;">Change Admin Password:</label><input type="text" id="new-admin-pw" placeholder="New admin password">
+                    <label style="font-weight:bold; font-size:14px;">Change Super Admin Password:</label><input type="text" id="new-super-pw" placeholder="New super admin password">
                     <button class="btn" style="background:#8e44ad; color:#fff;" onclick="savePasswords()">💾 Save Passwords</button>
                 </div>
                 <div style="margin-top:30px; border-top:2px dashed #ddd; padding-top:20px;">
@@ -535,9 +435,7 @@
                     </div>
                 </div>
                 <div style="margin-top:25px; background:#f8f9fa; border-left:4px solid #8e44ad; padding:12px 15px; border-radius:4px; font-size:13px; color:#555; line-height:1.6;">
-                    <strong>ℹ️ Storage Info</strong><br>
-                    Products: <span id="storage-products">0</span> &nbsp;|&nbsp; Orders: <span id="storage-orders">0</span> &nbsp;|&nbsp; Categories: <span id="storage-categories">0</span> &nbsp;|&nbsp; Members: <span id="storage-members">0</span><br>
-                    Images are auto-compressed before upload to keep the database small.
+                    <strong>ℹ️ Storage Info</strong><br>Products: <span id="storage-products">0</span> | Orders: <span id="storage-orders">0</span> | Categories: <span id="storage-categories">0</span> | Members: <span id="storage-members">0</span>
                 </div>
             </div>
         </div>
@@ -545,11 +443,7 @@
 
     <div id="receipt-page" class="page">
         <div class="receipt-box" id="receipt-content">
-            <div class="receipt-company-header">
-                <h2 id="receipt-company-name-display">LEXSTORE HARDWARE</h2>
-                <p id="receipt-company-phone-display">0102862797</p>
-                <p id="receipt-company-address-display">Your Trusted Local Hardware Store</p>
-            </div>
+            <div class="receipt-company-header"><h2 id="receipt-company-name-display">LEXSTORE HARDWARE</h2><p id="receipt-company-phone-display">0102862797</p><p id="receipt-company-address-display">Your Trusted Local Hardware Store</p></div>
             <div style="text-align:center; font-size:18px; font-weight:bold; margin-bottom:20px;">Receipt</div>
             <div class="receipt-section">
                 <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;"><span>Order No:</span><span id="receipt-order-id" style="font-weight:bold;"></span></div>
@@ -563,42 +457,18 @@
                 <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;"><span>Method:</span><span id="receipt-method-display">-</span></div>
             </div>
             <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:13px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:10px;">
-                <span style="flex:2; text-align:left;">Description</span>
-                <span style="flex:0.8; text-align:center;">Qty</span>
-                <span style="flex:1; text-align:right;">Price</span>
-                <span style="flex:1; text-align:right;">Amount</span>
+                <span style="flex:2; text-align:left;">Description</span><span style="flex:0.8; text-align:center;">Qty</span><span style="flex:1; text-align:right;">Price</span><span style="flex:1; text-align:right;">Amount</span>
             </div>
             <div id="receipt-items-container"></div>
             <div class="receipt-total-section"><span>Total:</span><span id="receipt-total">RM 0.00</span></div>
-            <div class="receipt-footer">
-                <div class="paid-by" id="receipt-paid-by-display">Paid By: Cash</div>
-                <div class="thanks">***** Thank You *****</div>
-                <div>Please Come Again</div>
-            </div>
+            <div class="receipt-footer"><div class="paid-by" id="receipt-paid-by-display">Paid By: Cash</div><div class="thanks">***** Thank You *****</div><div>Please Come Again</div></div>
             <div style="display:none;" id="receipt-editable-fields">
-                <input type="text" id="receipt-company-name">
-                <input type="text" id="receipt-company-phone">
-                <input type="text" id="receipt-company-address">
-                <input type="text" id="receipt-name">
-                <input type="text" id="receipt-phone">
-                <input type="text" id="receipt-address">
-                <select id="receipt-method">
-                    <option value="Delivery">Delivery (送货上门)</option>
-                    <option value="Self Pickup">Self Pickup (到店自取)</option>
-                </select>
-                <select id="receipt-status">
-                    <option value="pending">Pending</option>
-                    <option value="complete">Complete</option>
-                    <option value="cash">Cash</option>
-                    <option value="qrcode">QR Code</option>
-                    <option value="cancel">Cancel</option>
-                </select>
+                <input type="text" id="receipt-company-name"><input type="text" id="receipt-company-phone"><input type="text" id="receipt-company-address"><input type="text" id="receipt-name"><input type="text" id="receipt-phone"><input type="text" id="receipt-address">
+                <select id="receipt-method"><option value="Delivery">Delivery (送货上门)</option><option value="Self Pickup">Self Pickup (到店自取)</option></select>
+                <select id="receipt-status"><option value="pending">Pending</option><option value="complete">Complete</option><option value="cash">Cash</option><option value="qrcode">QR Code</option><option value="cancel">Cancel</option></select>
             </div>
             <button class="btn-save-receipt" onclick="saveReceiptWithAlert()">💾 Save Changes to Cloud</button>
-            <div class="receipt-actions">
-                <button class="btn-print" onclick="printReceipt()">🖨 Print Receipt</button>
-                <button class="btn-save-copy" onclick="saveAndShareCopy()">📤 Save Copy (WhatsApp)</button>
-            </div>
+            <div class="receipt-actions"><button class="btn-print" onclick="printReceipt()">🖨 Print Receipt</button><button class="btn-save-copy" onclick="saveAndShareCopy()">📤 Save Copy (WhatsApp)</button></div>
         </div>
     </div>
 
@@ -607,27 +477,17 @@
             <span class="close-btn" onclick="closeProductModal()">&times;</span>
             <img id="modal-main-img" src="" style="width:100%; height:260px; object-fit:cover; border-radius:8px; cursor:zoom-in; background:#f5f5f5;" onclick="openLightbox(this.src)">
             <div class="modal-thumbs" id="modal-thumbs"></div>
-            <h2 id="modal-name" style="margin-bottom:6px; color:#111; font-size:20px;"></h2>
-            <p id="modal-price" style="color:#ee4d2d; font-weight:800; font-size:24px;"></p>
-            <p id="modal-unit" style="font-size:13px; color:#666; margin-bottom:15px;"></p>
+            <h2 id="modal-name" style="margin-bottom:6px; color:#111; font-size:20px;"></h2><p id="modal-price" style="color:#ee4d2d; font-weight:800; font-size:24px;"></p><p id="modal-unit" style="font-size:13px; color:#666; margin-bottom:15px;"></p>
             <div id="modal-specs-area"></div>
-            <div class="qty-container">
-                <button class="qty-btn" onclick="changeModalQty(-1)">−</button>
-                <input class="qty-input" type="number" id="modal-qty" value="1" min="1">
-                <button class="qty-btn" onclick="changeModalQty(1)">+</button>
-            </div>
+            <div class="qty-container"><button class="qty-btn" onclick="changeModalQty(-1)">−</button><input class="qty-input" type="number" id="modal-qty" value="1" min="1"><button class="qty-btn" onclick="changeModalQty(1)">+</button></div>
             <button class="btn" id="modal-add-btn" onclick="addToCartFromModal()" style="padding:15px; font-size:16px; background:#2ecc71; color:#fff;">🛒 Add to Cart</button>
-            
-            <button class="btn" onclick="shareAffiliateProduct(currentModalId)" style="margin-top: 10px; background:#e67e22; color:#fff; padding:10px; font-size:14px; width:100%; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
-                💰 分享赚 3% 提成
-            </button>
+            <button class="btn" onclick="shareAffiliateProduct(currentModalId)" style="margin-top: 10px; background:#e67e22; color:#fff; padding:10px; font-size:14px; width:100%; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">💰 分享赚 1% 提成</button>
         </div>
     </div>
 
     <div id="fb-share-modal" class="modal-overlay" onclick="if(event.target===this) closeFbShareModal()">
         <div class="fb-modal-content">
-            <span class="close-btn" onclick="closeFbShareModal()">&times;</span>
-            <h3>Share to Facebook</h3>
+            <span class="close-btn" onclick="closeFbShareModal()">&times;</span><h3>Share to Facebook</h3>
             <div class="fb-desc">为了在 Facebook 自动生成直达卡片，请按以下 2 步操作：</div>
             <button class="fb-step-btn step1" onclick="downloadPoster()">🖼 第一步：下载精美海报图片</button>
             <button class="fb-step-btn step2" onclick="copyShareText()">📋 第二步：一键复制文案（链接已置顶）</button>
@@ -639,7 +499,6 @@
         <span class="close-btn" style="color:#fff; position:fixed; top:20px; right:30px; font-size:40px; width:50px; height:50px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); border-radius:50%;" onclick="closeLightbox()">&times;</span>
         <img id="lightbox-content" src="" alt="Product Image">
     </div>
-
 <script>
 const WHATSAPP_NUMBER   = '60102862797';
 const DELIVERY_FEE      = 5;
@@ -654,9 +513,7 @@ let isAdmin = false; let isSuperAdmin = false;
 let currentModalId = null; let currentModalImgs = []; let urlProductToOpen = null;
 let currentShareProductId = null; let currentReceiptId = null;
 let currentCategory = 'all'; let currentMember = null;
-let affiliateRef = null;
-let bankInfo = {};
-let currentQrBase64 = '';
+let affiliateRef = null; let bankInfo = {}; let currentQrBase64 = '';
 
 const $ = id => document.getElementById(id);
 const fmt = n => (Number(n) || 0).toFixed(2);
@@ -665,7 +522,6 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 function getImages(p){ if(!p) return []; if(Array.isArray(p.images)) return p.images.filter(Boolean); if(typeof p.images === 'string' && p.images) return [p.images]; if(p.image) return [p.image]; return []; }
 function normalizeItems(items){ if(!items) return []; if(Array.isArray(items)) return items; return Object.values(items); }
 function parseSpec(str){ if(!str || typeof str !== 'string') return []; return str.split(',').map(s => s.trim()).filter(Boolean); }
-
 function download(content, filename, type){ const blob = new Blob([content], { type }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 1500); }
 async function sha256(str){ const buf = new TextEncoder().encode(str); const hashBuf = await crypto.subtle.digest('SHA-256', buf); return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join(''); }
 
@@ -684,7 +540,7 @@ async function memberRegister(){
     const key = phoneKey(phone); const snap = await db.ref('members/' + key).once('value');
     if(snap.exists()){ alert('❌ 这个手机号已经注册过了，请直接登入。'); return; }
     const hashed = await sha256(pw1);
-    const member = { name, phone, passwordHash: hashed, createdAt: Date.now(), createdDate: new Date().toLocaleString() };
+    const member = { name, phone, passwordHash: hashed, createdAt: Date.now(), createdDate: new Date().toLocaleString(), referredBy: affiliateRef || '' };
     await db.ref('members/' + key).set(member);
     currentMember = { ...member, key }; localStorage.setItem('lexstore_member', JSON.stringify(currentMember));
     updateMemberUI(); alert('✅ 注册成功！欢迎 ' + name);
@@ -714,6 +570,7 @@ function updateMemberUI(){
         const phoneLast4 = currentMember.phone.slice(-4);
         const affLink = window.location.href.split('?')[0] + '?ref=' + encodeURIComponent(phoneLast4);
         const affEl = $('member-aff-link'); if (affEl) affEl.textContent = affLink;
+        renderMyDownlines(phoneLast4);
     } else {
         navBtn.textContent = '👤 Login / Register';
         $('member-not-logged-in').style.display = 'block'; $('member-logged-in').style.display = 'none';
@@ -721,52 +578,48 @@ function updateMemberUI(){
     }
 }
 
-function renderBankPage() {
-    const box = $('bank-content');
-    if (!box) return;
-    if (!bankInfo.companyName && !bankInfo.bankDetails && !bankInfo.qrImage) {
-        box.innerHTML = '<p style="text-align:center; color:#888;">No bank details provided yet.</p>';
+function renderMyDownlines(refCode) {
+    // 1. 计算 Total 提成
+    let totalComm = 0;
+    for (let id in allOrders) {
+        const o = allOrders[id];
+        // 找出所有推荐人是当前会员的订单，并且有提成金额的
+        if (o.affiliateRef === refCode && o.commission) {
+            totalComm += Number(o.commission);
+        }
+    }
+    const totalEl = $('my-total-commission');
+    if (totalEl) totalEl.textContent = 'RM ' + fmt(totalComm);
+
+    // 2. 渲染下线列表
+    const container = $('my-downline-list');
+    if (!container) return;
+    const myDownlines = Object.values(members || {}).filter(m => m.referredBy === refCode);
+    
+    if (myDownlines.length === 0) {
+        container.innerHTML = '<div style="font-size:12px; color:#777; text-align:center; padding:10px 0;">You have no downlines yet.<br>还没有下线。</div>';
         return;
     }
+    
+    let html = `<div style="font-size:13px; font-weight:bold; margin-bottom:8px; color:#27ae60;">👥 My Downlines (${myDownlines.length})</div>`;
+    html += `<div style="max-height: 150px; overflow-y: auto; background:#fff; border-radius:6px; padding:5px; border:1px solid #eee;">`;
+    myDownlines.forEach(m => {
+        html += `<div style="display:flex; justify-content:space-between; font-size:12px; padding:6px 5px; border-bottom:1px solid #f0f0f0;"><span style="font-weight:bold;">${esc(m.name)}</span><span style="color:#888;">${esc(m.createdDate ? m.createdDate.split(',')[0] : '')}</span></div>`;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+function renderBankPage() {
+    const box = $('bank-content'); if (!box) return;
+    if (!bankInfo.companyName && !bankInfo.bankDetails && !bankInfo.qrImage) { box.innerHTML = '<p style="text-align:center; color:#888;">No bank details provided yet.</p>'; return; }
     let qrHtml = bankInfo.qrImage ? `<img src="${bankInfo.qrImage}" class="qr-img" onclick="openLightbox(this.src)">` : '<p style="color:#888; margin-top:10px;">No QR Code uploaded.</p>';
-    box.innerHTML = `
-        <h2>${esc(bankInfo.companyName || 'LEXSTORE HARDWARE')}</h2>
-        <div class="bank-detail">${esc(bankInfo.bankDetails || 'Bank details not set.')}</div>
-        <div style="margin-top:20px;">
-            <h4 style="margin-bottom:10px; color:#555; font-size:15px;">Scan to Pay / 扫码支付</h4>
-            ${qrHtml}
-        </div>
-    `;
+    box.innerHTML = `<h2>${esc(bankInfo.companyName || 'LEXSTORE HARDWARE')}</h2><div class="bank-detail">${esc(bankInfo.bankDetails || 'Bank details not set.')}</div><div style="margin-top:20px;"><h4 style="margin-bottom:10px; color:#555; font-size:15px;">Scan to Pay / 扫码支付</h4>${qrHtml}</div>`;
 }
 
-function populateBankAdminForm() {
-    if (!$('bank-company-name')) return;
-    $('bank-company-name').value = bankInfo.companyName || '';
-    $('bank-details').value = bankInfo.bankDetails || '';
-    currentQrBase64 = bankInfo.qrImage || '';
-    const preview = $('qr-preview');
-    if (currentQrBase64) preview.innerHTML = `<img src="${currentQrBase64}" style="width:150px; border-radius:8px; border:1px solid #ddd;">`;
-    else preview.innerHTML = '';
-}
-
-function handleQrUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { alert('请选择图片文件'); return; }
-    readAndCompressImage(file, 500, 0.8).then(dataUrl => {
-        currentQrBase64 = dataUrl;
-        $('qr-preview').innerHTML = `<img src="${dataUrl}" style="width:150px; border-radius:8px; border:1px solid #ddd;">`;
-    }).catch(() => alert('图片读取失败。'));
-    event.target.value = '';
-}
-
-function saveBankSettings() {
-    const companyName = $('bank-company-name').value.trim();
-    const bankDetails = $('bank-details').value.trim();
-    db.ref('settings/bankInfo').set({ companyName, bankDetails, qrImage: currentQrBase64 })
-      .then(() => alert('✅ Bank settings saved successfully!'))
-      .catch(err => alert('Error: ' + err.message));
-}
+function populateBankAdminForm() { if (!$('bank-company-name')) return; $('bank-company-name').value = bankInfo.companyName || ''; $('bank-details').value = bankInfo.bankDetails || ''; currentQrBase64 = bankInfo.qrImage || ''; const preview = $('qr-preview'); if (currentQrBase64) preview.innerHTML = `<img src="${currentQrBase64}" style="width:150px; border-radius:8px; border:1px solid #ddd;">`; else preview.innerHTML = ''; }
+function handleQrUpload(event) { const file = event.target.files[0]; if (!file) return; if (!file.type.startsWith('image/')) { alert('请选择图片文件'); return; } readAndCompressImage(file, 500, 0.8).then(dataUrl => { currentQrBase64 = dataUrl; $('qr-preview').innerHTML = `<img src="${dataUrl}" style="width:150px; border-radius:8px; border:1px solid #ddd;">`; }).catch(() => alert('图片读取失败。')); event.target.value = ''; }
+function saveBankSettings() { const companyName = $('bank-company-name').value.trim(); const bankDetails = $('bank-details').value.trim(); db.ref('settings/bankInfo').set({ companyName, bankDetails, qrImage: currentQrBase64 }).then(() => alert('✅ Bank settings saved successfully!')).catch(err => alert('Error: ' + err.message)); }
 
 function switchPage(pageId, btn){
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -835,13 +688,8 @@ function addToCartFromModal(){ if(!currentModalId) return; addToCart(currentModa
 
 function shareAffiliateProduct(id) {
     if (!id) return;
-    if (!currentMember) {
-        alert('⚠️ 请先注册成为会员！\n\n只有注册会员，Admin 才能通过您的手机号联系您结算 3% 提成。');
-        switchPage('member', document.getElementById('member-nav-btn'));
-        return;
-    }
-    currentShareProductId = id;
-    $('fb-share-modal').style.display = 'flex';
+    if (!currentMember) { alert('⚠️ 请先注册成为会员！\n\n只有注册会员，Admin 才能通过您的手机号联系您结算 1% 提成。'); switchPage('member', document.getElementById('member-nav-btn')); return; }
+    currentShareProductId = id; $('fb-share-modal').style.display = 'flex';
 }
 function closeFbShareModal() { $('fb-share-modal').style.display = 'none'; currentShareProductId = null; }
 
@@ -881,14 +729,8 @@ function openFbPublish() {
     window.open(fbUrl, '_blank', 'width=600,height=500');
 }
 
-function copyAffiliateLink() {
-    const link = $('member-aff-link').textContent;
-    if(!link || link.includes('正在生成')) { alert('链接还没准备好，请稍后重试。'); return; }
-    navigator.clipboard.writeText(link).then(() => { alert('✅ 专属推广链接已复制！\n\n发给朋友，他们购买后你就能赚 3%！'); }).catch(() => { alert('复制失败，请长按链接手动复制。'); });
-}
-
+function copyAffiliateLink() { const link = $('member-aff-link').textContent; if(!link || link.includes('正在生成')) { alert('链接还没准备好，请稍后重试。'); return; } navigator.clipboard.writeText(link).then(() => { alert('✅ 专属推广链接已复制！\n\n发给朋友注册，他们以后买东西你就能赚 1%！'); }).catch(() => { alert('复制失败，请长按链接手动复制。'); }); }
 function checkUrlForProduct() { const params = new URLSearchParams(window.location.search); urlProductToOpen = params.get('product'); }
-
 function openLightbox(src){ if(!src) return; $('lightbox-content').src = src; $('lightbox-modal').style.display = 'flex'; }
 function closeLightbox(){ $('lightbox-modal').style.display = 'none'; }
 
@@ -903,13 +745,7 @@ function addToCart(id, qtyOverride){
     cart[id] = { id, name: p.name, price: Number(p.price) || 0, unit: p.unit || 'pcs', qty: existing + qty, img: getImages(p)[0] || '' };
     saveCart(); renderCart(); alert(`✅ "${p.name}" added to cart.`);
 }
-
-function changeCartQty(id, delta){
-    if(!cart[id]) return; let v = cart[id].qty + delta; if(v < 1) v = 1;
-    const stock = Number(products[id]?.stock);
-    if(!isNaN(stock)){ if(stock <= 0){ alert('⚠️ 此产品已无库存，将从购物车移除。'); delete cart[id]; saveCart(); renderCart(); return; } if(v > stock){ alert('⚠️ 已到达库存上限。'); v = stock; } }
-    cart[id].qty = v; saveCart(); renderCart();
-}
+function changeCartQty(id, delta){ if(!cart[id]) return; let v = cart[id].qty + delta; if(v < 1) v = 1; const stock = Number(products[id]?.stock); if(!isNaN(stock)){ if(stock <= 0){ alert('⚠️ 此产品已无库存，将从购物车移除。'); delete cart[id]; saveCart(); renderCart(); return; } if(v > stock){ alert('⚠️ 已到达库存上限。'); v = stock; } } cart[id].qty = v; saveCart(); renderCart(); }
 function removeFromCart(id){ delete cart[id]; saveCart(); renderCart(); }
 
 function renderCart(){
@@ -931,7 +767,6 @@ function updateTotals(){
     $('subtotal-display').textContent = 'Subtotal: RM ' + fmt(subtotal); $('shipping-display').textContent = 'Delivery Fee: RM ' + fmt(fee); $('total-price').textContent = 'Total: RM ' + fmt(subtotal + fee);
     return { subtotal, fee, total: subtotal + fee };
 }
-
 function toggleAddressField(){ const method = $('checkout-method').value; const address = $('customer-address'); if(method === 'Self Pickup'){ address.style.display = 'none'; address.required = false; address.value = ''; } else { address.style.display = 'block'; address.required = true; } updateTotals(); }
 
 function submitOrder(){
@@ -941,13 +776,38 @@ function submitOrder(){
     const totals = updateTotals();
     const items = ids.map(id => { const it = cart[id]; return { name: it.name, qty: it.qty, unit: it.unit, price: it.price, line: it.price * it.qty, img: it.img || '' }; });
     const now = Date.now();
+    
+    // 1% 提成逻辑 (需本月有购买记录)
+    let referrer = currentMember ? currentMember.referredBy : '';
+    let refPhone = '';
+    let commission = 0;
+    if (referrer) {
+        const nowDate = new Date();
+        const currentMonth = nowDate.getMonth();
+        const currentYear = nowDate.getFullYear();
+        let isActive = false;
+        for (let id in allOrders) {
+            const o = allOrders[id];
+            if (o.memberPhone && o.memberPhone.endsWith(referrer)) {
+                const oDate = new Date(o.ts);
+                if (oDate.getMonth() === currentMonth && oDate.getFullYear() === currentYear) {
+                    isActive = true;
+                    break;
+                }
+            }
+        }
+        if (isActive) { refPhone = referrer; commission = totals.total * 0.01; } 
+        else { refPhone = referrer; } // 记录推荐人但未达标，不给提成
+    }
+
     const order = {
         ts: now, date: new Date(now).toLocaleString(),
         name, phone, method, address: method === 'Delivery' ? address : 'Self Pickup at store',
         items, subtotal: totals.subtotal, fee: totals.fee, total: totals.total, status: 'pending',
         memberPhone: currentMember ? currentMember.phone : '',
-        affiliateRef: affiliateRef || ''
+        affiliateRef: refPhone, commission: commission
     };
+    
     db.ref('orders').push(order).catch(err => console.warn('Order cloud save failed:', err));
     saveOrderLocally(order);
     const lines = []; lines.push('*🏪 LEXSTORE HARDWARE - NEW ORDER*'); lines.push('────────────────────'); lines.push(`👤 Name: ${name}`); lines.push(`📞 Phone: ${phone}`);
@@ -997,57 +857,23 @@ function renderAdminOrders(){
     let sales = 0; list.forEach(o => sales += Number(o.total) || 0);
     $('total-orders-card').textContent = 'Total Orders: ' + list.length; $('total-sales-card').textContent = 'Total Sales: RM ' + fmt(sales);
     if(!list.length){ tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">No orders yet.</td></tr>'; return; }
-    
     tbody.innerHTML = list.map(o => {
         const status = o.status || 'pending';
         let statusClass = 'status-pending';
         if (status === 'complete') statusClass = 'status-complete'; else if (status === 'cash') statusClass = 'status-cash'; else if (status === 'qrcode') statusClass = 'status-qrcode'; else if (status === 'cancel') statusClass = 'status-cancel';
-        
-        const itemsHtml = normalizeItems(o.items).map(i => {
-            let imgSrc = i.img; if (!imgSrc && products[i.id]) imgSrc = getImages(products[i.id])[0] || '';
-            const thumb = imgSrc ? `<img src="${imgSrc}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : '';
-            const qty = Number(i.qty) || 1; const unit = (!i.unit || i.unit === 'undefined') ? 'pcs' : i.unit; const price = Number(i.price) || 0;
-            const lineAmount = (i.line !== undefined && i.line !== null) ? Number(i.line) : (price * qty);
-            return `<div style="display:flex; align-items:center; margin-bottom:5px;">${thumb}<span>${esc(i.name)} × ${qty} ${esc(unit)} — ${fmt(lineAmount)}</span></div>`;
-        }).join('');
-        
-        const refPhone = o.affiliateRef || '';
-        let commHtml = '<span style="color:#aaa;">—</span>';
+        const itemsHtml = normalizeItems(o.items).map(i => { let imgSrc = i.img; if (!imgSrc && products[i.id]) imgSrc = getImages(products[i.id])[0] || ''; const thumb = imgSrc ? `<img src="${imgSrc}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : ''; const qty = Number(i.qty) || 1; const unit = (!i.unit || i.unit === 'undefined') ? 'pcs' : i.unit; const price = Number(i.price) || 0; const lineAmount = (i.line !== undefined && i.line !== null) ? Number(i.line) : (price * qty); return `<div style="display:flex; align-items:center; margin-bottom:5px;">${thumb}<span>${esc(i.name)} × ${qty} ${esc(unit)} — ${fmt(lineAmount)}</span></div>`; }).join('');
+        const refPhone = o.affiliateRef || ''; let commHtml = '<span style="color:#aaa;">—</span>';
         if (refPhone) {
-            const comm = (Number(o.total) * 0.03).toFixed(2);
-            commHtml = `<span style="color:#e67e22; font-weight:bold;">📞 尾号 ${refPhone}</span><br><span style="font-size:11px; color:#27ae60;">提成: RM ${comm}</span>`;
+            const comm = o.commission !== undefined ? Number(o.commission) : 0;
+            if (comm > 0) { commHtml = `<span style="color:#e67e22; font-weight:bold;">📞 尾号 ${refPhone}</span><br><span style="font-size:11px; color:#27ae60;">提成: RM ${comm.toFixed(2)}</span>`; }
+            else { commHtml = `<span style="color:#e67e22; font-weight:bold;">📞 尾号 ${refPhone}</span><br><span style="font-size:11px; color:#c0392b;">无提成 (本月未购买)</span>`; }
         }
-
-        return `
-        <tr onclick="openReceipt('${o.id}')">
-            <td><span style="font-size:12px; color:#2ecc71; font-weight:bold; display:block; margin-bottom:6px;">${esc(o.date || new Date(o.ts||0).toLocaleString())}</span><strong>${esc(o.method)}</strong><br><span style="font-size:12px; color:#555;">${esc(o.name)}<br>📞 ${esc(o.phone)}<br>📍 ${esc(o.address || '-')}</span></td>
-            <td>${itemsHtml}</td>
-            <td style="font-weight:bold; color:#ee4d2d; white-space:nowrap;">${fmt(o.total)}</td>
-            <td>${commHtml}</td>
-            <td onclick="event.stopPropagation()">
-                <select class="status-select ${statusClass}" onchange="updateOrderStatus('${o.id}', this.value)">
-                    <option value="pending" ${status === 'pending' ? 'selected' : ''}>Pending</option>
-                    <option value="complete" ${status === 'complete' ? 'selected' : ''}>Complete</option>
-                    <option value="cash" ${status === 'cash' ? 'selected' : ''}>Cash</option>
-                    <option value="qrcode" ${status === 'qrcode' ? 'selected' : ''}>QR Code</option>
-                    <option value="cancel" ${status === 'cancel' ? 'selected' : ''}>Cancel</option>
-                </select>
-            </td>
-        </tr>`;
+        return `<tr onclick="openReceipt('${o.id}')"><td><span style="font-size:12px; color:#2ecc71; font-weight:bold; display:block; margin-bottom:6px;">${esc(o.date || new Date(o.ts||0).toLocaleString())}</span><strong>${esc(o.method)}</strong><br><span style="font-size:12px; color:#555;">${esc(o.name)}<br>📞 ${esc(o.phone)}<br>📍 ${esc(o.address || '-')}</span></td><td>${itemsHtml}</td><td style="font-weight:bold; color:#ee4d2d; white-space:nowrap;">${fmt(o.total)}</td><td>${commHtml}</td><td onclick="event.stopPropagation()"><select class="status-select ${statusClass}" onchange="updateOrderStatus('${o.id}', this.value)"><option value="pending" ${status === 'pending' ? 'selected' : ''}>Pending</option><option value="complete" ${status === 'complete' ? 'selected' : ''}>Complete</option><option value="cash" ${status === 'cash' ? 'selected' : ''}>Cash</option><option value="qrcode" ${status === 'qrcode' ? 'selected' : ''}>QR Code</option><option value="cancel" ${status === 'cancel' ? 'selected' : ''}>Cancel</option></select></td></tr>`;
     }).join('');
     updateStorageInfo();
 }
-
 function updateOrderStatus(orderId, newStatus) { db.ref('orders/' + orderId).update({ status: newStatus }).then(() => { renderAdminOrders(); }).catch(err => { alert('Failed to update status: ' + err.message); }); }
-
-function renderAdminMembers(){
-    const tbody = $('members-tbody');
-    const list = Object.entries(members || {}).map(([id, m]) => ({ id, ...m })).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
-    $('total-members-card').textContent = 'Total Members: ' + list.length;
-    if(!list.length){ tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">暂无会员</td></tr>'; return; }
-    tbody.innerHTML = list.map(m => `<tr><td>${esc(m.createdDate || new Date(m.createdAt||0).toLocaleString())}</td><td>${esc(m.name)}</td><td>${esc(m.phone)}</td></tr>`).join('');
-    updateStorageInfo();
-}
+function renderAdminMembers(){ const tbody = $('members-tbody'); const list = Object.entries(members || {}).map(([id, m]) => ({ id, ...m })).sort((a,b) => (b.createdAt||0) - (a.createdAt||0)); $('total-members-card').textContent = 'Total Members: ' + list.length; if(!list.length){ tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">暂无会员</td></tr>'; return; } tbody.innerHTML = list.map(m => `<tr><td>${esc(m.createdDate || new Date(m.createdAt||0).toLocaleString())}</td><td>${esc(m.name)}</td><td>${esc(m.phone)} ${m.referredBy ? `<br><span style="font-size:11px; color:#e67e22;">推荐人: 尾号 ${m.referredBy}</span>` : ''}</td></tr>`).join(''); updateStorageInfo(); }
 
 function openReceipt(orderId) {
     if (!allOrders[orderId]) { alert('Order not found.'); return; }
@@ -1060,7 +886,6 @@ function openReceipt(orderId) {
     $('receipt-paid-by-display').textContent = 'Paid By: ' + paidBy; renderReceiptItems(o.items || []);
     switchPage('receipt'); document.querySelectorAll('.nav-tabs .nav-btn').forEach(b => b.classList.remove('active'));
 }
-
 function renderReceiptItems(items) {
     const container = $('receipt-items-container'); const itemArr = normalizeItems(items);
     container.innerHTML = itemArr.map((it, idx) => {
@@ -1070,27 +895,12 @@ function renderReceiptItems(items) {
     }).join('');
     updateReceiptTotals();
 }
-
 function addReceiptItem() { const container = $('receipt-items-container'); const idx = container.children.length; const html = `<div class="receipt-item-row"><div style="flex:2; display:flex; align-items:center; gap:5px; min-width:100px;"><input type="text" class="item-name" value="" placeholder="Description" oninput="updateReceiptTotals()" id="rec-item-name-${idx}" style="flex:1; min-width:50px;"></div><input type="number" class="item-qty" value="1" min="1" placeholder="Qty" oninput="updateReceiptTotals()" id="rec-item-qty-${idx}" style="flex:0.8; min-width:40px; text-align:center;"><input type="number" class="item-price" value="0" step="any" placeholder="Price" oninput="updateReceiptTotals()" id="rec-item-price-${idx}" style="flex:1; min-width:60px; text-align:center;"><span class="item-subtotal" id="rec-item-subtotal-${idx}" style="flex:1; min-width:60px; text-align:right;">0.00</span><button class="btn-remove" onclick="removeReceiptItem(${idx})">✕</button></div>`; container.insertAdjacentHTML('beforeend', html); updateReceiptTotals(); }
 function removeReceiptItem(idx) { const el = document.getElementById('rec-item-name-' + idx); if (el) el.parentElement.remove(); updateReceiptTotals(); }
 function updateReceiptTotals() { const container = $('receipt-items-container'); let total = 0; Array.from(container.children).forEach((row) => { const qty = parseFloat(row.querySelector('.item-qty')?.value) || 0; const price = parseFloat(row.querySelector('.item-price')?.value) || 0; const sub = qty * price; const subEl = row.querySelector('.item-subtotal'); if (subEl) subEl.textContent = fmt(sub); total += sub; }); $('receipt-total').textContent = 'RM ' + fmt(total); }
-
-function saveReceipt() {
-    if (!currentReceiptId) { alert('No order loaded.'); return Promise.reject('No order'); }
-    const container = $('receipt-items-container');
-    const items = Array.from(container.children).map((row, idx) => { let name = row.querySelector('.item-name')?.value.trim() || 'Item'; const qty = parseInt(row.querySelector('.item-qty')?.value) || 1; const price = parseFloat(row.querySelector('.item-price')?.value) || 0; return { name, qty, unit: 'pcs', price, line: qty * price }; });
-    if (items.length === 0) { alert('Order must have at least one item.'); return Promise.reject('No items'); }
-    let subtotal = 0; items.forEach(i => subtotal += i.line);
-    const method = $('receipt-method-display').textContent; let fee = 0; if (method === 'Delivery (送货上门)') fee = (subtotal >= FREE_DELIVERY_THRESHOLD) ? 0 : DELIVERY_FEE;
-    const companyInfo = { name: $('receipt-company-name')?.value.trim() || 'LEXSTORE HARDWARE', phone: $('receipt-company-phone')?.value.trim() || '0102862797', address: $('receipt-company-address')?.value.trim() || 'Your Trusted Local Hardware Store' };
-    const updatedData = { name: $('receipt-name')?.value.trim() || $('receipt-name-display').textContent, phone: $('receipt-phone')?.value.trim() || $('receipt-phone-display').textContent, address: $('receipt-address')?.value.trim() || $('receipt-address-display').textContent, method: $('receipt-method')?.value || $('receipt-method-display').textContent, status: $('receipt-status')?.value || 'pending', items, subtotal, fee, total: subtotal + fee, companyInfo };
-    if (!updatedData.name || !updatedData.phone) { alert('Name and Phone are required.'); return Promise.reject('Missing name/phone'); }
-    return db.ref('orders/' + currentReceiptId).update(updatedData);
-}
-
+function saveReceipt() { if (!currentReceiptId) { alert('No order loaded.'); return Promise.reject('No order'); } const container = $('receipt-items-container'); const items = Array.from(container.children).map((row, idx) => { let name = row.querySelector('.item-name')?.value.trim() || 'Item'; const qty = parseInt(row.querySelector('.item-qty')?.value) || 1; const price = parseFloat(row.querySelector('.item-price')?.value) || 0; return { name, qty, unit: 'pcs', price, line: qty * price }; }); if (items.length === 0) { alert('Order must have at least one item.'); return Promise.reject('No items'); } let subtotal = 0; items.forEach(i => subtotal += i.line); const method = $('receipt-method-display').textContent; let fee = 0; if (method === 'Delivery (送货上门)') fee = (subtotal >= FREE_DELIVERY_THRESHOLD) ? 0 : DELIVERY_FEE; const companyInfo = { name: $('receipt-company-name')?.value.trim() || 'LEXSTORE HARDWARE', phone: $('receipt-company-phone')?.value.trim() || '0102862797', address: $('receipt-company-address')?.value.trim() || 'Your Trusted Local Hardware Store' }; const updatedData = { name: $('receipt-name')?.value.trim() || $('receipt-name-display').textContent, phone: $('receipt-phone')?.value.trim() || $('receipt-phone-display').textContent, address: $('receipt-address')?.value.trim() || $('receipt-address-display').textContent, method: $('receipt-method')?.value || $('receipt-method-display').textContent, status: $('receipt-status')?.value || 'pending', items, subtotal, fee, total: subtotal + fee, companyInfo }; if (!updatedData.name || !updatedData.phone) { alert('Name and Phone are required.'); return Promise.reject('Missing name/phone'); } return db.ref('orders/' + currentReceiptId).update(updatedData); }
 function saveReceiptWithAlert() { saveReceipt().then(() => { alert('✅ Receipt updated successfully!'); switchPage('admin'); renderAdminOrders(); }).catch(err => { if (typeof err === 'string') return; alert('Failed to save: ' + (err.message || err)); }); }
 function printReceipt() { window.print(); }
-
 function saveAndShareCopy() {
     const receiptElement = document.getElementById('receipt-content'); if (!receiptElement) { alert('Receipt not found.'); return; }
     const btn = document.querySelector('.btn-save-copy'); const originalText = btn.innerHTML; btn.innerHTML = '⏳ Generating...'; btn.disabled = true;
@@ -1101,133 +911,45 @@ function saveAndShareCopy() {
         }, 'image/jpeg', 0.9);
     }).catch(err => { alert('Failed to generate image: ' + err.message); btn.innerHTML = originalText; btn.disabled = false; });
 }
-
 function fallbackDownload(url, filename, btn, originalText) { const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 1500); btn.innerHTML = originalText; btn.disabled = false; alert('✅ 图片已保存！请打开 WhatsApp 发送给顾客。'); }
 
 function clearOrders(){ if(!isAdmin) return; if(!confirm('⚠️ Delete ALL orders permanently?')) return; db.ref('orders').remove().then(() => alert('✅ All orders cleared.')).catch(err => alert('Error: ' + err.message)); }
-
 function exportOrdersExcel(){
-    const list = Object.entries(allOrders || {}).map(([id, o]) => ({ id, ...o })).sort((a,b) => (b.ts||0) - (a.ts||0));
-    if(!list.length){ alert('No orders to export.'); return; }
+    const list = Object.entries(allOrders || {}).map(([id, o]) => ({ id, ...o })).sort((a,b) => (b.ts||0) - (a.ts||0)); if(!list.length){ alert('No orders to export.'); return; }
     const rows = [['Date','Customer','Phone','Method','Address','Items','Subtotal','Delivery Fee','Total (RM)','Status','Member Phone','推荐人 (提成)']];
-    list.forEach(o => {
-        const items = normalizeItems(o.items).map(i => `${i.name} x${i.qty} ${i.unit||'pcs'} @${fmt(i.price)}`).join(' | ');
-        const comm = o.affiliateRef ? `尾号 ${o.affiliateRef} (RM ${(Number(o.total)*0.03).toFixed(2)})` : '-';
-        rows.push([o.date || new Date(o.ts||0).toLocaleString(), o.name, o.phone, o.method, o.address || '-', items, fmt(o.subtotal), fmt(o.fee), fmt(o.total), o.status || 'pending', o.memberPhone || '-', comm]);
-    });
-    const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g,'""')}"`).join(',')).join('\r\n');
-    download('\uFEFF' + csv, `lexstore_orders_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
+    list.forEach(o => { const items = normalizeItems(o.items).map(i => `${i.name} x${i.qty} ${i.unit||'pcs'} @${fmt(i.price)}`).join(' | '); const comm = o.affiliateRef ? `尾号 ${o.affiliateRef} (RM ${(Number(o.commission)||0).toFixed(2)})` : '-'; rows.push([o.date || new Date(o.ts||0).toLocaleString(), o.name, o.phone, o.method, o.address || '-', items, fmt(o.subtotal), fmt(o.fee), fmt(o.total), o.status || 'pending', o.memberPhone || '-', comm]); });
+    const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g,'""')}"`).join(',')).join('\r\n'); download('\uFEFF' + csv, `lexstore_orders_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
 }
-
 function unitOptions(selected){ return UNITS.map(u => `<option value="${u.v}" ${u.v === selected ? 'selected' : ''}>${u.t}</option>`).join(''); }
-
-function renderAdminProducts(){
-    const tbody = $('admin-products-tbody'); const keys = Object.keys(products);
-    if(!keys.length){ tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888;">No products yet.</td></tr>'; updateStorageInfo(); return; }
-    tbody.innerHTML = keys.map(id => {
-        const p = products[id]; const img = getImages(p)[0] || '';
-        return `<tr><td style="text-align:center;">${img ? `<img src="${img}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${img}')">` : '<span style="color:#aaa;">—</span>'}<br><button class="btn-change-img" onclick="triggerImageUpload('${id}')">🖼 换图</button><input type="file" id="admin-img-input-${id}" accept="image/*" style="display:none;" onchange="handleAdminImageUpload(event, '${id}')"></td><td><input type="text" id="ap-name-${id}" value="${esc(p.name)}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td><input type="number" step="any" id="ap-price-${id}" value="${p.price ?? ''}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td><input type="number" step="any" id="ap-cost-${id}" value="${p.cost ?? ''}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td><select id="ap-cat-${id}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;">${categoryOptionsHtml(p.category)}</select></td><td><select id="ap-unit-${id}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;">${unitOptions(p.unit || 'pcs')}</select></td><td><input type="number" id="ap-stock-${id}" value="${p.stock ?? 0}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td style="white-space:nowrap; text-align:center;"><button class="btn-icon-action" title="Save" onclick="saveProductRow('${id}')">💾</button><button class="btn-icon-action delete" title="Delete" onclick="deleteProduct('${id}')">🗑</button></td></tr>`;
-    }).join('');
-    updateStorageInfo();
-}
-
+function renderAdminProducts(){ const tbody = $('admin-products-tbody'); const keys = Object.keys(products); if(!keys.length){ tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888;">No products yet.</td></tr>'; updateStorageInfo(); return; } tbody.innerHTML = keys.map(id => { const p = products[id]; const img = getImages(p)[0] || ''; return `<tr><td style="text-align:center;">${img ? `<img src="${img}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${img}')">` : '<span style="color:#aaa;">—</span>'}<br><button class="btn-change-img" onclick="triggerImageUpload('${id}')">🖼 换图</button><input type="file" id="admin-img-input-${id}" accept="image/*" style="display:none;" onchange="handleAdminImageUpload(event, '${id}')"></td><td><input type="text" id="ap-name-${id}" value="${esc(p.name)}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td><input type="number" step="any" id="ap-price-${id}" value="${p.price ?? ''}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td><input type="number" step="any" id="ap-cost-${id}" value="${p.cost ?? ''}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td><select id="ap-cat-${id}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;">${categoryOptionsHtml(p.category)}</select></td><td><select id="ap-unit-${id}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;">${unitOptions(p.unit || 'pcs')}</select></td><td><input type="number" id="ap-stock-${id}" value="${p.stock ?? 0}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td style="white-space:nowrap; text-align:center;"><button class="btn-icon-action" title="Save" onclick="saveProductRow('${id}')">💾</button><button class="btn-icon-action delete" title="Delete" onclick="deleteProduct('${id}')">🗑</button></td></tr>`; }).join(''); updateStorageInfo(); }
 function triggerImageUpload(id) { const input = document.getElementById('admin-img-input-' + id); if (input) input.click(); }
-
-function handleAdminImageUpload(event, id) {
-    const file = event.target.files[0]; if (!file) return;
-    if (!file.type.startsWith('image/')) { alert('请选择图片文件'); event.target.value = ''; return; }
-    readAndCompressImage(file).then(dataUrl => { db.ref('products/' + id).update({ images: [dataUrl] }).then(() => alert('✅ 图片更换成功！')).catch(err => alert('更新失败：' + err.message)); }).catch(() => alert('图片读取失败。'));
-    event.target.value = '';
-}
-
-function saveProductRow(id){
-    const name = $('ap-name-' + id).value.trim(); const price = parseFloat($('ap-price-' + id).value); const cost = parseFloat($('ap-cost-' + id).value); const cat = $('ap-cat-' + id).value; const unit = $('ap-unit-' + id).value; const stock = parseInt($('ap-stock-' + id).value);
-    if(!name){ alert('Product name cannot be empty.'); return; } if(isNaN(price) || price < 0){ alert('Please enter a valid price.'); return; }
-    db.ref('products/' + id).update({ name, price, cost: isNaN(cost) ? 0 : cost, category: cat, unit, stock: isNaN(stock) ? 0 : stock }).then(() => alert('✅ Saved: ' + name)).catch(err => alert('Error: ' + err.message));
-}
-
+function handleAdminImageUpload(event, id) { const file = event.target.files[0]; if (!file) return; if (!file.type.startsWith('image/')) { alert('请选择图片文件'); event.target.value = ''; return; } readAndCompressImage(file).then(dataUrl => { db.ref('products/' + id).update({ images: [dataUrl] }).then(() => alert('✅ 图片更换成功！')).catch(err => alert('更新失败：' + err.message)); }).catch(() => alert('图片读取失败。')); event.target.value = ''; }
+function saveProductRow(id){ const name = $('ap-name-' + id).value.trim(); const price = parseFloat($('ap-price-' + id).value); const cost = parseFloat($('ap-cost-' + id).value); const cat = $('ap-cat-' + id).value; const unit = $('ap-unit-' + id).value; const stock = parseInt($('ap-stock-' + id).value); if(!name){ alert('Product name cannot be empty.'); return; } if(isNaN(price) || price < 0){ alert('Please enter a valid price.'); return; } db.ref('products/' + id).update({ name, price, cost: isNaN(cost) ? 0 : cost, category: cat, unit, stock: isNaN(stock) ? 0 : stock }).then(() => alert('✅ Saved: ' + name)).catch(err => alert('Error: ' + err.message)); }
 function deleteProduct(id){ const p = products[id]; if(!confirm(`Delete product "${p?.name || id}"?`)) return; db.ref('products/' + id).remove().then(() => alert('🗑 Product deleted.')).catch(err => alert('Error: ' + err.message)); }
-
-function bindFileInput(input){
-    input.addEventListener('change', function(){
-        const file = this.files[0]; if(!file) return;
-        if(!file.type.startsWith('image/')){ alert('Please select an image file.'); this.value=''; return; }
-        readAndCompressImage(file).then(dataUrl => { this.dataset.dataUrl = dataUrl; let preview = this.parentElement.querySelector('.slot-preview'); if(!preview){ preview = document.createElement('img'); preview.className = 'slot-preview'; preview.style.cssText = 'width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid #ddd;'; this.parentElement.appendChild(preview); } preview.src = dataUrl; }).catch(() => alert('Failed to read image.'));
-    });
-}
-
-function readAndCompressImage(file, maxW = 700, quality = 0.75){
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = e => { const img = new Image(); img.onload = () => { let { width, height } = img; if(width > maxW){ height = Math.round(height * maxW / width); width = maxW; } const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height); ctx.drawImage(img, 0, 0, width, height); resolve(canvas.toDataURL('image/jpeg', quality)); }; img.onerror = reject; img.src = e.target.result; };
-        reader.onerror = reject; reader.readAsDataURL(file);
-    });
-}
-
+function bindFileInput(input){ input.addEventListener('change', function(){ const file = this.files[0]; if(!file) return; if(!file.type.startsWith('image/')){ alert('Please select an image file.'); this.value=''; return; } readAndCompressImage(file).then(dataUrl => { this.dataset.dataUrl = dataUrl; let preview = this.parentElement.querySelector('.slot-preview'); if(!preview){ preview = document.createElement('img'); preview.className = 'slot-preview'; preview.style.cssText = 'width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid #ddd;'; this.parentElement.appendChild(preview); } preview.src = dataUrl; }).catch(() => alert('Failed to read image.')); }); }
+function readAndCompressImage(file, maxW = 700, quality = 0.75){ return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = e => { const img = new Image(); img.onload = () => { let { width, height } = img; if(width > maxW){ height = Math.round(height * maxW / width); width = maxW; } const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height); ctx.drawImage(img, 0, 0, width, height); resolve(canvas.toDataURL('image/jpeg', quality)); }; img.onerror = reject; img.src = e.target.result; }; reader.onerror = reject; reader.readAsDataURL(file); }); }
 function addImageSlot(){ const container = $('image-slots-container'); const row = document.createElement('div'); row.className = 'img-slot-row'; row.innerHTML = `<span style="font-size:12px; font-weight:bold; color:#666;">#${container.children.length + 1}</span><input type="file" class="new-prod-file-slot" accept="image/*" style="flex:1;"><button type="button" class="btn-del-slot" onclick="removeImageSlot(this)">✕</button>`; container.appendChild(row); bindFileInput(row.querySelector('input')); }
 function removeImageSlot(btn){ const container = $('image-slots-container'); if(container.children.length <= 1){ alert('At least one image slot is required.'); return; } btn.parentElement.remove(); Array.from(container.children).forEach((row, i) => { row.querySelector('span').textContent = '#' + (i + 1); }); }
-
-function resetProductForm(){
-    $('new-prod-name').value = ''; $('new-prod-price').value = ''; $('new-prod-cost').value = ''; $('new-prod-stock').value = 100; $('new-prod-unit').value = 'pcs'; $('new-prod-model').value = ''; $('new-prod-size').value = '';
-    const catSel = $('new-prod-category'); if(catSel) catSel.value = '';
-    const container = $('image-slots-container'); container.innerHTML = `<div class="img-slot-row"><span style="font-size:12px; font-weight:bold; color:#666;">#1</span><input type="file" class="new-prod-file-slot" accept="image/*" style="flex:1;"></div>`; bindFileInput(container.querySelector('input'));
-}
-
-function addNewProduct(){
-    const name = $('new-prod-name').value.trim(); const price = parseFloat($('new-prod-price').value); const cost = parseFloat($('new-prod-cost').value); const cat = $('new-prod-category').value; const unit = $('new-prod-unit').value; const stock = parseInt($('new-prod-stock').value); const model = $('new-prod-model').value.trim(); const size = $('new-prod-size').value.trim();
-    if(!name){ alert('Please enter the product name.'); return; } if(isNaN(price) || price < 0){ alert('Please enter a valid selling price.'); return; }
-    const images = Array.from(document.querySelectorAll('.new-prod-file-slot')).map(inp => inp.dataset.dataUrl).filter(Boolean);
-    const newProduct = { name, price, cost: isNaN(cost) ? 0 : cost, category: cat, unit, stock: isNaN(stock) ? 0 : stock, model, size, images, createdAt: Date.now() };
-    db.ref('products').push(newProduct).then(() => { alert('✅ Product added: ' + name); resetProductForm(); switchAdminSubTab('products-list-section', document.querySelectorAll('.admin-sub-btn')[1]); }).catch(err => alert('Error saving product: ' + err.message));
-}
-
-function savePasswords(){
-    const a = $('new-admin-pw').value.trim(); const s = $('new-super-pw').value.trim();
-    if(!a && !s){ alert('Enter at least one new password.'); return; }
-    const updates = {}; if(a) updates.adminPassword = a; if(s) updates.superPassword = s;
-    db.ref('settings').update(updates).then(() => { alert('✅ Password(s) updated.'); $('new-admin-pw').value = ''; $('new-super-pw').value = ''; }).catch(err => alert('Error: ' + err.message));
-}
-
+function resetProductForm(){ $('new-prod-name').value = ''; $('new-prod-price').value = ''; $('new-prod-cost').value = ''; $('new-prod-stock').value = 100; $('new-prod-unit').value = 'pcs'; $('new-prod-model').value = ''; $('new-prod-size').value = ''; const catSel = $('new-prod-category'); if(catSel) catSel.value = ''; const container = $('image-slots-container'); container.innerHTML = `<div class="img-slot-row"><span style="font-size:12px; font-weight:bold; color:#666;">#1</span><input type="file" class="new-prod-file-slot" accept="image/*" style="flex:1;"></div>`; bindFileInput(container.querySelector('input')); }
+function addNewProduct(){ const name = $('new-prod-name').value.trim(); const price = parseFloat($('new-prod-price').value); const cost = parseFloat($('new-prod-cost').value); const cat = $('new-prod-category').value; const unit = $('new-prod-unit').value; const stock = parseInt($('new-prod-stock').value); const model = $('new-prod-model').value.trim(); const size = $('new-prod-size').value.trim(); if(!name){ alert('Please enter the product name.'); return; } if(isNaN(price) || price < 0){ alert('Please enter a valid selling price.'); return; } const images = Array.from(document.querySelectorAll('.new-prod-file-slot')).map(inp => inp.dataset.dataUrl).filter(Boolean); const newProduct = { name, price, cost: isNaN(cost) ? 0 : cost, category: cat, unit, stock: isNaN(stock) ? 0 : stock, model, size, images, createdAt: Date.now() }; db.ref('products').push(newProduct).then(() => { alert('✅ Product added: ' + name); resetProductForm(); switchAdminSubTab('products-list-section', document.querySelectorAll('.admin-sub-btn')[1]); }).catch(err => alert('Error saving product: ' + err.message)); }
+function savePasswords(){ const a = $('new-admin-pw').value.trim(); const s = $('new-super-pw').value.trim(); if(!a && !s){ alert('Enter at least one new password.'); return; } const updates = {}; if(a) updates.adminPassword = a; if(s) updates.superPassword = s; db.ref('settings').update(updates).then(() => { alert('✅ Password(s) updated.'); $('new-admin-pw').value = ''; $('new-super-pw').value = ''; }).catch(err => alert('Error: ' + err.message)); }
 function exportDataJson(){ const payload = { exportedAt: new Date().toISOString(), products, categories, members, orders: allOrders }; download(JSON.stringify(payload, null, 2), `lexstore_backup_${Date.now()}.json`, 'application/json'); }
-
-function importDataJson(event){
-    const file = event.target.files[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-        try {
-            const data = JSON.parse(e.target.result); if(!data.products && !data.orders){ alert('Invalid backup file.'); return; }
-            if(!confirm('⚠️ This will REPLACE all current data. Continue?')) return;
-            const updates = {}; updates.products = data.products || {}; updates.orders = data.orders || {}; updates.categories = data.categories || {}; updates.members = data.members || {};
-            db.ref().update(updates).then(() => alert('✅ Backup restored.')).catch(err => alert('Error: ' + err.message));
-        } catch(err){ alert('Invalid JSON file.'); }
-        event.target.value = '';
-    };
-    reader.readAsText(file);
-}
-
+function importDataJson(event){ const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = e => { try { const data = JSON.parse(e.target.result); if(!data.products && !data.orders){ alert('Invalid backup file.'); return; } if(!confirm('⚠️ This will REPLACE all current data. Continue?')) return; const updates = {}; updates.products = data.products || {}; updates.orders = data.orders || {}; updates.categories = data.categories || {}; updates.members = data.members || {}; db.ref().update(updates).then(() => alert('✅ Backup restored.')).catch(err => alert('Error: ' + err.message)); } catch(err){ alert('Invalid JSON file.'); } event.target.value = ''; }; reader.readAsText(file); }
 function clearAllProducts(){ if(!confirm('⚠️ Delete ALL products permanently?')) return; if(!confirm('Are you absolutely sure?')) return; db.ref('products').remove().then(() => alert('🗑 All products deleted.')).catch(err => alert('Error: ' + err.message)); }
-
 function updateStorageInfo(){ const sp = $('storage-products'); const so = $('storage-orders'); const sc = $('storage-categories'); const sm = $('storage-members'); if(sp) sp.textContent = Object.keys(products).length; if(so) so.textContent = Object.keys(allOrders || {}).length; if(sc) sc.textContent = Object.keys(categories).length; if(sm) sm.textContent = Object.keys(members).length; }
 
 db.ref('products').on('value', snap => { products = snap.val() || {}; renderProducts(); if(isAdmin) renderAdminProducts(); updateStorageInfo(); if(urlProductToOpen && products[urlProductToOpen]){ openProductModal(urlProductToOpen); urlProductToOpen = null; } }, err => console.error('Products listener error:', err));
 db.ref('categories').on('value', snap => { categories = snap.val() || {}; renderCategories(); renderProducts(); if(isAdmin){ renderAdminCategories(); populateCategoryDropdowns(); } updateStorageInfo(); }, err => console.error('Categories listener error:', err));
 db.ref('settings/bankInfo').on('value', snap => { bankInfo = snap.val() || {}; if (document.getElementById('bank-page') && document.getElementById('bank-page').classList.contains('active')) renderBankPage(); if (isAdmin && document.getElementById('bank-settings-section') && document.getElementById('bank-settings-section').classList.contains('active')) populateBankAdminForm(); }, err => console.error('Bank info listener error:', err));
-db.ref('members').on('value', snap => { members = snap.val() || {}; if(isAdmin) renderAdminMembers(); updateStorageInfo(); }, err => console.error('Members listener error:', err));
-db.ref('orders').on('value', snap => { allOrders = snap.val() || {}; renderAdminOrders(); updateStorageInfo(); }, err => console.error('Orders listener error:', err));
+db.ref('members').on('value', snap => { members = snap.val() || {}; if(isAdmin) renderAdminMembers(); updateStorageInfo(); if(currentMember){ const phoneLast4 = currentMember.phone.slice(-4); renderMyDownlines(phoneLast4); } }, err => console.error('Members listener error:', err));
+db.ref('orders').on('value', snap => { allOrders = snap.val() || {}; renderAdminOrders(); updateStorageInfo(); if(currentMember){ const phoneLast4 = currentMember.phone.slice(-4); renderMyDownlines(phoneLast4); } }, err => console.error('Orders listener error:', err));
 
 document.addEventListener('DOMContentLoaded', () => {
     loadCart(); loadMemberSession(); updateCartBadge(); updateMemberUI(); renderCategories(); renderProducts(); renderCart(); renderCustomerOrders(); restoreAdminSession(); populateCategoryDropdowns();
     bindFileInput(document.querySelector('.new-prod-file-slot')); checkUrlForProduct();
-    
     const urlParams = new URLSearchParams(window.location.search);
     const ref = urlParams.get('ref');
-    if (ref) {
-        localStorage.setItem('lexstore_affiliate_ref', ref);
-        affiliateRef = ref;
-    } else {
-        affiliateRef = localStorage.getItem('lexstore_affiliate_ref');
-    }
-    
+    if (ref) { localStorage.setItem('lexstore_affiliate_ref', ref); affiliateRef = ref; } else { affiliateRef = localStorage.getItem('lexstore_affiliate_ref'); }
     $('admin-password-input').addEventListener('keydown', e => { if(e.key === 'Enter') verifyAdminLogin(); });
     document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closeProductModal(); closeLightbox(); closeFbShareModal(); } });
 });
