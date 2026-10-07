@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEXSTORE - Hardware Store</title>
-    
-    <!-- 1. Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
-        // Firebase Config (Singapore Region Database)
         const firebaseConfig = {
             apiKey: "AIzaSyArWWVX5abPo-zZ-OJcR6M45eRikqFZNMA",
             authDomain: "lexstore-55d84.firebaseapp.com",
@@ -20,99 +17,189 @@
             messagingSenderId: "149887218467",
             appId: "1:149887218467:web:891e5af721129f97225296"
         };
-
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
     </script>
-
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f4f4f4; color: #333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+        body { background-color: #f5f5f5; color: #333; }
         
-        /* Navigation / Header */
-        header { background-color: #1a1a1a; color: #ffcc00; padding: 20px; text-align: center; }
-        header h1 { font-size: 28px; letter-spacing: 2px; margin-bottom: 10px; }
-        .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
-        .nav-btn { background: #333; color: #fff; border: 1px solid #ffcc00; padding: 8px 14px; cursor: pointer; border-radius: 4px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; font-size: 14px; }
-        .nav-btn.active { background: #ffcc00 !important; color: #1a1a1a !important; border-color: #ffcc00; }
-        .nav-btn.whatsapp-nav { background: #25d366; color: #fff; border-color: #25d366; }
+        header { background-color: #2ecc71; color: #fff; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        header h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; margin-bottom: 5px; }
+        header p { font-size: 12px; color: #e8f5e9; margin-bottom: 12px; }
+        .nav-tabs { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+        .nav-btn { background: #fff; color: #2ecc71; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; font-size: 13px; transition: all 0.2s; }
+        .nav-btn.active { background: #1a1a1a !important; color: #fff !important; }
+        .nav-btn.whatsapp-nav { background: #25d366; color: #fff; }
         .nav-btn.whatsapp-nav:hover { background: #1ebd56; }
-
-        /* Pages Control */
-        .page { display: none; max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+        
+        .page { display: none; max-width: 1200px; margin: 15px auto; padding: 0 10px; }
         .page.active { display: block !important; }
-
-        /* Store Layout */
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .product-card { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-        .product-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; cursor: pointer; transition: opacity 0.2s; }
-        .product-card img:hover { opacity: 0.85; }
-        .product-card h3 { font-size: 16px; margin: 5px 0; cursor: pointer; color: #1a1a1a; }
-        .product-card h3:hover { color: #e67e22; text-decoration: underline; }
-        .product-card p { color: #e67e22; font-weight: bold; margin-bottom: 5px; }
-        .product-unit { font-size: 12px; color: #666; margin-bottom: 10px; }
-        .multi-img-badge { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; z-index: 5; }
         
-        /* Quantity Selector inside Card */
-        .qty-container { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 10px; }
-        .qty-btn { background: #ddd; border: none; width: 28px; height: 28px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .qty-btn:hover { background: #ccc; }
-        .qty-input { width: 45px; text-align: center; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; padding: 4px; }
-
-        .btn { background-color: #ffcc00; color: #1a1a1a; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; width: 100%; }
-        .btn:hover { background-color: #e6b800; }
+        .category-bar { display: flex; gap: 8px; overflow-x: auto; padding: 12px 0; margin-bottom: 12px; border-bottom: 2px solid #eee; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .category-bar::-webkit-scrollbar { display: none; }
+        .category-tab { padding: 8px 16px; background: #fff; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; font-weight: bold; color: #555; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
+        .category-tab.active { background: #2ecc71; color: #fff; border-color: #2ecc71; }
+        .category-tab:hover:not(.active) { border-color: #2ecc71; color: #2ecc71; }
         
-        /* Cart Page Layout */
-        .cart-box { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .total-price { font-size: 20px; font-weight: bold; margin: 20px 0; text-align: right; color: #e67e22; }
-        .checkout-form { margin-top: 20px; border-top: 2px dashed #ddd; padding-top: 20px; }
-        .checkout-form input, .checkout-form select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; background: #fff; }
-        .checkout-btn { width: 100%; background-color: #25d366; color: white; padding: 14px; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(4, 1fr); gap: 12px; } }
+        
+        .product-card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; position: relative; cursor: pointer; transition: transform 0.2s; }
+        .product-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .product-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
+        .multi-img-badge { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; z-index: 5; }
+        .product-info { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; }
+        .product-title { font-size: 13px; color: #333; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px; flex-grow: 1; font-weight: 600; }
+        .price-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+        .price { color: #ee4d2d; font-size: 16px; font-weight: bold; }
+        .sold-count { font-size: 11px; color: #757575; }
+        
+        .cart-box { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .total-price { font-size: 22px; font-weight: 800; margin: 20px 0; text-align: right; color: #ee4d2d; }
+        .checkout-form { margin-top: 20px; border-top: 2px dashed #eee; padding-top: 20px; }
+        .checkout-form input, .checkout-form select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; background: #fafafa; }
+        .checkout-btn { width: 100%; background-color: #25d366; color: white; padding: 14px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .checkout-btn:hover { background-color: #1ebd56; }
-
-        /* Admin Box & Sub-tabs */
-        .box-container { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .admin-sub-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; flex-wrap: wrap; }
-        .admin-sub-btn { background: #f0f0f0; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 13px; color: #333; }
-        .admin-sub-btn.active { background: #1a1a1a !important; color: #ffcc00 !important; }
+        
+        .box-container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .admin-sub-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 12px; flex-wrap: wrap; }
+        .admin-sub-btn { background: #f8f9fa; border: none; padding: 8px 14px; cursor: pointer; border-radius: 20px; font-weight: bold; font-size: 13px; color: #555; transition: all 0.2s; }
+        .admin-sub-btn.active { background: #2ecc71 !important; color: #fff !important; }
         .admin-section { display: none; }
         .admin-section.active { display: block !important; }
-
-        .stats { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
-        .stat-card { background: #ffcc00; padding: 15px; border-radius: 6px; flex: 1; text-align: center; font-weight: bold; font-size: 16px; color: #1a1a1a; }
+        
+        .stats { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .stat-card { background: #e8f5e9; padding: 15px; border-radius: 8px; flex: 1; text-align: center; font-weight: bold; font-size: 15px; color: #2ecc71; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
-        th { background-color: #1a1a1a; color: #ffcc00; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .btn-clear { background: #e74c3c; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-top: 20px; }
-        .btn-clear:hover { background: #c0392b; }
+        th, td { border: 1px solid #eee; padding: 10px; text-align: left; font-size: 13px; }
+        th { background-color: #2ecc71; color: #fff; font-weight: 600; }
+        tr:nth-child(even) { background-color: #f9fdfa; }
+        #orders-table tbody tr { cursor: pointer; transition: background 0.2s; }
+        #orders-table tbody tr:hover { background-color: #e8f5e9; }
 
-        /* Admin Form Inputs */
-        .admin-form input, .admin-form textarea, .admin-form select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background: #fff; }
-
-        /* Admin Login Box */
-        #admin-login-box { max-width: 400px; margin: 50px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
-        #admin-login-box input { width: 100%; padding: 12px; margin: 10px 0 20px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
-
-        /* Image Slots Style */
-        .img-slot-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: #fafafa; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-        .img-slot-row input[type="file"] { margin-bottom: 0; }
-        .btn-add-slot { background: #2980b9; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
-        .btn-del-slot { background: #e74c3c; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
-
-        /* Thumbnail Bar for Modal */
+        .btn-clear { background: #e74c3c; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+        .admin-form input, .admin-form textarea, .admin-form select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: #fafafa; }
+        .admin-form label { font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px; }
+        #admin-login-box { max-width: 400px; margin: 50px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
+        #admin-login-box input { width: 100%; padding: 12px; margin: 10px 0 20px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
+        
+        .img-slot-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: #fafafa; padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
+        .btn-add-slot { background: #3498db; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
+        .btn-del-slot { background: #e74c3c; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; }
+        
         .modal-thumbs { display: flex; gap: 8px; margin-top: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .modal-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid #ccc; flex-shrink: 0; }
-        .modal-thumb.active { border-color: #e67e22; box-shadow: 0 0 5px rgba(230, 126, 34, 0.8); }
-
-        /* Modals */
-        .modal-overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
-        .modal-content { background: #fff; width: 90%; max-width: 500px; padding: 25px; border-radius: 8px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; color: #333; z-index: 1010; }
+        .modal-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid #ddd; flex-shrink: 0; }
+        .modal-thumb.active { border-color: #2ecc71; box-shadow: 0 0 6px rgba(46, 204, 113, 0.5); }
+        .modal-overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); justify-content: center; align-items: center; }
+        .modal-content { background: #fff; width: 90%; max-width: 420px; padding: 20px; border-radius: 12px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; color: #999; z-index: 1010; }
         .close-btn:hover { color: #e74c3c; }
-        #lightbox-content { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 4px 20px rgba(255,255,255,0.2); }
+        #lightbox-content { max-width: 90%; max-height: 90%; border-radius: 8px; }
+        
+        .qty-container { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 15px; }
+        .qty-btn { background: #f0f0f0; border: 1px solid #ddd; width: 32px; height: 32px; font-weight: bold; cursor: pointer; border-radius: 4px; color: #555; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .qty-btn:hover { background: #e0e0e0; }
+        .qty-input { width: 45px; text-align: center; font-size: 14px; border: 1px solid #ddd; border-radius: 4px; padding: 4px; }
+        
+        .btn-change-img { background-color: #3498db; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; margin-top: 5px; width: 100%; }
+        .btn-change-img:hover { background-color: #2980b9; }
+        
+        .fb-share-btn { background-color: transparent; border: none; padding: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+        .fb-share-btn:hover { transform: scale(1.1); }
+        .fb-share-btn svg { width: 32px; height: 32px; }
+        .fb-modal-content { background: #fff; width: 90%; max-width: 400px; padding: 25px; border-radius: 16px; position: relative; text-align: left; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .fb-modal-content h3 { font-size: 20px; margin-bottom: 15px; color: #1a1a1a; }
+        .fb-modal-content .fb-desc { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5; }
+        .fb-step-btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; color: #fff; cursor: pointer; margin-bottom: 12px; text-align: center; transition: opacity 0.2s; }
+        .fb-step-btn:hover { opacity: 0.9; }
+        .fb-step-btn.step1 { background-color: #f39c12; }
+        .fb-step-btn.step2 { background-color: #27ae60; }
+        .fb-step-btn.step3 { background-color: #1877f2; }
+        
+        .status-select { padding: 5px; border-radius: 4px; border: 1px solid #ddd; font-weight: bold; cursor: pointer; width: 100%; min-width: 90px; text-align: center; }
+        .status-pending { background-color: #fff8e1; color: #e67e22; border-color: #ffe082; }
+        .status-complete { background-color: #e8f5e9; color: #2ecc71; border-color: #c8e6c9; }
+        .status-cash { background-color: #e3f2fd; color: #1976d2; border-color: #bbdefb; }
+        .status-qrcode { background-color: #f3e5f5; color: #8e44ad; border-color: #e1bee7; }
+        .status-cancel { background-color: #ffebee; color: #c62828; border-color: #ffcdd2; }
+        
+        .cart-item-img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: #f0f0f0; }
+
+        /* 收据页面样式（POS 打印风格） */
+        .receipt-box { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 700px; margin: 0 auto; font-family: 'Courier New', Courier, monospace; color: #000; }
+        .receipt-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 20px; }
+        .receipt-header h2 { font-size: 22px; color: #000; text-align: center; flex: 1; margin: 0; }
+        .receipt-company-header { text-align: center; margin-bottom: 20px; }
+        .receipt-company-header h2 { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+        .receipt-company-header p { font-size: 14px; margin-bottom: 3px; }
+        .receipt-section { margin-bottom: 20px; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
+        .receipt-section h3 { font-size: 16px; color: #000; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        .receipt-section input, .receipt-section select { width: 100%; padding: 5px; border: none; border-bottom: 1px dotted #ccc; border-radius: 0; font-size: 14px; margin-bottom: 10px; background: transparent; font-family: 'Courier New', Courier, monospace; color: #000; }
+        .receipt-section input:focus, .receipt-section select:focus { outline: none; border-bottom: 1px solid #2ecc71; }
+        .receipt-item-row { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 5px; padding: 5px 0; border-bottom: 1px dotted #eee; }
+        .receipt-item-row input.item-name { flex: 2; padding: 5px; font-weight: bold; min-width: 100px; }
+        .receipt-item-row input.item-qty { flex: 0.8; min-width: 40px; padding: 5px; text-align: center; }
+        .receipt-item-row input.item-price { flex: 1; min-width: 60px; padding: 5px; text-align: center; }
+        .receipt-item-row .item-subtotal { flex: 1; font-weight: bold; color: #000; min-width: 60px; text-align: right; padding-right: 5px; }
+        .receipt-item-row .btn-remove { background: #e74c3c; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .receipt-divider { border-top: 2px dashed #000; margin: 15px 0; }
+        .receipt-total-section { display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 800; color: #000; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #000; }
+        .receipt-total-section span:first-child { font-size: 18px; }
+        .receipt-footer { text-align: center; margin-top: 20px; font-size: 14px; }
+        .receipt-footer .paid-by { font-weight: bold; margin-bottom: 15px; }
+        .receipt-footer .thanks { font-weight: bold; margin-bottom: 5px; }
+        .receipt-qr-code { width: 120px; height: 120px; margin: 10px auto; display: block; }
+        .btn-save-receipt { width: 100%; background-color: #2ecc71; color: white; padding: 14px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 15px; font-family: Arial, Helvetica, sans-serif; }
+        .btn-save-receipt:hover { background-color: #27ae60; }
+        .btn-back-orders { background: #95a5a6; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; font-family: Arial, Helvetica, sans-serif; }
+        .btn-back-orders:hover { background: #7f8c8d; }
+        .btn-add-item { background: #3498db; color: #fff; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; width: 100%; margin-bottom: 15px; font-family: Arial, Helvetica, sans-serif; }
+        .btn-add-item:hover { background: #2980b9; }
+        .receipt-actions { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .btn-print { background-color: #3498db; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; flex: 1; min-width: 120px; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: Arial, Helvetica, sans-serif; }
+        .btn-print:hover { background-color: #2980b9; }
+        .btn-save-copy { background-color: #9b59b6; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; flex: 1; min-width: 120px; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: Arial, Helvetica, sans-serif; }
+        .btn-save-copy:hover { background-color: #8e44ad; }
+
+        .spec-section { margin-bottom: 15px; }
+        .spec-label { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 8px; }
+        .spec-card { display: flex; flex-wrap: wrap; gap: 8px; }
+        .spec-option { padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; background: #fafafa; font-size: 13px; cursor: pointer; transition: all 0.2s; color: #555; line-height: 1.4; }
+        .spec-option.selected { border-color: #ee4d2d; background: #fff5f2; color: #ee4d2d; font-weight: bold; }
+        .spec-option:hover { border-color: #ee4d2d; }
+
+        /* 新增：只显示 emoji 的小按钮 */
+        .btn-icon-action {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        .btn-icon-action:hover { background: #e0e0e0; }
+        .btn-icon-action.delete {
+            background: #ffebee;
+            border-color: #ffcdd2;
+        }
+        .btn-icon-action.delete:hover { background: #ffcdd2; }
+
+        @media print {
+            body * { visibility: hidden; }
+            header, .nav-tabs, .btn-back-orders, .btn-save-receipt, .btn-print, .btn-save-copy, .btn-add-item, .btn-remove, .receipt-actions, .footer-note { display: none !important; }
+            .page, .receipt-box, .receipt-box * { visibility: visible; }
+            .receipt-box { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; padding: 0; max-width: 100%; border-radius: 0; }
+            .receipt-section { border-bottom: none; margin-bottom: 10px; }
+            .receipt-section input, .receipt-section select { border: none; background: transparent; padding: 0; font-weight: bold; color: #000; margin-bottom: 5px; }
+            .receipt-item-row { border-bottom: 1px solid #eee; background: transparent; padding: 5px 0; }
+            .receipt-item-row input { border: none; background: transparent; padding: 0; font-weight: bold; color: #000; }
+            .receipt-total-section { border-top: 2px solid #000; color: #000; }
+        }
     </style>
 </head>
 <body>
@@ -122,102 +209,82 @@
         <p>Your Trusted Local Hardware Store</p>
         <div class="nav-tabs">
             <button class="nav-btn active" onclick="switchPage('store', this)">🛒 Store</button>
-            <button class="nav-btn" onclick="switchPage('cart', this)">🛍 Shopping Cart <span id="cart-badge" style="background:red; color:white; padding:2px 6px; border-radius:50%; font-size:12px; display:none;">0</span></button>
+            <button class="nav-btn" onclick="switchPage('cart', this)">🛍 Shopping Cart <span id="cart-badge" style="background:#e74c3c; color:white; padding:2px 6px; border-radius:50%; font-size:11px; display:none;">0</span></button>
             <button class="nav-btn" onclick="switchPage('orders', this)">📦 My Orders</button>
             <button class="nav-btn" onclick="switchPage('admin', this)">📊 Admin Panel</button>
-            <a id="header-whatsapp-btn" href="https://wa.me/60102862797" target="_blank" class="nav-btn whatsapp-nav">💬 Contact: WhatsApp 0102862797</a>
+            <a id="header-whatsapp-btn" href="https://wa.me/60102862797" target="_blank" class="nav-btn whatsapp-nav">💬 WhatsApp 0102862797</a>
         </div>
     </header>
 
-    <!-- 1. STORE PAGE -->
     <div id="store-page" class="page active">
-        <h2>Our Products</h2>
-        <div class="product-grid" id="product-grid" style="margin-top: 15px;"></div>
+        <div class="category-bar" id="category-bar"></div>
+        <div class="product-grid" id="product-grid"></div>
     </div>
 
-    <!-- 2. SHOPPING CART PAGE -->
     <div id="cart-page" class="page">
         <div class="cart-box">
-            <h2>Your Shopping Cart</h2>
-            <div id="cart-items" style="margin-top: 20px;">
-                <p>Your cart is empty.</p>
-            </div>
-            
+            <h2 style="font-size: 20px; margin-bottom: 15px;">Your Shopping Cart</h2>
+            <div id="cart-items" style="margin-top: 20px;"><p>Your cart is empty.</p></div>
             <div id="cart-summary-box" style="display:none;">
                 <div style="text-align: right; font-size: 15px; color: #555; margin-top: 15px;" id="subtotal-display">Subtotal: RM 0.00</div>
-                <div style="text-align: right; font-size: 15px; color: #555; margin-top: 5px;" id="shipping-display">Delivery Fee: RM 8.00</div>
+                <div style="text-align: right; font-size: 15px; color: #555; margin-top: 5px;" id="shipping-display">Delivery Fee: RM 0.00</div>
                 <div class="total-price" id="total-price">Total: RM 0.00</div>
             </div>
-
             <div class="checkout-form" id="checkout-container" style="display:none;">
-                <h3>Checkout Details</h3>
-                <div style="margin-top: 15px;">
+                <h3 style="font-size: 16px; margin-bottom: 15px;">Checkout Details</h3>
+                <div>
                     <label style="font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px;">Fulfillment Method (取货方式):</label>
                     <select id="checkout-method" onchange="toggleAddressField()">
-                        <option value="Delivery">送货上门 (Delivery) [+RM 8]</option>
+                        <option value="Delivery">送货上门 (Delivery) [满 RM 50 免运费，否则 RM 5]</option>
                         <option value="Self Pickup">到店自取 (Self Pickup) [Free]</option>
                     </select>
-
                     <input type="text" id="customer-name" placeholder="Your Name" required>
                     <input type="text" id="customer-phone" placeholder="Phone Number" required>
                     <input type="text" id="customer-address" placeholder="Delivery Address" required>
-                    
-                    <button class="checkout-btn" onclick="submitOrder()">
-                        💬 Submit Order (WhatsApp)
-                    </button>
-                    
-                    <div style="margin-top: 12px; background: #fff8e1; border: 1px solid #ffe082; padding: 10px 12px; border-radius: 4px; font-size: 13px; color: #856404; line-height: 1.5;">
+                    <button class="checkout-btn" onclick="submitOrder()">💬 Submit Order (WhatsApp)</button>
+                    <div style="margin-top: 12px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 12px; border-radius: 6px; font-size: 13px; color: #2e7d32; line-height: 1.5;">
                         💡 <strong>温馨提示 (Delivery Notice)：</strong><br>
-                        选择送货上门服务将额外收取 <strong>RM 8</strong> 运费。送货服务目前仅涵盖：Damai, Penampang, Likas, Kota Kinabalu, Menggatal, Kolombong, Inanam, Putatan 区域。谢谢您的支持！
+                        购物满 <strong>RM 50</strong> 免运费。未满 RM 50 收取 <strong>RM 5</strong> 运费。送货服务目前仅涵盖：Damai, Penampang, Likas, Kota Kinabalu, Menggatal, Kolombong, Inanam, Putatan 区域。谢谢您的支持！
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 3. MY ORDERS PAGE -->
     <div id="orders-page" class="page">
         <div class="box-container">
-            <h2>My Purchase History</h2>
-            <p style="color: #666; margin-top: 5px; margin-bottom: 15px;">These are the orders saved in the cloud.</p>
+            <h2 style="font-size: 20px; margin-bottom: 5px;">My Purchase History</h2>
+            <p style="color: #666; margin-bottom: 15px;">These are the orders saved in the cloud.</p>
             <div style="overflow-x:auto;">
                 <table id="customer-orders-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Fulfillment & Info</th>
-                            <th>Items Ordered</th>
-                            <th>Total (RM)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="customer-orders-tbody">
-                        <tr><td colspan="4" style="text-align: center;">You have no past orders yet.</td></tr>
-                    </tbody>
+                    <thead><tr><th>Date</th><th>Fulfillment & Info</th><th>Items Ordered</th><th>Total (RM)</th></tr></thead>
+                    <tbody id="customer-orders-tbody"><tr><td colspan="4" style="text-align: center;">You have no past orders yet.</td></tr></tbody>
                 </table>
             </div>
             <button class="btn-clear" onclick="clearCustomerOrders()">Clear My History</button>
         </div>
     </div>
 
-    <!-- 4. ADMIN PAGE -->
     <div id="admin-page" class="page">
         <div id="admin-login-box">
-            <h2>Admin Login</h2>
-            <p style="color: #666; font-size: 14px; margin-top: 5px;">Enter password to access dashboard</p>
+            <h2 style="font-size: 20px; margin-bottom: 5px;">Admin Login</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Enter password to access dashboard</p>
             <input type="password" id="admin-password-input" placeholder="Enter Admin Password">
-            <button class="btn" onclick="verifyAdminLogin()">Login</button>
+            <button class="btn" onclick="verifyAdminLogin()" style="padding: 12px; font-size: 16px;">Login</button>
         </div>
 
         <div id="admin-dashboard" class="box-container" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
-                <h2 id="admin-title">Admin Panel</h2>
-                <button class="btn" style="width: auto; background: #e74c3c; color: white;" onclick="adminLogout()">Logout</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                <h2 id="admin-title" style="font-size: 18px;">Admin Panel</h2>
+                <button class="btn" style="width: auto; background: #e74c3c; color: white; padding: 8px 14px; font-size: 13px;" onclick="adminLogout()">Logout</button>
             </div>
 
             <div class="admin-sub-tabs">
                 <button class="admin-sub-btn active" onclick="switchAdminSubTab('orders-section', this)">📦 Orders List</button>
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('products-list-section', this)">📋 Products List</button>
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('add-product-section', this)">➕ Add Products</button>
+                <button class="admin-sub-btn" onclick="switchAdminSubTab('categories-section', this)">🏷 Categories</button>
+                <button class="admin-sub-btn" onclick="switchAdminSubTab('change-password-section', this)">🔑 Change Password</button>
                 <button class="admin-sub-btn" id="super-tab-btn" onclick="switchAdminSubTab('super-settings-section', this)" style="display:none;">🔐 Super Admin Settings</button>
             </div>
 
@@ -226,65 +293,55 @@
                     <div class="stat-card" id="total-orders-card">Total Orders: 0</div>
                     <div class="stat-card" id="total-sales-card">Total Sales: RM 0.00</div>
                 </div>
-
-                <h3>Customer Orders List (Cloud Synced)</h3>
+                <h3 style="font-size: 16px; margin-bottom: 10px;">Customer Orders List (Cloud Synced)</h3>
+                <p style="font-size:12px; color:#888; margin-bottom:10px;">💡 Click on any order row to view and edit the receipt.</p>
                 <div style="overflow-x:auto;">
                     <table id="orders-table">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Fulfillment & Customer Info</th>
+                                <th>Date & Customer Info</th>
                                 <th>Order Items</th>
                                 <th>Total (RM)</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody id="orders-tbody">
-                            <tr><td colspan="4" style="text-align: center;">No orders yet.</td></tr>
-                        </tbody>
+                        <tbody id="orders-tbody"><tr><td colspan="4" style="text-align: center;">No orders yet.</td></tr></tbody>
                     </table>
                 </div>
-
                 <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button class="btn" style="width: auto; background: #2980b9; color: white;" onclick="exportOrdersExcel()">📊 导出 Excel (Export Orders Excel)</button>
-                    <button class="btn" style="width: auto; background: #8e44ad; color: white;" onclick="exportDataJson()">📦 导出 JSON (Export Data JSON)</button>
-                    <button class="btn-clear" style="margin-top:0;" onclick="clearOrders()">Clear All Orders</button>
+                    <button class="btn" style="width: auto; background: #2980b9; color: white; font-size: 13px; padding: 8px 12px;" onclick="exportOrdersExcel()">📊 导出 Excel</button>
+                    <button class="btn" style="width: auto; background: #8e44ad; color: white; font-size: 13px; padding: 8px 12px;" onclick="exportDataJson()">📦 导出 JSON</button>
+                    <button class="btn-clear" style="margin-top:0; font-size: 13px; padding: 8px 12px;" onclick="clearOrders()">Clear All Orders</button>
                 </div>
             </div>
 
             <div id="products-list-section" class="admin-section">
-                <h3 style="color: #1a1a1a; margin-bottom: 15px;">Manage Products Inventory & Pricing</h3>
-                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Directly edit product name, price, cost, inventory quantity, and select unit from dropdown. Click Save for each row.</p>
+                <h3 style="font-size: 16px; margin-bottom: 10px;">Manage Products Inventory & Pricing</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Directly edit product name, price, cost, category, inventory quantity, unit. Click 💾 to save each row.</p>
                 <div style="overflow-x:auto;">
                     <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 60px;">Img</th>
-                                <th style="min-width: 200px;">Name</th>
-                                <th style="width: 90px;">Price (RM)</th>
-                                <th style="width: 90px;">Cost (RM)</th>
-                                <th style="width: 100px;">Unit</th>
-                                <th style="width: 90px;">Inventory</th>
-                                <th style="width: 120px;">Actions</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th style="width: 70px;">Img</th><th style="min-width: 180px;">Name</th><th style="width: 90px;">Price (RM)</th><th style="width: 90px;">Cost (RM)</th><th style="width: 130px;">Category</th><th style="width: 90px;">Unit</th><th style="width: 80px;">Stock</th><th style="width: 90px;">Actions</th></tr></thead>
                         <tbody id="admin-products-tbody"></tbody>
                     </table>
                 </div>
             </div>
 
             <div id="add-product-section" class="admin-section">
-                <h3 style="color: #27ae60; margin-bottom: 15px;">Add New Product to Store</h3>
+                <h3 style="color: #27ae60; font-size: 16px; margin-bottom: 15px;">Add New Product to Store</h3>
                 <div class="admin-form">
-                    <label style="font-weight: bold; font-size: 14px;">Product Name *:</label>
+                    <label>Product Name *:</label>
                     <input type="text" id="new-prod-name" placeholder="e.g. Electric Saw">
-
-                    <label style="font-weight: bold; font-size: 14px;">Selling Price (RM) *:</label>
+                    
+                    <label>Selling Price (RM) *:</label>
                     <input type="number" id="new-prod-price" placeholder="e.g. 85.00" step="any">
-
-                    <label style="font-weight: bold; font-size: 14px;">Cost Price (RM):</label>
+                    
+                    <label>Cost Price (RM):</label>
                     <input type="number" id="new-prod-cost" placeholder="e.g. 50.00" step="any">
-
-                    <label style="font-weight: bold; font-size: 14px;">Unit:</label>
+                    
+                    <label>Category (分类):</label>
+                    <select id="new-prod-category"></select>
+                    
+                    <label>Unit:</label>
                     <select id="new-prod-unit">
                         <option value="pcs">pcs (个)</option>
                         <option value="pack">pack (包)</option>
@@ -297,912 +354,1473 @@
                         <option value="cm">cm (厘米)</option>
                         <option value="unit">unit (单位)</option>
                     </select>
-
-                    <label style="font-weight: bold; font-size: 14px;">Initial Inventory Quantity:</label>
+                    
+                    <label>Initial Inventory Quantity:</label>
                     <input type="number" id="new-prod-stock" placeholder="e.g. 100" value="100">
-
-                    <label style="font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px;">Upload Product Images (支持多张图片):</label>
+                    
+                    <label>Model Options (用逗号分隔，选填):</label>
+                    <input type="text" id="new-prod-model" placeholder="e.g. 黑色带拉链,红色不带拉链">
+                    
+                    <label>Size Options (用逗号分隔，选填):</label>
+                    <input type="text" id="new-prod-size" placeholder="e.g. 5XL - 适合155-175cm,7XL - 适合175-190cm">
+                    
+                    <label style="display:block; margin-bottom: 5px;">Upload Product Images (支持多张图片):</label>
                     <div id="image-slots-container">
                         <div class="img-slot-row">
                             <span style="font-size:12px; font-weight:bold; color:#666;">#1</span>
                             <input type="file" class="new-prod-file-slot" accept="image/*">
                         </div>
                     </div>
-                    <button type="button" class="btn-add-slot" onclick="addImageSlot()">➕ Add Another Image Slot (增加图片上传框)</button>
+                    <button type="button" class="btn-add-slot" onclick="addImageSlot()">➕ Add Another Image Slot</button>
+                    <button class="btn" style="background:#27ae60; color:#fff; padding:14px; font-size:16px; margin-top:10px;" onclick="addNewProduct()">✅ Save New Product</button>
+                    <button class="btn" style="background:#95a5a6; color:#fff; margin-top:8px;" onclick="resetProductForm()">↺ Reset Form</button>
+                </div>
+            </div>
 
-                    <label style="font-weight: bold; font-size: 14px; display: block;">Product Description & Details:</label>
-                    <textarea id="new-prod-desc" placeholder="Enter product specifications and details" rows="3"></textarea>
+            <div id="categories-section" class="admin-section">
+                <h3 style="color: #2ecc71; font-size: 16px; margin-bottom: 15px;">🏷 分类管理 / Category Management</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">新增、修改或删除分类。修改后会立即显示在商店首页顶部。删除分类不会删除产品，但产品会变成未分类。</p>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <label style="font-weight: bold; font-size: 14px; display: block; margin-bottom: 8px;">➕ 新增分类：</label>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <input type="text" id="new-cat-name" placeholder="e.g. 手工具 / Hand Tools" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        <button class="btn" style="width: auto; background: #2ecc71; color: #fff; padding: 10px 20px;" onclick="addNewCategory()">➕ 新增</button>
+                    </div>
+                </div>
 
-                    <button class="btn" id="btn-submit-prod" style="background: #27ae60; color: white; padding: 12px; font-size: 16px;" onclick="addNewProduct()">Add Product Now</button>
+                <h4 style="margin-bottom: 10px;">现有分类：</h4>
+                <div id="admin-categories-list"></div>
+            </div>
+
+            <div id="change-password-section" class="admin-section">
+                <h3 style="color: #2980b9; font-size: 16px; margin-bottom: 15px;">🔑 Change Admin Password</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Enter your new password below. This will update the password in the cloud immediately.</p>
+                <div class="admin-form" style="max-width:400px;">
+                    <label style="font-weight:bold; font-size:14px;">New Password *:</label>
+                    <input type="password" id="change-new-pw" placeholder="Enter new password">
+                    <label style="font-weight:bold; font-size:14px;">Confirm New Password *:</label>
+                    <input type="password" id="change-confirm-pw" placeholder="Confirm new password">
+                    <button class="btn" style="background:#2980b9; color:#fff;" onclick="changeAdminPassword()">💾 Update Password</button>
                 </div>
             </div>
 
             <div id="super-settings-section" class="admin-section">
-                <h3 style="color: #c0392b; margin-bottom: 15px;">🔐 Change System Passwords & Settings</h3>
-                <div style="display: flex; flex-direction: column; gap: 20px; max-width: 450px;">
-                    <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #eee;">
-                        <h4 style="margin-bottom: 10px; color: #333;">Change System Passwords</h4>
-                        <label style="font-size: 13px; font-weight: bold;">New Super Admin Password:</label>
-                        <input type="password" id="new-super-pwd" placeholder="Enter new superadmin password" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                        
-                        <label style="font-size: 13px; font-weight: bold;">New Normal Admin Password:</label>
-                        <input type="password" id="new-normal-pwd" placeholder="Enter new normal admin password" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                        
-                        <button class="btn" style="background: #2980b9; color: white; padding: 10px;" onclick="updateAdminPasswords()">Save New Passwords</button>
+                <h3 style="color:#8e44ad; font-size: 16px; margin-bottom:15px;">🔐 Super Admin Settings</h3>
+                <div class="admin-form" style="max-width:520px;">
+                    <label style="font-weight:bold; font-size:14px;">Change Admin Password:</label>
+                    <input type="text" id="new-admin-pw" placeholder="New admin password">
+                    <label style="font-weight:bold; font-size:14px;">Change Super Admin Password:</label>
+                    <input type="text" id="new-super-pw" placeholder="New super admin password">
+                    <button class="btn" style="background:#8e44ad; color:#fff;" onclick="savePasswords()">💾 Save Passwords</button>
+                </div>
+                <div style="margin-top:30px; border-top:2px dashed #ddd; padding-top:20px;">
+                    <h4 style="margin-bottom:10px;">Database Management</h4>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn" style="width:auto; background:#2980b9; color:#fff;" onclick="exportDataJson()">📦 Export JSON Backup</button>
+                        <button class="btn" style="width:auto; background:#16a085; color:#fff;" onclick="document.getElementById('import-json-file').click()">📥 Import JSON Backup</button>
+                        <input type="file" id="import-json-file" accept=".json" style="display:none;" onchange="importDataJson(event)">
+                        <button class="btn-clear" style="margin-top:0;" onclick="clearOrders()">🗑 Clear All Orders</button>
+                        <button class="btn-clear" style="margin-top:0;" onclick="clearAllProducts()">🗑 Delete All Products</button>
                     </div>
-
-                    <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #eee;">
-                        <h4 style="margin-bottom: 10px; color: #27ae60;">💬 Change Store WhatsApp Number</h4>
-                        <label style="font-size: 13px; font-weight: bold;">New WhatsApp Number (e.g. 60102862797):</label>
-                        <input type="text" id="new-whatsapp-input" placeholder="Enter store whatsapp number" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                        <button class="btn" style="background: #27ae60; color: white; padding: 10px;" onclick="updateWhatsAppNumber()">Save WhatsApp Number</button>
-                    </div>
+                </div>
+                <div style="margin-top:25px; background:#f8f9fa; border-left:4px solid #8e44ad; padding:12px 15px; border-radius:4px; font-size:13px; color:#555; line-height:1.6;">
+                    <strong>ℹ️ Storage Info</strong><br>
+                    Products: <span id="storage-products">0</span> &nbsp;|&nbsp; Orders: <span id="storage-orders">0</span> &nbsp;|&nbsp; Categories: <span id="storage-categories">0</span><br>
+                    Images are auto-compressed before upload to keep the database small.
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Product Details Modal -->
-    <div id="product-details-modal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeProductDetails()">&times;</span>
-            <div id="modal-details-body"></div>
+    <div id="receipt-page" class="page">
+        <div class="receipt-box" id="receipt-content">
+            <div class="receipt-company-header">
+                <h2 id="receipt-company-name-display">LEXSTORE HARDWARE</h2>
+                <p id="receipt-company-phone-display">0102862797</p>
+                <p id="receipt-company-address-display">Your Trusted Local Hardware Store</p>
+            </div>
+
+            <div style="text-align:center; font-size:18px; font-weight:bold; margin-bottom:20px;">Receipt</div>
+
+            <div class="receipt-section">
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                    <span>Order No:</span>
+                    <span id="receipt-order-id" style="font-weight:bold;"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                    <span>Date:</span>
+                    <span id="receipt-date"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                    <span>Status:</span>
+                    <span id="receipt-status-display">Pending</span>
+                </div>
+            </div>
+
+            <div class="receipt-section">
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                    <span>Customer:</span>
+                    <span id="receipt-name-display">-</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                    <span>Phone:</span>
+                    <span id="receipt-phone-display">-</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                    <span>Address:</span>
+                    <span id="receipt-address-display">-</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                    <span>Method:</span>
+                    <span id="receipt-method-display">-</span>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:13px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:10px;">
+                <span style="flex:2; text-align:left;">Description</span>
+                <span style="flex:0.8; text-align:center;">Qty</span>
+                <span style="flex:1; text-align:right;">Price</span>
+                <span style="flex:1; text-align:right;">Amount</span>
+            </div>
+
+            <div id="receipt-items-container"></div>
+
+            <div class="receipt-total-section">
+                <span>Total:</span>
+                <span id="receipt-total">RM 0.00</span>
+            </div>
+
+            <div class="receipt-footer">
+                <div class="paid-by" id="receipt-paid-by-display">Paid By: Cash</div>
+                <div class="thanks">***** Thank You *****</div>
+                <div>Please Come Again</div>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=Request+E-Receipt+LEXSTORE" alt="E-Receipt QR Code" class="receipt-qr-code">
+                <div style="font-size:12px; font-weight:bold; color:#000; margin-top:5px;">Scan this QR to request E-Receipt</div>
+            </div>
+
+            <div style="display:none;" id="receipt-editable-fields">
+                <input type="text" id="receipt-company-name">
+                <input type="text" id="receipt-company-phone">
+                <input type="text" id="receipt-company-address">
+                <input type="text" id="receipt-name">
+                <input type="text" id="receipt-phone">
+                <input type="text" id="receipt-address">
+                <select id="receipt-method">
+                    <option value="Delivery">Delivery (送货上门)</option>
+                    <option value="Self Pickup">Self Pickup (到店自取)</option>
+                </select>
+                <select id="receipt-status">
+                    <option value="pending">Pending</option>
+                    <option value="complete">Complete</option>
+                    <option value="cash">Cash</option>
+                    <option value="qrcode">QR Code</option>
+                    <option value="cancel">Cancel</option>
+                </select>
+            </div>
+
+            <button class="btn-save-receipt" onclick="saveReceiptWithAlert()">💾 Save Changes to Cloud</button>
+            
+            <div class="receipt-actions">
+                <button class="btn-print" onclick="printReceipt()">🖨 Print Receipt</button>
+                <button class="btn-save-copy" onclick="saveAndShareCopy()">📤 Save Copy (WhatsApp)</button>
+            </div>
         </div>
     </div>
 
-    <!-- Lightbox Modal for Image Zoom -->
-    <div id="lightbox-modal" class="modal-overlay" onclick="closeLightbox()">
-        <span class="close-btn" style="color:#fff; right: 30px; top: 20px; font-size: 36px;" onclick="closeLightbox()">&times;</span>
-        <img id="lightbox-content" src="" alt="Enlarged Product">
+    <div id="product-modal" class="modal-overlay" onclick="if(event.target===this) closeProductModal()">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeProductModal()">&times;</span>
+            <img id="modal-main-img" src="" style="width:100%; height:260px; object-fit:cover; border-radius:8px; cursor:zoom-in; background:#f5f5f5;" onclick="openLightbox(this.src)">
+            <div class="modal-thumbs" id="modal-thumbs"></div>
+            <h2 id="modal-name" style="margin-bottom:6px; color:#111; font-size:20px;"></h2>
+            <p id="modal-price" style="color:#ee4d2d; font-weight:800; font-size:24px;"></p>
+            <p id="modal-unit" style="font-size:13px; color:#666; margin-bottom:15px;"></p>
+            
+            <div id="modal-specs-area"></div>
+            
+            <div class="qty-container">
+                <button class="qty-btn" onclick="changeModalQty(-1)">−</button>
+                <input class="qty-input" type="number" id="modal-qty" value="1" min="1">
+                <button class="qty-btn" onclick="changeModalQty(1)">+</button>
+            </div>
+            <button class="btn" id="modal-add-btn" onclick="addToCartFromModal()" style="padding:15px; font-size:16px; background:#2ecc71; color:#fff;">🛒 Add to Cart</button>
+            <button class="fb-share-btn" onclick="shareProductToFacebook(currentModalId)" title="Share on Facebook" style="margin-top: 15px; display:flex; margin-left:auto; margin-right:auto;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#1877f2"/><path d="M15.402 12.665l.478-3.12h-3.002V7.522c0-.854.418-1.686 1.76-1.686h1.363V3.12S14.63 3 13.202 3c-2.325 0-3.844 1.408-3.844 3.956V9.545H6.414v3.12h2.944v7.544c.59.093 1.195.141 1.81.141.615 0 1.22-.048 1.81-.141v-7.544h2.424z" fill="#ffffff"/></svg>
+            </button>
+        </div>
     </div>
 
-    <script>
-        if (!localStorage.getItem('super_admin_pwd')) {
-            localStorage.setItem('super_admin_pwd', 'super123');
-        }
-        if (!localStorage.getItem('normal_admin_pwd')) {
-            localStorage.setItem('normal_admin_pwd', 'admin123');
-        }
-        if (!localStorage.getItem('store_whatsapp')) {
-            localStorage.setItem('store_whatsapp', '60102862797');
-        }
+    <div id="fb-share-modal" class="modal-overlay" onclick="if(event.target===this) closeFbShareModal()">
+        <div class="fb-modal-content">
+            <span class="close-btn" onclick="closeFbShareModal()">&times;</span>
+            <h3>Share to Facebook</h3>
+            <div class="fb-desc">为了在 Facebook 自动生成直达卡片，请按以下 2 步操作：</div>
+            <button class="fb-step-btn step1" onclick="downloadPoster()">🖼 第一步：下载精美海报图片</button>
+            <button class="fb-step-btn step2" onclick="copyShareText()">📋 第二步：一键复制文案（链接已置顶）</button>
+            <button class="fb-step-btn step3" onclick="openFbPublish()">🚀 打开 Facebook 发布 →</button>
+        </div>
+    </div>
 
-        function initWhatsAppHeader() {
-            const currentWa = localStorage.getItem('store_whatsapp') || '60102862797';
-            const waBtn = document.getElementById('header-whatsapp-btn');
-            if (waBtn) {
-                waBtn.href = `https://wa.me/${currentWa}`;
-                waBtn.innerText = `💬 Contact: WhatsApp ${currentWa}`;
-            }
-        }
-        initWhatsAppHeader();
+    <div id="lightbox-modal" class="modal-overlay" onclick="closeLightbox()">
+        <span class="close-btn" style="color:#fff; position:fixed; top:20px; right:30px; font-size:40px; width:50px; height:50px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); border-radius:50%;" onclick="closeLightbox()">&times;</span>
+        <img id="lightbox-content" src="" alt="Product Image">
+    </div>
 
-        const defaultProducts = [
-            { id: "1", name: "Heavy Duty Hammer", price: 25.00, cost: 15.00, unit: "pcs", stock: 50, images: ["https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=800&q=80"], desc: "High-quality forged steel head with a comfortable shock-absorbing rubber grip." },
-            { id: "2", name: "Cordless Drill", price: 150.00, cost: 100.00, unit: "set", stock: 20, images: ["https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80"], desc: "Powerful rechargeable cordless drill with variable speed settings." },
-            { id: "3", name: "Stainless Steel Screws", price: 12.50, cost: 6.00, unit: "pack", stock: 100, images: ["https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&q=80"], desc: "Rust-resistant premium stainless steel screws pack of 100 pieces." }
-        ];
+<script>
+const WHATSAPP_NUMBER   = '60102862797';
+const DELIVERY_FEE      = 5;
+const FREE_DELIVERY_THRESHOLD = 50;
+let DEFAULT_ADMIN_PW  = 'admin123';
+let DEFAULT_SUPER_PW  = 'admin123';
 
-        let products = [];
-        let orders = [];
-        let cart = [];
-        let currentRole = null;
-        const availableUnits = ["pcs", "pack", "set", "bottle", "bag", "kg", "gram", "m", "cm", "unit"];
+const UNITS = [
+    { v:'pcs',    t:'pcs (个)' },
+    { v:'pack',   t:'pack (包)' },
+    { v:'set',    t:'set (套)' },
+    { v:'bottle', t:'bottle (瓶)' },
+    { v:'bag',    t:'bag (袋)' },
+    { v:'kg',     t:'kg (公斤)' },
+    { v:'gram',   t:'gram (克)' },
+    { v:'m',      t:'m (米)' },
+    { v:'cm',     t:'cm (厘米)' },
+    { v:'unit',   t:'unit (单位)' }
+];
 
-        // 🌟 1. 实时监听 Firebase：商品列表同步
-        db.ref('products').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                if (Array.isArray(data)) {
-                    products = data.filter(Boolean);
-                } else {
-                    products = Object.keys(data).map(key => ({ ...data[key], id: key }));
-                }
-            } else {
-                defaultProducts.forEach(p => {
-                    db.ref('products/' + p.id).set(p);
-                });
-                products = defaultProducts;
-            }
+let products        = {};
+let allOrders       = {};
+let categories      = {};
+let cart            = {};
+let isAdmin         = false;
+let isSuperAdmin    = false;
+let currentModalId  = null;
+let currentModalImgs = [];
+let urlProductToOpen = null;
+let currentShareProductId = null;
+let currentReceiptId = null;
+let currentCategory = 'all';
 
-            products = products.map(p => {
-                if (!p.images || !Array.isArray(p.images)) {
-                    p.images = p.image ? [p.image] : ["https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=800&q=80"];
-                }
-                return p;
-            });
+const $  = id => document.getElementById(id);
+const fmt = n => (Number(n) || 0).toFixed(2);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-            renderProducts();
-            if (document.getElementById('products-list-section').classList.contains('active')) {
-                loadAdminProductsTable();
-            }
+function getImages(p){
+    if(!p) return [];
+    if(Array.isArray(p.images)) return p.images.filter(Boolean);
+    if(typeof p.images === 'string' && p.images) return [p.images];
+    if(p.image) return [p.image];
+    return [];
+}
+
+function normalizeItems(items){
+    if(!items) return [];
+    if(Array.isArray(items)) return items;
+    return Object.values(items);
+}
+
+function parseSpec(str){
+    if(!str || typeof str !== 'string') return [];
+    return str.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+function download(content, filename, type){
+    const blob = new Blob([content], { type });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+function switchPage(pageId, btn){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const page = $(pageId + '-page');
+    if(page) page.classList.add('active');
+    document.querySelectorAll('.nav-tabs .nav-btn').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    if(pageId === 'cart')   renderCart();
+    if(pageId === 'orders') renderCustomerOrders();
+    if(pageId === 'store')  renderProducts();
+    window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function switchAdminSubTab(sectionId, btn){
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    const sec = $(sectionId);
+    if(sec) sec.classList.add('active');
+    document.querySelectorAll('.admin-sub-btn').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    if(sectionId === 'products-list-section') renderAdminProducts();
+    if(sectionId === 'categories-section') renderAdminCategories();
+    if(sectionId === 'super-settings-section') updateStorageInfo();
+    if(sectionId === 'add-product-section') populateCategoryDropdowns();
+}
+
+/* ================= 分类 ================= */
+function renderCategories(){
+    const bar = $('category-bar');
+    let html = `<div class="category-tab ${currentCategory === 'all' ? 'active' : ''}" onclick="selectCategory('all')">全部 All</div>`;
+    Object.entries(categories).forEach(([id, name]) => {
+        html += `<div class="category-tab ${currentCategory === id ? 'active' : ''}" onclick="selectCategory('${id}')">${esc(name)}</div>`;
+    });
+    bar.innerHTML = html;
+}
+
+function selectCategory(catId){
+    currentCategory = catId;
+    renderCategories();
+    renderProducts();
+}
+
+function populateCategoryDropdowns(){
+    const newSel = $('new-prod-category');
+    if(newSel){
+        let html = '<option value="">-- 未分类 Uncategorized --</option>';
+        Object.entries(categories).forEach(([id, name]) => {
+            html += `<option value="${id}">${esc(name)}</option>`;
         });
+        newSel.innerHTML = html;
+    }
+}
 
-        // 🌟 2. 实时监听 Firebase：订单列表同步（解决不同手机Admin看到订单不一致的问题）
-        db.ref('orders').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                orders = Object.keys(data).map(key => ({ ...data[key], id: key })).reverse();
-            } else {
-                orders = [];
-            }
-            if (document.getElementById('orders-section').classList.contains('active')) {
-                loadOrders();
-            }
-            if (document.getElementById('orders-page').classList.contains('active')) {
-                loadCustomerOrders();
-            }
-        });
+function categoryOptionsHtml(selected){
+    let html = `<option value="" ${!selected ? 'selected' : ''}>-- 未分类 --</option>`;
+    Object.entries(categories).forEach(([cid, name]) => {
+        html += `<option value="${cid}" ${cid === selected ? 'selected' : ''}>${esc(name)}</option>`;
+    });
+    return html;
+}
 
-        function switchPage(pageName, btnElement) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                if(!b.classList.contains('whatsapp-nav')) {
-                    b.classList.remove('active');
-                }
-            });
+function renderAdminCategories(){
+    const list = $('admin-categories-list');
+    const keys = Object.keys(categories);
+    if(!keys.length){
+        list.innerHTML = '<p style="color:#888; padding:10px;">还没有分类。请在上面新增。</p>';
+        return;
+    }
+    list.innerHTML = keys.map(id => `
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px; background:#f9f9f9; padding:10px; border-radius:6px;">
+            <input type="text" id="cat-name-${id}" value="${esc(categories[id])}" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:6px;">
+            <button class="btn" style="width:auto; background:#2ecc71; color:#fff; padding:10px 14px; font-size:13px;" onclick="saveCategory('${id}')">💾 保存</button>
+            <button class="btn-del-slot" onclick="deleteCategory('${id}')">🗑 删除</button>
+        </div>
+    `).join('');
+}
 
-            if (pageName === 'store') {
-                document.getElementById('store-page').classList.add('active');
-                renderProducts();
-            } else if (pageName === 'cart') {
-                document.getElementById('cart-page').classList.add('active');
-                updateCart();
-            } else if (pageName === 'orders') {
-                document.getElementById('orders-page').classList.add('active');
-                loadCustomerOrders();
-            } else if (pageName === 'admin') {
-                document.getElementById('admin-page').classList.add('active');
-                checkAdminSession();
-            }
-            if (btnElement && !btnElement.classList.contains('whatsapp-nav')) {
-                btnElement.classList.add('active');
-            }
-        }
+function addNewCategory(){
+    const name = $('new-cat-name').value.trim();
+    if(!name){ alert('请输入分类名称 / Please enter category name.'); return; }
+    db.ref('categories').push(name)
+      .then(() => { $('new-cat-name').value = ''; alert('✅ 分类已新增：' + name); })
+      .catch(err => alert('Error: ' + err.message));
+}
 
-        function switchAdminSubTab(sectionId, btnElement) {
-            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.admin-sub-btn').forEach(b => b.classList.remove('active'));
+function saveCategory(id){
+    const name = $('cat-name-' + id).value.trim();
+    if(!name){ alert('分类名称不能为空。'); return; }
+    db.ref('categories/' + id).set(name)
+      .then(() => alert('✅ 分类已保存：' + name))
+      .catch(err => alert('Error: ' + err.message));
+}
 
-            document.getElementById(sectionId).classList.add('active');
-            btnElement.classList.add('active');
+function deleteCategory(id){
+    const name = categories[id] || id;
+    if(!confirm(`删除分类 "${name}" 吗？该分类下的产品会变成"未分类"。`)) return;
+    db.ref('categories/' + id).remove()
+      .then(() => alert('🗑 分类已删除。'))
+      .catch(err => alert('Error: ' + err.message));
+}
 
-            if (sectionId === 'products-list-section') {
-                loadAdminProductsTable();
-            } else if (sectionId === 'orders-section') {
-                loadOrders();
-            } else if (sectionId === 'super-settings-section') {
-                document.getElementById('new-whatsapp-input').value = localStorage.getItem('store_whatsapp') || '';
-            }
-        }
+/* ================= 产品渲染 ================= */
+function renderProducts(){
+    const grid = $('product-grid');
+    let keys = Object.keys(products);
+    if(currentCategory !== 'all'){
+        keys = keys.filter(id => products[id].category === currentCategory);
+    }
+    keys = keys.sort((a,b) =>
+        String(products[a].name || '').localeCompare(String(products[b].name || ''))
+    );
+    if(!keys.length){
+        grid.innerHTML = '<p style="padding:20px;color:#888; grid-column: 1/-1; text-align:center;">这个分类暂时没有产品。</p>';
+        return;
+    }
+    grid.innerHTML = keys.map(id => {
+        const p      = products[id];
+        const imgs   = getImages(p);
+        const img    = imgs[0] || 'https://via.placeholder.com/300x300?text=No+Image';
+        const stock  = Number(p.stock);
+        const inStock = isNaN(stock) ? true : stock > 0;
+        const badge  = imgs.length > 1 ? `<span class="multi-img-badge">📷 ${imgs.length}</span>` : '';
+        const soldCount = Math.floor(Math.random() * 500) + 10;
+        const soldOutBadge = !inStock ? `<div style="position:absolute; top:8px; left:8px; background:#e74c3c; color:#fff; font-size:10px; padding:2px 6px; border-radius:4px; z-index:5; font-weight:bold;">SOLD OUT</div>` : '';
 
-        function toggleAddressField() {
-            const method = document.getElementById('checkout-method').value;
-            const addressInput = document.getElementById('customer-address');
-            if (method === 'Self Pickup') {
-                addressInput.style.display = 'none';
-                addressInput.value = 'Self Pickup (到店自取)';
-            } else {
-                addressInput.style.display = 'block';
-                addressInput.value = '';
-                addressInput.placeholder = 'Delivery Address';
-            }
-            updateCart();
-        }
-
-        function renderProducts() {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
-            products.forEach(product => {
-                const mainImg = (product.images && product.images.length > 0) ? product.images[0] : (product.image || '');
-                const imgBadge = (product.images && product.images.length > 1) ? `<span class="multi-img-badge">📷 ${product.images.length}</span>` : '';
-
-                grid.innerHTML += `
-                    <div class="product-card">
-                        ${imgBadge}
-                        <div>
-                            <img src="${mainImg}" alt="${product.name}" onclick="openProductDetails('${product.id}')" title="Click to view details">
-                            <h3 onclick="openProductDetails('${product.id}')" title="View Product Details">${product.name}</h3>
-                            <p>RM ${parseFloat(product.price).toFixed(2)}</p>
-                            <div class="product-unit">Unit: ${product.unit || 'pcs'} | Inventory: ${product.stock !== undefined ? product.stock : 0}</div>
-                        </div>
-                        <div>
-                            <div class="qty-container">
-                                <button class="qty-btn" onclick="changeQty('${product.id}', -1)">-</button>
-                                <input type="number" id="qty-${product.id}" class="qty-input" value="1" min="1">
-                                <button class="qty-btn" onclick="changeQty('${product.id}', 1)">+</button>
-                            </div>
-                            <button class="btn" onclick="addToCartWithQty('${product.id}')">Add to Cart</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function loadAdminProductsTable() {
-            const tbody = document.getElementById('admin-products-tbody');
-            if (products.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No products found.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = '';
-            products.forEach(product => {
-                const mainImg = (product.images && product.images.length > 0) ? product.images[0] : (product.image || '');
-                let unitOptions = availableUnits.map(u => `<option value="${u}" ${product.unit === u ? 'selected' : ''}>${u}</option>`).join('');
-                
-                tbody.innerHTML += `
-                    <tr>
-                        <td><img src="${mainImg}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="openLightbox('${mainImg}')" title="Click to zoom"></td>
-                        <td><input type="text" id="edit-name-${product.id}" value="${product.name}" style="width: 100%; padding: 8px; font-size: 15px; font-weight: bold; border:1px solid #ccc; border-radius:4px;"></td>
-                        <td><input type="number" id="edit-price-${product.id}" value="${product.price}" step="any" style="width: 80px; padding: 8px; font-size: 14px; border:1px solid #ccc; border-radius:4px;"></td>
-                        <td><input type="number" id="edit-cost-${product.id}" value="${product.cost !== undefined ? product.cost : 0.00}" step="any" style="width: 80px; padding: 8px; font-size: 14px; border:1px solid #ccc; border-radius:4px;"></td>
-                        <td>
-                            <select id="edit-unit-${product.id}" style="padding: 8px; font-size: 14px; border:1px solid #ccc; border-radius:4px; background:#fff;">
-                                ${unitOptions}
-                            </select>
-                        </td>
-                        <td><input type="number" id="edit-stock-${product.id}" value="${product.stock !== undefined ? product.stock : 100}" style="width: 70px; padding: 8px; font-size: 14px; border:1px solid #ccc; border-radius:4px;"></td>
-                        <td>
-                            <button onclick="saveProductEdit('${product.id}')" style="background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 4px; font-size: 13px;">Save</button>
-                            <button onclick="deleteProduct('${product.id}')" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">Del</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function saveProductEdit(productId) {
-            const name = document.getElementById(`edit-name-${productId}`).value.trim();
-            const price = parseFloat(document.getElementById(`edit-price-${productId}`).value);
-            const cost = parseFloat(document.getElementById(`edit-cost-${productId}`).value);
-            const unit = document.getElementById(`edit-unit-${productId}`).value;
-            const stock = parseInt(document.getElementById(`edit-stock-${productId}`).value);
-
-            if (!name || isNaN(price) || price < 0 || isNaN(cost) || cost < 0 || isNaN(stock)) {
-                alert('Please check your inputs.');
-                return;
-            }
-
-            db.ref('products/' + productId).update({
-                name: name,
-                price: price,
-                cost: cost,
-                unit: unit,
-                stock: stock
-            }).then(() => {
-                alert('✅ Product updated and synced to all devices!');
-            }).catch(err => {
-                alert('Update error: ' + err.message);
-            });
-        }
-
-        function deleteProduct(productId) {
-            if (confirm('Are you sure you want to delete this product?')) {
-                db.ref('products/' + productId).remove()
-                    .then(() => alert('Product deleted!'))
-                    .catch(err => alert('Delete error: ' + err.message));
-            }
-        }
-
-        function addImageSlot() {
-            const container = document.getElementById('image-slots-container');
-            const count = container.children.length + 1;
-            const div = document.createElement('div');
-            div.className = 'img-slot-row';
-            div.innerHTML = `
-                <span style="font-size:12px; font-weight:bold; color:#666;">#${count}</span>
-                <input type="file" class="new-prod-file-slot" accept="image/*">
-                <button type="button" class="btn-del-slot" onclick="removeImageSlot(this)">✕</button>
-            `;
-            container.appendChild(div);
-        }
-
-        function removeImageSlot(btn) {
-            btn.parentElement.remove();
-        }
-
-        function compressImage(file, maxWidth = 500) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onerror = () => reject('FileReader Error');
-                reader.onload = function (e) {
-                    const img = new Image();
-                    img.onerror = () => reject('Image Load Error');
-                    img.onload = function () {
-                        try {
-                            const canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
-
-                            if (width > maxWidth) {
-                                height = Math.round((height * maxWidth) / width);
-                                width = maxWidth;
-                            }
-
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-
-                            resolve(canvas.toDataURL('image/jpeg', 0.5));
-                        } catch (err) {
-                            reject(err);
-                        }
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function addNewProduct() {
-            try {
-                const nameInput = document.getElementById('new-prod-name');
-                const priceInput = document.getElementById('new-prod-price');
-
-                const name = nameInput ? nameInput.value.trim() : '';
-                const priceVal = priceInput ? priceInput.value.trim() : '';
-                const price = parseFloat(priceVal);
-
-                const cost = parseFloat(document.getElementById('new-prod-cost').value) || 0;
-                const unit = document.getElementById('new-prod-unit').value;
-                const stock = parseInt(document.getElementById('new-prod-stock').value) || 100;
-                const desc = document.getElementById('new-prod-desc').value.trim();
-                const fileInputs = document.querySelectorAll('.new-prod-file-slot');
-                const submitBtn = document.getElementById('btn-submit-prod');
-
-                if (!name) {
-                    alert('⚠️ 提示: 请填写商品名称 (Product Name)!');
-                    return;
-                }
-                if (!priceVal || isNaN(price) || price <= 0) {
-                    alert('⚠️ 提示: 请输入正确的销售价格 (Selling Price)!');
-                    return;
-                }
-
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerText = "⏳ Uploading & Syncing...";
-                }
-
-                let uploadedImages = [];
-                for (let input of fileInputs) {
-                    if (input.files && input.files[0]) {
-                        try {
-                            const compressedImg = await compressImage(input.files[0]);
-                            uploadedImages.push(compressedImg);
-                        } catch (imgErr) {
-                            console.error("Image compress error", imgErr);
-                        }
-                    }
-                }
-
-                if (uploadedImages.length === 0) {
-                    uploadedImages.push("https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=800&q=80");
-                }
-
-                saveNewProductData(name, price, cost, unit, stock, uploadedImages, desc);
-
-            } catch (globalErr) {
-                alert("运行错误: " + globalErr.message);
-                const submitBtn = document.getElementById('btn-submit-prod');
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "Add Product Now";
-                }
-            }
-        }
-
-        function saveNewProductData(name, price, cost, unit, stock, imagesArray, desc) {
-            const newRef = db.ref('products').push();
-            const newProduct = {
-                id: newRef.key,
-                name: name,
-                price: price,
-                cost: cost,
-                unit: unit,
-                stock: stock,
-                images: imagesArray,
-                desc: desc || 'No additional description provided.'
-            };
-
-            newRef.set(newProduct).then(() => {
-                document.getElementById('new-prod-name').value = '';
-                document.getElementById('new-prod-price').value = '';
-                document.getElementById('new-prod-cost').value = '';
-                document.getElementById('new-prod-stock').value = '100';
-                document.getElementById('new-prod-desc').value = '';
-                document.getElementById('image-slots-container').innerHTML = `
-                    <div class="img-slot-row">
-                        <span style="font-size:12px; font-weight:bold; color:#666;">#1</span>
-                        <input type="file" class="new-prod-file-slot" accept="image/*">
-                    </div>
-                `;
-
-                alert('✅ Product added successfully and synced to ALL mobile devices!');
-                const submitBtn = document.getElementById('btn-submit-prod');
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "Add Product Now";
-                }
-                switchPage('store', document.querySelectorAll('.nav-btn')[0]);
-            }).catch(err => {
-                alert("Upload failed: " + err.message);
-                const submitBtn = document.getElementById('btn-submit-prod');
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "Add Product Now";
-                }
-            });
-        }
-
-        function switchModalMainImage(src, thumbElement) {
-            document.getElementById('modal-main-img').src = src;
-            document.querySelectorAll('.modal-thumb').forEach(t => t.classList.remove('active'));
-            if (thumbElement) thumbElement.classList.add('active');
-        }
-
-        function openProductDetails(productId) {
-            const product = products.find(p => String(p.id) === String(productId));
-            if (!product) return;
-
-            const imgs = (product.images && product.images.length > 0) ? product.images : [product.image || ''];
-            const mainImg = imgs[0];
-
-            let thumbsHtml = '';
-            if (imgs.length > 1) {
-                thumbsHtml = '<div class="modal-thumbs">';
-                imgs.forEach((imgSrc, idx) => {
-                    thumbsHtml += `<img src="${imgSrc}" class="modal-thumb ${idx===0?'active':''}" onclick="switchModalMainImage('${imgSrc}', this)">`;
-                });
-                thumbsHtml += '</div>';
-            }
-
-            const modalBody = document.getElementById('modal-details-body');
-            modalBody.innerHTML = `
-                <img id="modal-main-img" src="${mainImg}" alt="${product.name}" style="width:100%; height:220px; object-fit:cover; border-radius:6px; margin-bottom:10px; cursor:pointer;" onclick="openLightbox(this.src)" title="Click to zoom">
-                ${thumbsHtml}
-                <h2 style="margin-bottom:10px; color:#1a1a1a;">${product.name}</h2>
-                <p style="color:#e67e22; font-size:20px; font-weight:bold; margin-bottom:5px;">RM ${parseFloat(product.price).toFixed(2)} <span style="font-size:14px; color:#666;">/ ${product.unit || 'pcs'}</span></p>
-                <p style="font-size:13px; color:#555; margin-bottom:15px;">Available Inventory: <strong>${product.stock !== undefined ? product.stock : 0}</strong></p>
-                <div style="background:#f9f9f9; padding:12px; border-radius:6px; margin-bottom:20px;">
-                    <strong style="display:block; margin-bottom:5px; color:#333;">Product Details & Description:</strong>
-                    <p style="color:#555; font-size:14px; line-height:1.5;">${product.desc}</p>
+        return `
+        <div class="product-card" onclick="openProductModal('${id}')">
+            <div style="position:relative;">
+                <img src="${img}" alt="${esc(p.name)}">
+                ${badge}
+                ${soldOutBadge}
+            </div>
+            <div class="product-info">
+                <span class="product-title">${esc(p.name)}</span>
+                <div class="price-row">
+                    <span class="price">RM ${fmt(p.price)}</span>
+                    <span class="sold-count">${soldCount} Sold</span>
                 </div>
-                <div class="qty-container" style="justify-content:flex-start; margin-bottom:15px;">
-                    <span style="font-weight:bold; font-size:14px;">Quantity:</span>
-                    <button class="qty-btn" onclick="changeModalQty(-1)">-</button>
-                    <input type="number" id="modal-qty-input" class="qty-input" value="1" min="1">
-                    <button class="qty-btn" onclick="changeModalQty(1)">+</button>
-                </div>
-                <button class="btn" onclick="addToCartFromModal('${product.id}')" style="background:#27ae60; color:white; padding:12px; font-size:16px;">Add to Cart</button>
-            `;
-            document.getElementById('product-details-modal').style.display = 'flex';
-        }
+            </div>
+        </div>`;
+    }).join('');
+}
 
-        function closeProductDetails() {
-            document.getElementById('product-details-modal').style.display = 'none';
-        }
+function changeQty(id, delta){
+    const input = $('qty-' + id);
+    if(!input) return;
+    let v = parseInt(input.value) || 1;
+    v += delta;
+    if(v < 1) v = 1;
+    const stock = Number(products[id]?.stock);
+    if(!isNaN(stock) && v > stock) v = stock;
+    input.value = v;
+}
 
-        function changeModalQty(amount) {
-            const input = document.getElementById('modal-qty-input');
-            let val = parseInt(input.value) || 1;
-            val += amount;
-            if (val < 1) val = 1;
-            input.value = val;
-        }
+function openProductModal(id){
+    const p = products[id];
+    if(!p) return;
+    currentModalId   = id;
+    currentModalImgs = getImages(p);
+    $('modal-name').textContent  = p.name;
+    $('modal-price').textContent = 'RM ' + fmt(p.price);
+    const stock = Number(p.stock);
+    $('modal-unit').textContent  = `Unit: ${p.unit || 'pcs'}` + (isNaN(stock) ? '' : ` • Stock available: ${stock}`);
+    const qtyInput = $('modal-qty');
+    qtyInput.value = 1;
+    qtyInput.max = (!isNaN(stock) && stock > 0) ? stock : '';
+    const mainImg = currentModalImgs[0] || 'https://via.placeholder.com/500x300?text=No+Image';
+    $('modal-main-img').src = mainImg;
+    $('modal-thumbs').innerHTML = currentModalImgs.length > 1
+        ? currentModalImgs.map((src, i) =>
+            `<img class="modal-thumb ${i===0?'active':''}" src="${src}" onclick="selectModalImage(${i}, this)">`
+          ).join('')
+        : '';
+    renderModalSpecs(p);
+    const outOfStock = !isNaN(stock) && stock <= 0;
+    const addBtn = $('modal-add-btn');
+    addBtn.disabled = outOfStock;
+    addBtn.style.background = outOfStock ? '#ccc' : '#2ecc71';
+    addBtn.style.cursor = outOfStock ? 'not-allowed' : 'pointer';
+    addBtn.textContent = outOfStock ? 'Out of Stock' : '🛒 Add to Cart';
+    $('product-modal').style.display = 'flex';
+}
 
-        function addToCartFromModal(productId) {
-            const product = products.find(p => String(p.id) === String(productId));
-            const qtyInput = document.getElementById('modal-qty-input');
-            const quantity = parseInt(qtyInput.value) || 1;
+function renderModalSpecs(p){
+    const area = $('modal-specs-area');
+    let html = '';
+    const models = parseSpec(p.model);
+    if(models.length > 0){
+        html += `
+        <div class="spec-section">
+            <div class="spec-label">Model</div>
+            <div class="spec-card">
+                ${models.map((m, i) => `<div class="spec-option ${i===0?'selected':''}" onclick="selectSpecOption(this)">${esc(m)}</div>`).join('')}
+            </div>
+        </div>`;
+    }
+    const sizes = parseSpec(p.size);
+    if(sizes.length > 0){
+        html += `
+        <div class="spec-section">
+            <div class="spec-label">Size</div>
+            <div class="spec-card">
+                ${sizes.map((s, i) => `<div class="spec-option ${i===0?'selected':''}" onclick="selectSpecOption(this)">${esc(s)}</div>`).join('')}
+            </div>
+        </div>`;
+    }
+    area.innerHTML = html;
+}
 
-            const cartItem = cart.find(item => String(item.id) === String(productId));
-            if (cartItem) {
-                cartItem.quantity += quantity;
-            } else {
-                cart.push({ ...product, quantity: quantity });
-            }
-            updateCartBadge();
-            alert(`Added ${quantity} x "${product.name}" to Shopping Cart!`);
-            closeProductDetails();
-        }
+function selectSpecOption(el){
+    const siblings = el.parentElement.children;
+    for(let i = 0; i < siblings.length; i++){
+        siblings[i].classList.remove('selected');
+    }
+    el.classList.add('selected');
+}
 
-        function changeQty(productId, amount) {
-            const input = document.getElementById(`qty-${productId}`);
-            let currentVal = parseInt(input.value) || 1;
-            currentVal += amount;
-            if (currentVal < 1) currentVal = 1;
-            input.value = currentVal;
-        }
+function selectModalImage(i, el){
+    $('modal-main-img').src = currentModalImgs[i];
+    document.querySelectorAll('.modal-thumb').forEach(t => t.classList.remove('active'));
+    if(el) el.classList.add('active');
+}
 
-        function addToCartWithQty(productId) {
-            const product = products.find(p => String(p.id) === String(productId));
-            const qtyInput = document.getElementById(`qty-${productId}`);
-            const quantity = parseInt(qtyInput.value) || 1;
+function closeProductModal(){
+    $('product-modal').style.display = 'none';
+    currentModalId = null;
+}
 
-            const cartItem = cart.find(item => String(item.id) === String(productId));
-            if (cartItem) {
-                cartItem.quantity += quantity;
-            } else {
-                cart.push({ ...product, quantity: quantity });
-            }
-            updateCartBadge();
-            alert(`Added ${quantity} x "${product.name}" to Shopping Cart!`);
-            qtyInput.value = 1;
-        }
+function changeModalQty(delta){
+    const input = $('modal-qty');
+    let v = parseInt(input.value) || 1;
+    v += delta;
+    if(v < 1) v = 1;
+    const stock = Number(products[currentModalId]?.stock);
+    if(!isNaN(stock) && v > stock) v = stock;
+    input.value = v;
+}
 
-        function openLightbox(imgSrc) {
-            const modal = document.getElementById('lightbox-modal');
-            const modalImg = document.getElementById('lightbox-content');
-            modal.style.display = 'flex';
-            modalImg.src = imgSrc;
-        }
+function addToCartFromModal(){
+    if(!currentModalId) return;
+    addToCart(currentModalId, parseInt($('modal-qty').value) || 1);
+    closeProductModal();
+}
 
-        function closeLightbox() {
-            document.getElementById('lightbox-modal').style.display = 'none';
-        }
+/* ================= Facebook 分享 ================= */
+function shareProductToFacebook(id) {
+    if (!id) return;
+    currentShareProductId = id;
+    $('fb-share-modal').style.display = 'flex';
+}
 
-        function updateCartBadge() {
-            const badge = document.getElementById('cart-badge');
-            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-            if (totalCount > 0) {
-                badge.innerText = totalCount;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
+function closeFbShareModal() {
+    $('fb-share-modal').style.display = 'none';
+    currentShareProductId = null;
+}
 
-        function updateCart() {
-            const cartContainer = document.getElementById('cart-items');
-            const summaryBox = document.getElementById('cart-summary-box');
-            const subtotalDisplay = document.getElementById('subtotal-display');
-            const shippingDisplay = document.getElementById('shipping-display');
-            const totalPriceElement = document.getElementById('total-price');
-            const checkoutContainer = document.getElementById('checkout-container');
-
-            if (cart.length === 0) {
-                cartContainer.innerHTML = '<p>Your cart is empty.</p>';
-                summaryBox.style.display = 'none';
-                checkoutContainer.style.display = 'none';
-                updateCartBadge();
-                return;
-            }
-
-            cartContainer.innerHTML = '';
-            let subtotal = 0;
-            cart.forEach(item => {
-                let itemTotal = parseFloat(item.price) * item.quantity;
-                subtotal += itemTotal;
-                cartContainer.innerHTML += `
-                    <div class="cart-item">
-                        <div>
-                            <strong>${item.name}</strong> (${item.unit || 'pcs'})<br>
-                            <small>RM ${parseFloat(item.price).toFixed(2)} x ${item.quantity} = <strong>RM ${itemTotal.toFixed(2)}</strong></small>
-                        </div>
-                        <button class="btn" style="background:#ff4d4d; color:white; padding:6px 12px; width:auto;" onclick="removeFromCart('${item.id}')">Remove</button>
-                    </div>
-                `;
-            });
-
-            const method = document.getElementById('checkout-method') ? document.getElementById('checkout-method').value : 'Delivery';
-            let shippingFee = (method === 'Delivery') ? 8.00 : 0.00;
-            let total = subtotal + shippingFee;
-
-            subtotalDisplay.innerText = `Subtotal: RM ${subtotal.toFixed(2)}`;
-            shippingDisplay.innerText = `Delivery Fee: RM ${shippingFee.toFixed(2)}`;
-            totalPriceElement.innerHTML = `Total: RM ${total.toFixed(2)}`;
-
-            summaryBox.style.display = 'block';
-            checkoutContainer.style.display = 'block';
-            updateCartBadge();
-        }
-
-        function removeFromCart(productId) {
-            cart = cart.filter(item => String(item.id) !== String(productId));
-            updateCart();
-        }
-
-        // 🌟 3. 提交订单并同步保存至 Firebase 云端数据库
-        function submitOrder() {
-            const name = document.getElementById('customer-name').value.trim();
-            const phone = document.getElementById('customer-phone').value.trim();
-            const method = document.getElementById('checkout-method').value;
-            const address = document.getElementById('customer-address').value.trim();
-
-            if (!name || !phone || (method === 'Delivery' && !address)) {
-                alert('Please fill in all customer details!');
-                return;
-            }
-
-            let subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-            let shippingFee = (method === 'Delivery') ? 8.00 : 0.00;
-            let total = subtotal + shippingFee;
-            
-            const orderData = {
-                name: name,
-                phone: phone,
-                method: method,
-                address: method === 'Self Pickup' ? 'Self Pickup (到店自取)' : address,
-                shippingFee: shippingFee,
-                items: cart,
-                total: total,
-                date: new Date().toLocaleString()
-            };
-
-            // 写入 Firebase 云端数据库
-            db.ref('orders').push(orderData).then(() => {
-                let itemsText = cart.map(i => `- ${i.name} x ${i.quantity} (${i.unit || 'pcs'}) [RM ${(parseFloat(i.price) * i.quantity).toFixed(2)}]`).join('\n');
-                let waMessage = `*📦 New Order from LEXSTORE*\n\n` +
-                                `*Customer Name:* ${name}\n` +
-                                `*Phone:* ${phone}\n` +
-                                `*Fulfillment:* ${method}\n` +
-                                `*Address:* ${orderData.address}\n\n` +
-                                `*Items Ordered:*\n${itemsText}\n\n` +
-                                `*Subtotal:* RM ${subtotal.toFixed(2)}\n` +
-                                `*Delivery Fee:* RM ${shippingFee.toFixed(2)}\n` +
-                                `*Total Amount:* *RM ${total.toFixed(2)}*\n\n` +
-                                `*Order Time:* ${orderData.date}`;
-
-                const storeWhatsApp = localStorage.getItem('store_whatsapp') || '60102862797'; 
-                const waUrl = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(waMessage)}`;
-                window.open(waUrl, '_blank');
-
-                alert('Order submitted and synced to cloud! Redirecting to WhatsApp & My Orders...');
-                
-                cart = [];
-                updateCart();
-                document.getElementById('customer-name').value = '';
-                document.getElementById('customer-phone').value = '';
-                document.getElementById('customer-address').value = '';
-                document.getElementById('checkout-method').value = 'Delivery';
-                toggleAddressField();
-                
-                switchPage('orders', document.querySelectorAll('.nav-btn')[2]);
-            }).catch(err => {
-                alert("Order sync failed: " + err.message);
-            });
-        }
-
-        function loadCustomerOrders() {
-            const tbody = document.getElementById('customer-orders-tbody');
-
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">You have no past orders yet.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = '';
-            orders.forEach(order => {
-                let itemsList = order.items.map(i => `${i.name} x ${i.quantity} (${i.unit || 'pcs'})`).join('<br>');
-                let fulfillmentTag = `<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${order.method || 'Delivery'}</span>`;
-                let shippingInfo = (order.shippingFee !== undefined && order.shippingFee > 0) ? `<br><small style="color:#e67e22;">Incl. RM 8.00 Delivery Fee</small>` : '';
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${order.date}</td>
-                        <td>${fulfillmentTag}<br><strong>${order.name}</strong><br>${order.phone}<br><small>${order.address}</small>${shippingInfo}</td>
-                        <td>${itemsList}</td>
-                        <td><strong>RM ${parseFloat(order.total).toFixed(2)}</strong></td>
-                    </tr>
-                `;
-            });
-        }
-
-        function clearCustomerOrders() {
-            if (confirm('Are you sure you want to clear your order history?')) {
-                db.ref('orders').remove().then(() => loadCustomerOrders());
-            }
-        }
-
-        function checkAdminSession() {
-            const sessionRole = sessionStorage.getItem('admin_session');
-            if (sessionRole) {
-                currentRole = sessionRole;
-                showAdminDashboard();
-            } else {
-                document.getElementById('admin-login-box').style.display = 'block';
-                document.getElementById('admin-dashboard').style.display = 'none';
-                document.getElementById('admin-password-input').value = '';
-            }
-        }
-
-        function verifyAdminLogin() {
-            const pwd = document.getElementById('admin-password-input').value;
-            const superPwd = localStorage.getItem('super_admin_pwd');
-            const normalPwd = localStorage.getItem('normal_admin_pwd');
-
-            if (pwd === superPwd) {
-                currentRole = 'super';
-                sessionStorage.setItem('admin_session', 'super');
-                showAdminDashboard();
-            } else if (pwd === normalPwd) {
-                currentRole = 'normal';
-                sessionStorage.setItem('admin_session', 'normal');
-                showAdminDashboard();
-            } else {
-                alert('Incorrect password! Please try again.');
-            }
-        }
-
-        function adminLogout() {
-            sessionStorage.removeItem('admin_session');
-            currentRole = null;
-            checkAdminSession();
-        }
-
-        function showAdminDashboard() {
-            document.getElementById('admin-login-box').style.display = 'none';
-            document.getElementById('admin-dashboard').style.display = 'block';
-
-            switchAdminSubTab('orders-section', document.querySelectorAll('.admin-sub-btn')[0]);
-
-            if (currentRole === 'super') {
-                document.getElementById('admin-title').innerText = 'Super Admin Panel - Full Access';
-                document.getElementById('super-tab-btn').style.display = 'inline-block';
-            } else {
-                document.getElementById('admin-title').innerText = 'Normal Admin Panel - View Only';
-                document.getElementById('super-tab-btn').style.display = 'none';
-            }
-
-            loadOrders();
-        }
-
-        function updateAdminPasswords() {
-            const newSuper = document.getElementById('new-super-pwd').value;
-            const newNormal = document.getElementById('new-normal-pwd').value;
-
-            if (!newSuper && !newNormal) {
-                alert('Please enter at least one new password to update.');
-                return;
-            }
-
-            if (newSuper) {
-                localStorage.setItem('super_admin_pwd', newSuper);
-            }
-            if (newNormal) {
-                localStorage.setItem('normal_admin_pwd', newNormal);
-            }
-
-            alert('Passwords updated successfully!');
-            document.getElementById('new-super-pwd').value = '';
-            document.getElementById('new-normal-pwd').value = '';
-        }
-
-        function updateWhatsAppNumber() {
-            const newWa = document.getElementById('new-whatsapp-input').value.trim();
-            if (!newWa) {
-                alert('Please enter a valid WhatsApp number!');
-                return;
-            }
-            localStorage.setItem('store_whatsapp', newWa);
-            initWhatsAppHeader();
-            alert('WhatsApp number updated successfully!');
-        }
-
-        function loadOrders() {
-            const tbody = document.getElementById('orders-tbody');
-            const totalOrdersCard = document.getElementById('total-orders-card');
-            const totalSalesCard = document.getElementById('total-sales-card');
-
-            totalOrdersCard.innerText = `Total Orders: ${orders.length}`;
-            
-            let totalSales = 0;
-            orders.forEach(o => totalSales += parseFloat(o.total));
-            totalSalesCard.innerText = `Total Sales: RM ${totalSales.toFixed(2)}`;
-
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No orders yet.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = '';
-            orders.forEach(order => {
-                let itemsList = order.items.map(i => `${i.name} x ${i.quantity} (${i.unit || 'pcs'})`).join('<br>');
-                let fulfillmentTag = `<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${order.method || 'Delivery'}</span>`;
-                let shippingInfo = (order.shippingFee !== undefined && order.shippingFee > 0) ? `<br><small style="color:#e67e22;">Incl. RM 8.00 Delivery Fee</small>` : '';
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${order.date}</td>
-                        <td>${fulfillmentTag}<br><strong>${order.name}</strong><br>${order.phone}<br><small>${order.address}</small>${shippingInfo}</td>
-                        <td>${itemsList}</td>
-                        <td><strong>RM ${parseFloat(order.total).toFixed(2)}</strong></td>
-                    </tr>
-                `;
-            });
-        }
-
-        function clearOrders() {
-            if (currentRole !== 'super') {
-                alert('Only Super Admin can clear orders!');
-                return;
-            }
-            if (confirm('Are you sure you want to clear all orders from the cloud?')) {
-                db.ref('orders').remove().then(() => loadOrders());
-            }
-        }
-
-        function exportDataJson() {
-            const allData = {
-                products: products,
-                orders: orders,
-                store_whatsapp: localStorage.getItem('store_whatsapp')
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "lexstore_backup.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function exportOrdersExcel() {
-            if (orders.length === 0) {
-                alert('No orders available to export!');
-                return;
-            }
-
-            let html = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-                <head>
-                    <meta charset="utf-8">
-                    <title>Lexstore Orders Report</title>
-                </head>
-                <body>
-                    <table border="1">
-                        <thead>
-                            <tr style="background-color: #1a1a1a; color: #ffcc00; font-weight: bold;">
-                                <th>Date</th>
-                                <th>Fulfillment Method</th>
-                                <th>Customer Name</th>
-                                <th>Phone Number</th>
-                                <th>Address / Details</th>
-                                <th>Delivery Fee (RM)</th>
-                                <th>Order Items</th>
-                                <th>Total (RM)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            orders.forEach(order => {
-                let itemsList = order.items.map(i => `${i.name} x ${i.quantity} (${i.unit || 'pcs'})`).join('; ');
-                let fee = (order.shippingFee !== undefined) ? parseFloat(order.shippingFee).toFixed(2) : "0.00";
-                html += `
-                    <tr>
-                        <td>${order.date}</td>
-                        <td>${order.method || 'Delivery'}</td>
-                        <td>${order.name}</td>
-                        <td>${order.phone}</td>
-                        <td>${order.address}</td>
-                        <td>${fee}</td>
-                        <td>${itemsList}</td>
-                        <td>${parseFloat(order.total).toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-
-            html += `
-                        </tbody>
-                    </table>
-                </body>
-                </html>
-            `;
-
-            const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
-            const url = URL.createObjectURL(blob);
+function downloadPoster() {
+    const p = products[currentShareProductId];
+    if (!p) return;
+    const imgSrc = getImages(p)[0] || 'https://via.placeholder.com/600x400?text=No+Image';
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 800;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 800, 800);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = function() {
+        const maxW = 600, maxH = 600;
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = h * maxW / w; w = maxW; }
+        if (h > maxH) { w = w * maxH / h; h = maxH; }
+        const x = (800 - w) / 2;
+        const y = 80;
+        ctx.drawImage(img, x, y, w, h);
+        ctx.fillStyle = '#111';
+        ctx.font = 'bold 36px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('LEXSTORE HARDWARE', 400, 750);
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 28px Arial';
+        ctx.fillText(p.name.length > 30 ? p.name.substring(0, 30) + '...' : p.name, 400, 720);
+        ctx.fillStyle = '#ee4d2d';
+        ctx.font = 'bold 48px Arial';
+        ctx.fillText('RM ' + fmt(p.price), 400, 680);
+        try {
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'LEXSTORE_' + p.name + '_海报.jpg';
+                document.body.appendChild(a); a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 'image/jpeg', 0.9);
+        } catch (e) {
+            alert('如果海报下载失败，请长按下方图片保存原图。');
             const a = document.createElement('a');
-            a.href = url;
-            a.download = 'lexstore_orders_report.xls';
-            document.body.appendChild(a);
-            a.click();
+            a.href = imgSrc;
+            a.download = 'LEXSTORE_' + p.name + '.jpg';
+            document.body.appendChild(a); a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(url);
         }
+    };
+    img.onerror = function() { alert('图片加载失败，无法生成海报。'); };
+    img.src = imgSrc;
+}
 
-        switchPage('store', document.querySelector('.nav-btn'));
-    </script>
+function copyShareText() {
+    const p = products[currentShareProductId];
+    if (!p) return;
+    const baseUrl = window.location.href.split('?')[0];
+    const productUrl = baseUrl + '?product=' + currentShareProductId;
+    const text = `【LEXSTORE HARDWARE 五金店】\n\n📌 ${productUrl}\n\n产品：${p.name}\n价格：RM ${fmt(p.price)}\n单位：${p.unit || 'pcs'}\n\n快来逛逛吧！`;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('✅ 文案已复制！');
+    }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('✅ 文案已复制！');
+    });
+}
+
+function openFbPublish() {
+    const baseUrl = window.location.href.split('?')[0];
+    const productUrl = baseUrl + '?product=' + currentShareProductId;
+    const fbUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(productUrl);
+    window.open(fbUrl, '_blank', 'width=600,height=500');
+}
+
+function checkUrlForProduct() {
+    const params = new URLSearchParams(window.location.search);
+    urlProductToOpen = params.get('product');
+}
+
+/* ================= Lightbox ================= */
+function openLightbox(src){
+    if(!src) return;
+    $('lightbox-content').src = src;
+    $('lightbox-modal').style.display = 'flex';
+}
+function closeLightbox(){
+    $('lightbox-modal').style.display = 'none';
+}
+
+/* ================= 购物车 ================= */
+function loadCart(){
+    try { cart = JSON.parse(localStorage.getItem('lexstore_cart') || '{}') || {}; }
+    catch(e){ cart = {}; }
+}
+function saveCart(){
+    localStorage.setItem('lexstore_cart', JSON.stringify(cart));
+    updateCartBadge();
+}
+function updateCartBadge(){
+    const count = Object.values(cart).reduce((s, it) => s + (it.qty || 0), 0);
+    const badge = $('cart-badge');
+    if(count > 0){
+        badge.textContent = count;
+        badge.style.display = 'inline-block';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function addToCart(id, qtyOverride){
+    const p = products[id];
+    if(!p){ alert('Product not found.'); return; }
+    const stock = Number(p.stock);
+    let qty = qtyOverride || parseInt($('qty-' + id)?.value) || 1;
+    const existing = cart[id]?.qty || 0;
+    if(!isNaN(stock) && stock > 0 && existing + qty > stock){
+        const allow = stock - existing;
+        if(allow <= 0){ alert('⚠️ 已到达库存上限 / Reached stock limit.'); return; }
+        alert(`⚠️ 库存只剩 ${stock} 个，购物车已有 ${existing} 个，只能再加 ${allow} 个。`);
+        qty = allow;
+    }
+    cart[id] = {
+        id, name: p.name,
+        price: Number(p.price) || 0,
+        unit: p.unit || 'pcs',
+        qty: existing + qty,
+        img: getImages(p)[0] || ''
+    };
+    saveCart();
+    renderCart();
+    alert(`✅ "${p.name}" added to cart.`);
+}
+
+function changeCartQty(id, delta){
+    if(!cart[id]) return;
+    let v = cart[id].qty + delta;
+    if(v < 1) v = 1;
+    const stock = Number(products[id]?.stock);
+    if(!isNaN(stock)){
+        if(stock <= 0){
+            alert('⚠️ 此产品已无库存，将从购物车移除。');
+            delete cart[id];
+            saveCart();
+            renderCart();
+            return;
+        }
+        if(v > stock){ alert('⚠️ 已到达库存上限。'); v = stock; }
+    }
+    cart[id].qty = v;
+    saveCart();
+    renderCart();
+}
+
+function removeFromCart(id){
+    delete cart[id];
+    saveCart();
+    renderCart();
+}
+
+function renderCart(){
+    const box = $('cart-items');
+    const ids = Object.keys(cart);
+    if(!ids.length){
+        box.innerHTML = '<p>Your cart is empty.</p>';
+        $('cart-summary-box').style.display   = 'none';
+        $('checkout-container').style.display = 'none';
+        return;
+    }
+    box.innerHTML = ids.map(id => {
+        const it = cart[id];
+        const line = it.price * it.qty;
+        let imgSrc = it.img;
+        if (!imgSrc && products[id]) imgSrc = getImages(products[id])[0] || '';
+        const thumb = imgSrc ? `<img src="${imgSrc}" class="cart-item-img" style="cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : `<div class="cart-item-img" style="display:flex; align-items:center; justify-content:center; font-size:10px; color:#aaa;">无图</div>`;
+        return `
+        <div class="cart-item">
+            <div style="display:flex; align-items:center; gap:10px;">
+                ${thumb}
+                <div>
+                    <strong>${esc(it.name)}</strong><br>
+                    <span style="font-size:13px;color:#888;">RM ${fmt(it.price)} / ${esc(it.unit)}</span>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+                <button class="qty-btn" onclick="changeCartQty('${id}',-1)">−</button>
+                <span style="min-width:26px; text-align:center; font-weight:bold;">${it.qty}</span>
+                <button class="qty-btn" onclick="changeCartQty('${id}',1)">+</button>
+                <span style="min-width:90px; text-align:right; font-weight:bold; color:#ee4d2d;">RM ${fmt(line)}</span>
+                <button class="btn-del-slot" onclick="removeFromCart('${id}')">✕</button>
+            </div>
+        </div>`;
+    }).join('');
+    $('cart-summary-box').style.display   = 'block';
+    $('checkout-container').style.display = 'block';
+    updateTotals();
+}
+
+function updateTotals(){
+    let subtotal = 0;
+    Object.values(cart).forEach(it => subtotal += it.price * it.qty);
+    const method = $('checkout-method').value;
+    let fee = 0;
+    if (method === 'Delivery') fee = (subtotal >= FREE_DELIVERY_THRESHOLD) ? 0 : DELIVERY_FEE;
+    $('subtotal-display').textContent = 'Subtotal: RM ' + fmt(subtotal);
+    $('shipping-display').textContent = 'Delivery Fee: RM ' + fmt(fee);
+    $('total-price').textContent      = 'Total: RM ' + fmt(subtotal + fee);
+    return { subtotal, fee, total: subtotal + fee };
+}
+
+function toggleAddressField(){
+    const method  = $('checkout-method').value;
+    const address = $('customer-address');
+    if(method === 'Self Pickup'){
+        address.style.display = 'none';
+        address.required = false;
+        address.value = '';
+    } else {
+        address.style.display = 'block';
+        address.required = true;
+    }
+    updateTotals();
+}
+
+function submitOrder(){
+    const ids = Object.keys(cart);
+    if(!ids.length){ alert('Your cart is empty.'); return; }
+    const name    = $('customer-name').value.trim();
+    const phone   = $('customer-phone').value.trim();
+    const method  = $('checkout-method').value;
+    const address = $('customer-address').value.trim();
+    if(!name){ alert('Please enter your name.'); return; }
+    if(!phone){ alert('Please enter your phone number.'); return; }
+    if(method === 'Delivery' && !address){ alert('Please enter your delivery address.'); return; }
+    const totals = updateTotals();
+    const items = ids.map(id => {
+        const it = cart[id];
+        return { name: it.name, qty: it.qty, unit: it.unit, price: it.price, line: it.price * it.qty, img: it.img || '' };
+    });
+    const now = Date.now();
+    const order = {
+        ts: now, date: new Date(now).toLocaleString(),
+        name, phone, method,
+        address: method === 'Delivery' ? address : 'Self Pickup at store',
+        items, subtotal: totals.subtotal, fee: totals.fee, total: totals.total, status: 'pending'
+    };
+    db.ref('orders').push(order).catch(err => console.warn('Order cloud save failed:', err));
+    saveOrderLocally(order);
+    const lines = [];
+    lines.push('*🏪 LEXSTORE HARDWARE - NEW ORDER*');
+    lines.push('────────────────────');
+    lines.push(`👤 Name: ${name}`);
+    lines.push(`📞 Phone: ${phone}`);
+    lines.push(`🚚 Method: ${method === 'Delivery' ? 'Delivery (送货上门)' : 'Self Pickup (到店自取)'}`);
+    if(method === 'Delivery') lines.push(`📍 Address: ${address}`);
+    lines.push('────────────────────');
+    items.forEach((it, i) => {
+        lines.push(`${i+1}. ${it.name}`);
+        lines.push(`   ${it.qty} ${it.unit} × RM ${fmt(it.price)} = RM ${fmt(it.line)}`);
+    });
+    lines.push('────────────────────');
+    lines.push(`Subtotal: RM ${fmt(totals.subtotal)}`);
+    if(totals.fee > 0) lines.push(`Delivery Fee: RM ${fmt(totals.fee)}`);
+    lines.push(`*TOTAL: RM ${fmt(totals.total)}*`);
+    lines.push('────────────────────');
+    lines.push('Thank you! 🙏');
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+    cart = {};
+    saveCart();
+    renderCart();
+    $('customer-name').value = '';
+    $('customer-phone').value = '';
+    $('customer-address').value = '';
+    alert('✅ Order submitted! Please send the WhatsApp message to confirm.');
+}
+
+function saveOrderLocally(order){
+    let mine = [];
+    try { mine = JSON.parse(localStorage.getItem('lexstore_my_orders') || '[]'); } catch(e){}
+    mine.unshift(order);
+    localStorage.setItem('lexstore_my_orders', JSON.stringify(mine.slice(0, 100)));
+}
+
+/* ================= 我的订单 ================= */
+function renderCustomerOrders(){
+    const tbody = $('customer-orders-tbody');
+    let mine = [];
+    try { mine = JSON.parse(localStorage.getItem('lexstore_my_orders') || '[]'); } catch(e){}
+    if(!mine.length){
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">You have no past orders yet.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = mine.map(o => {
+        const itemsHtml = normalizeItems(o.items).map(i => {
+            let imgSrc = i.img;
+            if (!imgSrc && products[i.id]) imgSrc = getImages(products[i.id])[0] || '';
+            const thumb = imgSrc ? `<img src="${imgSrc}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : '';
+            const qty = Number(i.qty) || 1;
+            const unit = (!i.unit || i.unit === 'undefined') ? 'pcs' : i.unit;
+            const price = Number(i.price) || 0;
+            const lineAmount = (i.line !== undefined && i.line !== null) ? Number(i.line) : (price * qty);
+            return `<div style="display:flex; align-items:center; margin-bottom:5px;">${thumb}<span>${esc(i.name)} × ${qty} ${esc(unit)} — ${fmt(lineAmount)}</span></div>`;
+        }).join('');
+        return `
+        <tr>
+            <td>${esc(o.date)}</td>
+            <td><strong>${esc(o.method)}</strong><br><span style="font-size:12px; color:#888;">${esc(o.name)} • ${esc(o.phone)}<br>${esc(o.address || '')}</span></td>
+            <td>${itemsHtml}</td>
+            <td style="font-weight:bold; color:#ee4d2d;">${fmt(o.total)}</td>
+        </tr>`;
+    }).join('');
+}
+
+function clearCustomerOrders(){
+    if(!confirm('Clear your local order history?')) return;
+    localStorage.removeItem('lexstore_my_orders');
+    renderCustomerOrders();
+}
+
+/* ================= Admin 登录 ================= */
+function verifyAdminLogin(){
+    const pw = $('admin-password-input').value;
+    db.ref('settings').once('value').then(snap => {
+        const s = snap.val() || {};
+        const adminPw = s.adminPassword || DEFAULT_ADMIN_PW;
+        const superPw = s.superPassword || DEFAULT_SUPER_PW;
+        if(pw === superPw){ isAdmin = true; isSuperAdmin = true; }
+        else if(pw === adminPw){ isAdmin = true; isSuperAdmin = false; }
+        else { alert('❌ Wrong password.'); return; }
+        $('admin-login-box').style.display  = 'none';
+        $('admin-dashboard').style.display  = 'block';
+        $('super-tab-btn').style.display    = isSuperAdmin ? 'inline-block' : 'none';
+        $('admin-title').textContent        = isSuperAdmin ? 'Admin Panel — Super Admin' : 'Admin Panel';
+        sessionStorage.setItem('lexstore_admin', isSuperAdmin ? 'super' : 'admin');
+        $('admin-password-input').value = '';
+        renderAdminProducts();
+        renderAdminOrders();
+        renderAdminCategories();
+        populateCategoryDropdowns();
+    }).catch(err => alert('Connection error: ' + err.message));
+}
+
+function adminLogout(){
+    isAdmin = false; isSuperAdmin = false;
+    sessionStorage.removeItem('lexstore_admin');
+    $('admin-dashboard').style.display = 'none';
+    $('admin-login-box').style.display = 'block';
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    $('orders-section').classList.add('active');
+    document.querySelectorAll('.admin-sub-btn').forEach((b,i) => b.classList.toggle('active', i === 0));
+}
+
+function restoreAdminSession(){
+    const s = sessionStorage.getItem('lexstore_admin');
+    if(s){
+        isAdmin = true;
+        isSuperAdmin = (s === 'super');
+        $('admin-login-box').style.display = 'none';
+        $('admin-dashboard').style.display = 'block';
+        $('super-tab-btn').style.display   = isSuperAdmin ? 'inline-block' : 'none';
+        $('admin-title').textContent       = isSuperAdmin ? 'Admin Panel — Super Admin' : 'Admin Panel';
+    }
+}
+
+/* ================= 管理订单 ================= */
+function renderAdminOrders(){
+    const tbody = $('orders-tbody');
+    const list = Object.entries(allOrders || {}).map(([id, o]) => ({ id, ...o })).sort((a,b) => (b.ts||0) - (a.ts||0));
+    let sales = 0;
+    list.forEach(o => sales += Number(o.total) || 0);
+    $('total-orders-card').textContent = 'Total Orders: ' + list.length;
+    $('total-sales-card').textContent  = 'Total Sales: RM ' + fmt(sales);
+    if(!list.length){
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">No orders yet.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = list.map(o => {
+        const status = o.status || 'pending';
+        let statusClass = 'status-pending';
+        if (status === 'complete') statusClass = 'status-complete';
+        else if (status === 'cash') statusClass = 'status-cash';
+        else if (status === 'qrcode') statusClass = 'status-qrcode';
+        else if (status === 'cancel') statusClass = 'status-cancel';
+        const itemsHtml = normalizeItems(o.items).map(i => {
+            let imgSrc = i.img;
+            if (!imgSrc && products[i.id]) imgSrc = getImages(products[i.id])[0] || '';
+            const thumb = imgSrc ? `<img src="${imgSrc}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : '';
+            const qty = Number(i.qty) || 1;
+            const unit = (!i.unit || i.unit === 'undefined') ? 'pcs' : i.unit;
+            const price = Number(i.price) || 0;
+            const lineAmount = (i.line !== undefined && i.line !== null) ? Number(i.line) : (price * qty);
+            return `<div style="display:flex; align-items:center; margin-bottom:5px;">${thumb}<span>${esc(i.name)} × ${qty} ${esc(unit)} — ${fmt(lineAmount)}</span></div>`;
+        }).join('');
+        return `
+        <tr onclick="openReceipt('${o.id}')">
+            <td>
+                <span style="font-size:12px; color:#2ecc71; font-weight:bold; display:block; margin-bottom:6px;">${esc(o.date || new Date(o.ts||0).toLocaleString())}</span>
+                <strong>${esc(o.method)}</strong><br>
+                <span style="font-size:12px; color:#555;">${esc(o.name)}<br>📞 ${esc(o.phone)}<br>📍 ${esc(o.address || '-')}</span>
+            </td>
+            <td>${itemsHtml}</td>
+            <td style="font-weight:bold; color:#ee4d2d; white-space:nowrap;">${fmt(o.total)}</td>
+            <td onclick="event.stopPropagation()">
+                <select class="status-select ${statusClass}" onchange="updateOrderStatus('${o.id}', this.value)">
+                    <option value="pending" ${status === 'pending' ? 'selected' : ''}>Pending</option>
+                    <option value="complete" ${status === 'complete' ? 'selected' : ''}>Complete</option>
+                    <option value="cash" ${status === 'cash' ? 'selected' : ''}>Cash</option>
+                    <option value="qrcode" ${status === 'qrcode' ? 'selected' : ''}>QR Code</option>
+                    <option value="cancel" ${status === 'cancel' ? 'selected' : ''}>Cancel</option>
+                </select>
+            </td>
+        </tr>`;
+    }).join('');
+    updateStorageInfo();
+}
+
+function updateOrderStatus(orderId, newStatus) {
+    db.ref('orders/' + orderId).update({ status: newStatus })
+      .then(() => { renderAdminOrders(); })
+      .catch(err => { alert('Failed to update status: ' + err.message); });
+}
+
+/* ================= 收据页面 ================= */
+function openReceipt(orderId) {
+    if (!allOrders[orderId]) { alert('Order not found.'); return; }
+    currentReceiptId = orderId;
+    const o = allOrders[orderId];
+    $('receipt-order-id').textContent = orderId;
+    $('receipt-date').textContent = o.date || new Date(o.ts || 0).toLocaleString();
+    $('receipt-status-display').textContent = o.status || 'Pending';
+    $('receipt-name-display').textContent = o.name || '-';
+    $('receipt-phone-display').textContent = o.phone || '-';
+    $('receipt-address-display').textContent = o.address || '-';
+    $('receipt-method-display').textContent = o.method || '-';
+    const companyInfo = o.companyInfo || { name: 'LEXSTORE HARDWARE', phone: '0102862797', address: 'Your Trusted Local Hardware Store' };
+    $('receipt-company-name-display').textContent = companyInfo.name;
+    $('receipt-company-phone-display').textContent = companyInfo.phone;
+    $('receipt-company-address-display').textContent = companyInfo.address;
+    const status = o.status || 'pending';
+    let paidBy = 'CASH';
+    if (status === 'qrcode') paidBy = 'QR CODE';
+    if (status === 'cancel') paidBy = 'CANCELLED';
+    if (status === 'pending') paidBy = 'PENDING';
+    $('receipt-paid-by-display').textContent = 'Paid By: ' + paidBy;
+    renderReceiptItems(o.items || []);
+    switchPage('receipt');
+    document.querySelectorAll('.nav-tabs .nav-btn').forEach(b => b.classList.remove('active'));
+}
+
+function renderReceiptItems(items) {
+    const container = $('receipt-items-container');
+    const itemArr = normalizeItems(items);
+    container.innerHTML = itemArr.map((it, idx) => {
+        const qty = Number(it.qty) || 1;
+        const price = Number(it.price) || 0;
+        const subtotal = qty * price;
+        let itemName = it.name;
+        if (!itemName || itemName === 'undefined' || itemName.trim() === '') itemName = 'Item';
+        const imgSrc = it.img || (it.id && products[it.id] ? getImages(products[it.id])[0] : '');
+        const thumb = imgSrc ? `<img src="${imgSrc}" style="width:30px;height:30px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:5px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : '';
+        return `
+        <div class="receipt-item-row">
+            <div style="flex:2; display:flex; align-items:center; gap:5px; min-width:100px;">
+                ${thumb}
+                <input type="text" class="item-name" value="${esc(itemName)}" placeholder="Description" oninput="updateReceiptTotals()" id="rec-item-name-${idx}" style="flex:1; min-width:50px;">
+            </div>
+            <input type="number" class="item-qty" value="${qty}" min="1" placeholder="Qty" oninput="updateReceiptTotals()" id="rec-item-qty-${idx}" style="flex:0.8; min-width:40px; text-align:center;">
+            <input type="number" class="item-price" value="${price}" step="any" placeholder="Price" oninput="updateReceiptTotals()" id="rec-item-price-${idx}" style="flex:1; min-width:60px; text-align:center;">
+            <span class="item-subtotal" id="rec-item-subtotal-${idx}" style="flex:1; min-width:60px; text-align:right;">${fmt(subtotal)}</span>
+            <button class="btn-remove" onclick="removeReceiptItem(${idx})">✕</button>
+        </div>`;
+    }).join('');
+    updateReceiptTotals();
+}
+
+function addReceiptItem() {
+    const container = $('receipt-items-container');
+    const idx = container.children.length;
+    const html = `
+    <div class="receipt-item-row">
+        <div style="flex:2; display:flex; align-items:center; gap:5px; min-width:100px;">
+            <input type="text" class="item-name" value="" placeholder="Description" oninput="updateReceiptTotals()" id="rec-item-name-${idx}" style="flex:1; min-width:50px;">
+        </div>
+        <input type="number" class="item-qty" value="1" min="1" placeholder="Qty" oninput="updateReceiptTotals()" id="rec-item-qty-${idx}" style="flex:0.8; min-width:40px; text-align:center;">
+        <input type="number" class="item-price" value="0" step="any" placeholder="Price" oninput="updateReceiptTotals()" id="rec-item-price-${idx}" style="flex:1; min-width:60px; text-align:center;">
+        <span class="item-subtotal" id="rec-item-subtotal-${idx}" style="flex:1; min-width:60px; text-align:right;">0.00</span>
+        <button class="btn-remove" onclick="removeReceiptItem(${idx})">✕</button>
+    </div>`;
+    container.insertAdjacentHTML('beforeend', html);
+    updateReceiptTotals();
+}
+
+function removeReceiptItem(idx) {
+    const el = document.getElementById('rec-item-name-' + idx);
+    if (el) el.parentElement.remove();
+    updateReceiptTotals();
+}
+
+function updateReceiptTotals() {
+    const container = $('receipt-items-container');
+    let total = 0;
+    Array.from(container.children).forEach((row) => {
+        const qty = parseFloat(row.querySelector('.item-qty')?.value) || 0;
+        const price = parseFloat(row.querySelector('.item-price')?.value) || 0;
+        const sub = qty * price;
+        const subEl = row.querySelector('.item-subtotal');
+        if (subEl) subEl.textContent = fmt(sub);
+        total += sub;
+    });
+    $('receipt-total').textContent = 'RM ' + fmt(total);
+}
+
+function saveReceipt() {
+    if (!currentReceiptId) { alert('No order loaded.'); return Promise.reject('No order'); }
+    const container = $('receipt-items-container');
+    const items = Array.from(container.children).map((row, idx) => {
+        let name = row.querySelector('.item-name')?.value.trim() || 'Item';
+        const qty = parseInt(row.querySelector('.item-qty')?.value) || 1;
+        const price = parseFloat(row.querySelector('.item-price')?.value) || 0;
+        return { name, qty, unit: 'pcs', price, line: qty * price };
+    });
+    if (items.length === 0) { alert('Order must have at least one item.'); return Promise.reject('No items'); }
+    let subtotal = 0;
+    items.forEach(i => subtotal += i.line);
+    const method = $('receipt-method-display').textContent;
+    let fee = 0;
+    if (method === 'Delivery (送货上门)') fee = (subtotal >= FREE_DELIVERY_THRESHOLD) ? 0 : DELIVERY_FEE;
+    const companyInfo = {
+        name: $('receipt-company-name')?.value.trim() || 'LEXSTORE HARDWARE',
+        phone: $('receipt-company-phone')?.value.trim() || '0102862797',
+        address: $('receipt-company-address')?.value.trim() || 'Your Trusted Local Hardware Store'
+    };
+    const updatedData = {
+        name: $('receipt-name')?.value.trim() || $('receipt-name-display').textContent,
+        phone: $('receipt-phone')?.value.trim() || $('receipt-phone-display').textContent,
+        address: $('receipt-address')?.value.trim() || $('receipt-address-display').textContent,
+        method: $('receipt-method')?.value || $('receipt-method-display').textContent,
+        status: $('receipt-status')?.value || 'pending',
+        items, subtotal, fee, total: subtotal + fee, companyInfo
+    };
+    if (!updatedData.name || !updatedData.phone) { alert('Name and Phone are required.'); return Promise.reject('Missing name/phone'); }
+    return db.ref('orders/' + currentReceiptId).update(updatedData);
+}
+
+function saveReceiptWithAlert() {
+    saveReceipt().then(() => {
+        alert('✅ Receipt updated successfully!');
+        switchPage('admin');
+        renderAdminOrders();
+    }).catch(err => {
+        if (typeof err === 'string') return;
+        alert('Failed to save: ' + (err.message || err));
+    });
+}
+
+function printReceipt() { window.print(); }
+
+function saveAndShareCopy() {
+    const receiptElement = document.getElementById('receipt-content');
+    if (!receiptElement) { alert('Receipt not found.'); return; }
+    const btn = document.querySelector('.btn-save-copy');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '⏳ Generating...';
+    btn.disabled = true;
+    html2canvas(receiptElement, {
+        scale: 2, useCORS: true, backgroundColor: '#ffffff',
+        onclone: function(clonedDoc) {
+            ['.btn-back-orders', '.btn-save-receipt', '.btn-print', '.btn-save-copy', '.btn-add-item', '.btn-remove'].forEach(sel => {
+                clonedDoc.querySelectorAll(sel).forEach(el => el.style.display = 'none');
+            });
+            clonedDoc.querySelectorAll('.receipt-section input, .receipt-section select, .receipt-item-row input').forEach(el => {
+                el.style.border = 'none';
+                el.style.background = 'transparent';
+                el.style.fontWeight = 'bold';
+                el.style.color = '#000';
+            });
+        }
+    }).then(canvas => {
+        canvas.toBlob(function(blob) {
+            const url = URL.createObjectURL(blob);
+            const filename = 'Lexstore_Receipt_' + (currentReceiptId || 'Order') + '.jpg';
+            if (navigator.share && navigator.canShare) {
+                const file = new File([blob], filename, { type: 'image/jpeg' });
+                if (navigator.canShare({ files: [file] })) {
+                    navigator.share({ files: [file], title: 'LEXSTORE Receipt', text: 'Here is your order receipt.' })
+                      .then(() => { btn.innerHTML = originalText; btn.disabled = false; alert('✅ Receipt shared!'); })
+                      .catch(() => { fallbackDownload(url, filename, btn, originalText); });
+                    return;
+                }
+            }
+            fallbackDownload(url, filename, btn, originalText);
+        }, 'image/jpeg', 0.9);
+    }).catch(err => {
+        alert('Failed to generate image: ' + err.message);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function fallbackDownload(url, filename, btn, originalText) {
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    alert('✅ 图片已保存！请打开 WhatsApp 发送给顾客。');
+}
+
+/* ================= 其他 Admin 功能 ================= */
+function clearOrders(){
+    if(!isAdmin) return;
+    if(!confirm('⚠️ Delete ALL orders permanently?')) return;
+    db.ref('orders').remove().then(() => alert('✅ All orders cleared.')).catch(err => alert('Error: ' + err.message));
+}
+
+function exportOrdersExcel(){
+    const list = Object.entries(allOrders || {}).map(([id, o]) => ({ id, ...o })).sort((a,b) => (b.ts||0) - (a.ts||0));
+    if(!list.length){ alert('No orders to export.'); return; }
+    const rows = [['Date','Customer','Phone','Method','Address','Items','Subtotal','Delivery Fee','Total (RM)','Status']];
+    list.forEach(o => {
+        const items = normalizeItems(o.items).map(i => `${i.name} x${i.qty} ${i.unit||'pcs'} @${fmt(i.price)}`).join(' | ');
+        rows.push([o.date || new Date(o.ts||0).toLocaleString(), o.name, o.phone, o.method, o.address || '-', items, fmt(o.subtotal), fmt(o.fee), fmt(o.total), o.status || 'pending']);
+    });
+    const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    download('\uFEFF' + csv, `lexstore_orders_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
+}
+
+function unitOptions(selected){
+    return UNITS.map(u => `<option value="${u.v}" ${u.v === selected ? 'selected' : ''}>${u.t}</option>`).join('');
+}
+
+function renderAdminProducts(){
+    const tbody = $('admin-products-tbody');
+    const keys  = Object.keys(products);
+    if(!keys.length){
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888;">No products yet.</td></tr>';
+        updateStorageInfo();
+        return;
+    }
+    tbody.innerHTML = keys.map(id => {
+        const p   = products[id];
+        const img = getImages(p)[0] || '';
+        return `
+        <tr>
+            <td style="text-align:center;">
+                ${img ? `<img src="${img}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${img}')">` : '<span style="color:#aaa;">—</span>'}
+                <br>
+                <button class="btn-change-img" onclick="triggerImageUpload('${id}')">🖼 换图</button>
+                <input type="file" id="admin-img-input-${id}" accept="image/*" style="display:none;" onchange="handleAdminImageUpload(event, '${id}')">
+            </td>
+            <td><input type="text" id="ap-name-${id}" value="${esc(p.name)}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td>
+            <td><input type="number" step="any" id="ap-price-${id}" value="${p.price ?? ''}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td>
+            <td><input type="number" step="any" id="ap-cost-${id}" value="${p.cost ?? ''}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td>
+            <td><select id="ap-cat-${id}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;">${categoryOptionsHtml(p.category)}</select></td>
+            <td><select id="ap-unit-${id}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;">${unitOptions(p.unit || 'pcs')}</select></td>
+            <td><input type="number" id="ap-stock-${id}" value="${p.stock ?? 0}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td>
+            <td style="white-space:nowrap; text-align:center;">
+                <button class="btn-icon-action" title="Save" onclick="saveProductRow('${id}')">💾</button>
+                <button class="btn-icon-action delete" title="Delete" onclick="deleteProduct('${id}')">🗑</button>
+            </td>
+        </tr>`;
+    }).join('');
+    updateStorageInfo();
+}
+
+function triggerImageUpload(id) {
+    const input = document.getElementById('admin-img-input-' + id);
+    if (input) input.click();
+}
+
+function handleAdminImageUpload(event, id) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('请选择图片文件'); event.target.value = ''; return; }
+    readAndCompressImage(file).then(dataUrl => {
+        db.ref('products/' + id).update({ images: [dataUrl] })
+          .then(() => alert('✅ 图片更换成功！'))
+          .catch(err => alert('更新失败：' + err.message));
+    }).catch(() => alert('图片读取失败。'));
+    event.target.value = '';
+}
+
+function saveProductRow(id){
+    const name  = $('ap-name-' + id).value.trim();
+    const price = parseFloat($('ap-price-' + id).value);
+    const cost  = parseFloat($('ap-cost-' + id).value);
+    const cat   = $('ap-cat-' + id).value;
+    const unit  = $('ap-unit-' + id).value;
+    const stock = parseInt($('ap-stock-' + id).value);
+    if(!name){ alert('Product name cannot be empty.'); return; }
+    if(isNaN(price) || price < 0){ alert('Please enter a valid price.'); return; }
+    db.ref('products/' + id).update({
+        name, price, cost: isNaN(cost) ? 0 : cost,
+        category: cat, unit, stock: isNaN(stock) ? 0 : stock
+    }).then(() => alert('✅ Saved: ' + name)).catch(err => alert('Error: ' + err.message));
+}
+
+function deleteProduct(id){
+    const p = products[id];
+    if(!confirm(`Delete product "${p?.name || id}"?`)) return;
+    db.ref('products/' + id).remove().then(() => alert('🗑 Product deleted.')).catch(err => alert('Error: ' + err.message));
+}
+
+function bindFileInput(input){
+    input.addEventListener('change', function(){
+        const file = this.files[0];
+        if(!file) return;
+        if(!file.type.startsWith('image/')){ alert('Please select an image file.'); this.value=''; return; }
+        readAndCompressImage(file).then(dataUrl => {
+            this.dataset.dataUrl = dataUrl;
+            let preview = this.parentElement.querySelector('.slot-preview');
+            if(!preview){
+                preview = document.createElement('img');
+                preview.className = 'slot-preview';
+                preview.style.cssText = 'width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid #ddd;';
+                this.parentElement.appendChild(preview);
+            }
+            preview.src = dataUrl;
+        }).catch(() => alert('Failed to read image.'));
+    });
+}
+
+function readAndCompressImage(file, maxW = 700, quality = 0.75){
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                let { width, height } = img;
+                if(width > maxW){ height = Math.round(height * maxW / width); width = maxW; }
+                const canvas = document.createElement('canvas');
+                canvas.width = width; canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+function addImageSlot(){
+    const container = $('image-slots-container');
+    const row = document.createElement('div');
+    row.className = 'img-slot-row';
+    row.innerHTML = `
+        <span style="font-size:12px; font-weight:bold; color:#666;">#${container.children.length + 1}</span>
+        <input type="file" class="new-prod-file-slot" accept="image/*" style="flex:1;">
+        <button type="button" class="btn-del-slot" onclick="removeImageSlot(this)">✕</button>`;
+    container.appendChild(row);
+    bindFileInput(row.querySelector('input'));
+}
+
+function removeImageSlot(btn){
+    const container = $('image-slots-container');
+    if(container.children.length <= 1){ alert('At least one image slot is required.'); return; }
+    btn.parentElement.remove();
+    Array.from(container.children).forEach((row, i) => {
+        row.querySelector('span').textContent = '#' + (i + 1);
+    });
+}
+
+function resetProductForm(){
+    $('new-prod-name').value = '';
+    $('new-prod-price').value = '';
+    $('new-prod-cost').value = '';
+    $('new-prod-stock').value = 100;
+    $('new-prod-unit').value = 'pcs';
+    $('new-prod-model').value = '';
+    $('new-prod-size').value = '';
+    const catSel = $('new-prod-category');
+    if(catSel) catSel.value = '';
+    const container = $('image-slots-container');
+    container.innerHTML = `
+        <div class="img-slot-row">
+            <span style="font-size:12px; font-weight:bold; color:#666;">#1</span>
+            <input type="file" class="new-prod-file-slot" accept="image/*" style="flex:1;">
+        </div>`;
+    bindFileInput(container.querySelector('input'));
+}
+
+function addNewProduct(){
+    const name  = $('new-prod-name').value.trim();
+    const price = parseFloat($('new-prod-price').value);
+    const cost  = parseFloat($('new-prod-cost').value);
+    const cat   = $('new-prod-category').value;
+    const unit  = $('new-prod-unit').value;
+    const stock = parseInt($('new-prod-stock').value);
+    const model = $('new-prod-model').value.trim();
+    const size  = $('new-prod-size').value.trim();
+    if(!name){ alert('Please enter the product name.'); return; }
+    if(isNaN(price) || price < 0){ alert('Please enter a valid selling price.'); return; }
+    const images = Array.from(document.querySelectorAll('.new-prod-file-slot')).map(inp => inp.dataset.dataUrl).filter(Boolean);
+    const newProduct = {
+        name, price,
+        cost: isNaN(cost) ? 0 : cost,
+        category: cat, unit,
+        stock: isNaN(stock) ? 0 : stock,
+        model, size, images, createdAt: Date.now()
+    };
+    db.ref('products').push(newProduct).then(() => {
+        alert('✅ Product added: ' + name);
+        resetProductForm();
+        switchAdminSubTab('products-list-section', document.querySelectorAll('.admin-sub-btn')[1]);
+    }).catch(err => alert('Error saving product: ' + err.message));
+}
+
+function changeAdminPassword() {
+    const newPw = $('change-new-pw').value.trim();
+    const confirmPw = $('change-confirm-pw').value.trim();
+    if (!newPw || !confirmPw) { alert('Please fill in both fields.'); return; }
+    if (newPw !== confirmPw) { alert('❌ Passwords do not match!'); return; }
+    if (newPw.length < 4) { alert('Password must be at least 4 characters long.'); return; }
+    db.ref('settings').update({ adminPassword: newPw })
+      .then(() => { alert('✅ Password updated!'); $('change-new-pw').value = ''; $('change-confirm-pw').value = ''; })
+      .catch(err => alert('Error: ' + err.message));
+}
+
+function savePasswords(){
+    const a = $('new-admin-pw').value.trim();
+    const s = $('new-super-pw').value.trim();
+    if(!a && !s){ alert('Enter at least one new password.'); return; }
+    const updates = {};
+    if(a) updates.adminPassword = a;
+    if(s) updates.superPassword = s;
+    db.ref('settings').update(updates).then(() => {
+        alert('✅ Password(s) updated.');
+        $('new-admin-pw').value = '';
+        $('new-super-pw').value = '';
+    }).catch(err => alert('Error: ' + err.message));
+}
+
+function exportDataJson(){
+    const payload = { exportedAt: new Date().toISOString(), products, categories, orders: allOrders };
+    download(JSON.stringify(payload, null, 2), `lexstore_backup_${Date.now()}.json`, 'application/json');
+}
+
+function importDataJson(event){
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if(!data.products && !data.orders){ alert('Invalid backup file.'); return; }
+            if(!confirm('⚠️ This will REPLACE all current data. Continue?')) return;
+            const updates = {};
+            updates.products   = data.products || {};
+            updates.orders     = data.orders || {};
+            updates.categories = data.categories || {};
+            db.ref().update(updates).then(() => alert('✅ Backup restored.')).catch(err => alert('Error: ' + err.message));
+        } catch(err){ alert('Invalid JSON file.'); }
+        event.target.value = '';
+    };
+    reader.readAsText(file);
+}
+
+function clearAllProducts(){
+    if(!confirm('⚠️ Delete ALL products permanently?')) return;
+    if(!confirm('Are you absolutely sure?')) return;
+    db.ref('products').remove().then(() => alert('🗑 All products deleted.')).catch(err => alert('Error: ' + err.message));
+}
+
+function updateStorageInfo(){
+    const sp = $('storage-products');
+    const so = $('storage-orders');
+    const sc = $('storage-categories');
+    if(sp) sp.textContent = Object.keys(products).length;
+    if(so) so.textContent = Object.keys(allOrders || {}).length;
+    if(sc) sc.textContent = Object.keys(categories).length;
+}
+
+/* ================= Firebase 监听 ================= */
+db.ref('products').on('value', snap => {
+    products = snap.val() || {};
+    renderProducts();
+    if(isAdmin) renderAdminProducts();
+    updateStorageInfo();
+    if(urlProductToOpen && products[urlProductToOpen]){
+        openProductModal(urlProductToOpen);
+        urlProductToOpen = null;
+    }
+}, err => console.error('Products listener error:', err));
+
+db.ref('categories').on('value', snap => {
+    categories = snap.val() || {};
+    renderCategories();
+    renderProducts();
+    if(isAdmin){
+        renderAdminCategories();
+        populateCategoryDropdowns();
+    }
+    updateStorageInfo();
+}, err => console.error('Categories listener error:', err));
+
+db.ref('orders').on('value', snap => {
+    allOrders = snap.val() || {};
+    renderAdminOrders();
+    updateStorageInfo();
+}, err => console.error('Orders listener error:', err));
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadCart();
+    updateCartBadge();
+    renderCategories();
+    renderProducts();
+    renderCart();
+    renderCustomerOrders();
+    restoreAdminSession();
+    populateCategoryDropdowns();
+    bindFileInput(document.querySelector('.new-prod-file-slot'));
+    checkUrlForProduct();
+    $('admin-password-input').addEventListener('keydown', e => {
+        if(e.key === 'Enter') verifyAdminLogin();
+    });
+    document.addEventListener('keydown', e => {
+        if(e.key === 'Escape'){
+            closeProductModal();
+            closeLightbox();
+            closeFbShareModal();
+        }
+    });
+});
+</script>
 </body>
 </html>
