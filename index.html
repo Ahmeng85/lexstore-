@@ -193,6 +193,7 @@
             <button class="nav-btn" onclick="switchPage('orders', this)">📦 My Orders</button>
             <button class="nav-btn" onclick="switchPage('admin', this)">📊 Admin Panel</button>
             <button class="nav-btn" onclick="switchPage('bank', this)">🏦 Bank</button>
+            <button class="nav-btn" onclick="switchPage('help', this)">📖 Help</button>
             <button class="nav-btn member-nav" id="member-nav-btn" onclick="switchPage('member', this)">👤 Login / Register</button>
             <a id="header-whatsapp-btn" href="https://wa.me/60102862797" target="_blank" class="nav-btn whatsapp-nav">💬 WhatsApp 0102862797</a>
         </div>
@@ -243,6 +244,12 @@
     <div id="bank-page" class="page">
         <div class="bank-box" id="bank-content">
             <p style="text-align: center; color: #888;">Loading bank information...</p>
+        </div>
+    </div>
+
+    <div id="help-page" class="page">
+        <div class="box-container" id="help-content">
+            <p style="text-align:center; color:#888;">Loading guide...</p>
         </div>
     </div>
 
@@ -333,6 +340,7 @@
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('members-section', this)">👥 Members</button>
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('withdraw-section', this)">💸 Withdraw Requests</button>
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('bank-settings-section', this)">🏦 Bank Settings</button>
+                <button class="admin-sub-btn" onclick="switchAdminSubTab('help-settings-section', this)">📖 Help Settings</button>
                 <button class="admin-sub-btn" id="super-tab-btn" onclick="switchAdminSubTab('super-settings-section', this)" style="display:none;">🔐 Super Admin Settings</button>
             </div>
             <div id="orders-section" class="admin-section active">
@@ -420,6 +428,20 @@
                     <label style="display:block; margin-bottom: 5px;">QR Code Upload (支持上传二维码):</label><input type="file" id="bank-qr-upload" accept="image/*" onchange="handleQrUpload(event)" style="margin-bottom: 10px;">
                     <div id="qr-preview" style="margin-bottom: 15px;"></div>
                     <button class="btn" style="background:#2ecc71; color:#fff;" onclick="saveBankSettings()">💾 Save Bank Settings</button>
+                </div>
+            </div>
+            <div id="help-settings-section" class="admin-section">
+                <h3 style="color: #3498db; font-size: 16px; margin-bottom: 15px;">📖 操作指南设置</h3>
+                <div class="admin-form" style="max-width: 600px;">
+                    <label>指南文字说明 (支持换行):</label>
+                    <textarea id="help-text-input" rows="8" placeholder="请输入操作指南的文字内容..." style="resize:vertical;"></textarea>
+                    
+                    <label style="display:block; margin-bottom: 5px;">上传指南图片 (可多次上传):</label>
+                    <input type="file" id="help-image-upload" accept="image/*" onchange="handleHelpImageUpload(event)" style="margin-bottom:10px;">
+                    <div id="help-image-preview" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;"></div>
+                    
+                    <button class="btn" style="background:#3498db; color:#fff;" onclick="saveHelpSettings()">💾 保存操作指南</button>
+                    <button class="btn-clear" style="margin-top:10px;" onclick="clearHelpGuide()">🗑 清空指南数据</button>
                 </div>
             </div>
             <div id="super-settings-section" class="admin-section">
@@ -517,6 +539,7 @@ let currentModalId = null; let currentModalImgs = []; let urlProductToOpen = nul
 let currentShareProductId = null; let currentReceiptId = null;
 let currentCategory = 'all'; let currentMember = null;
 let affiliateRef = null; let bankInfo = {}; let currentQrBase64 = '';
+let helpInfo = {}; let currentHelpImages = [];
 
 const $ = id => document.getElementById(id);
 const fmt = n => (Number(n) || 0).toFixed(2);
@@ -630,13 +653,62 @@ function populateBankAdminForm() { if (!$('bank-company-name')) return; $('bank-
 function handleQrUpload(event) { const file = event.target.files[0]; if (!file) return; if (!file.type.startsWith('image/')) { alert('请选择图片文件'); return; } readAndCompressImage(file, 500, 0.8).then(dataUrl => { currentQrBase64 = dataUrl; $('qr-preview').innerHTML = `<img src="${dataUrl}" style="width:150px; border-radius:8px; border:1px solid #ddd;">`; }).catch(() => alert('图片读取失败。')); event.target.value = ''; }
 function saveBankSettings() { const companyName = $('bank-company-name').value.trim(); const bankDetails = $('bank-details').value.trim(); db.ref('settings/bankInfo').set({ companyName, bankDetails, qrImage: currentQrBase64 }).then(() => alert('✅ Bank settings saved successfully!')).catch(err => alert('Error: ' + err.message)); }
 
+// ⭐ 操作指南前台渲染
+function renderHelpPage() {
+    const container = $('help-content');
+    if (!container) return;
+    let imagesHtml = '';
+    if (helpInfo.images && helpInfo.images.length > 0) {
+        imagesHtml = helpInfo.images.map(src => `<img src="${src}" style="max-width:100%; border-radius:8px; margin-bottom:10px; cursor:zoom-in;" onclick="openLightbox('${src}')">`).join('');
+    }
+    container.innerHTML = `
+        <div style="white-space: pre-wrap; font-size: 15px; line-height: 1.6; color: #333; margin-bottom: 20px;">${esc(helpInfo.text || '暂无操作指南内容，请等待管理员添加。')}</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">${imagesHtml}</div>
+    `;
+}
+
+// ⭐ 操作指南后台管理
+function populateHelpAdminForm() {
+    if (!$('help-text-input')) return;
+    $('help-text-input').value = helpInfo.text || '';
+    currentHelpImages = helpInfo.images ? [...helpInfo.images] : [];
+    renderHelpImagePreview();
+}
+function renderHelpImagePreview() {
+    const preview = $('help-image-preview');
+    if (!preview) return;
+    if (currentHelpImages.length === 0) { preview.innerHTML = ''; return; }
+    preview.innerHTML = currentHelpImages.map((src, i) => `
+        <div style="position:relative;">
+            <img src="${src}" style="width:80px; height:80px; object-fit:cover; border-radius:6px; border:1px solid #ddd;">
+            <button style="position:absolute; top:-5px; right:-5px; background:#e74c3c; color:#fff; border:none; border-radius:50%; width:20px; height:20px; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center;" onclick="removeHelpImage(${i})">×</button>
+        </div>
+    `).join('');
+}
+function removeHelpImage(index) { currentHelpImages.splice(index, 1); renderHelpImagePreview(); }
+function handleHelpImageUpload(event) {
+    const file = event.target.files[0]; if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('请选择图片文件'); return; }
+    readAndCompressImage(file, 800, 0.8).then(dataUrl => { currentHelpImages.push(dataUrl); renderHelpImagePreview(); }).catch(() => alert('图片读取失败。'));
+    event.target.value = '';
+}
+function saveHelpSettings() {
+    const text = $('help-text-input').value;
+    db.ref('settings/helpGuide').set({ text, images: currentHelpImages }).then(() => alert('✅ 操作指南已保存！')).catch(err => alert('Error: ' + err.message));
+}
+function clearHelpGuide() {
+    if (!confirm('确定要清空整个操作指南吗？')) return;
+    db.ref('settings/helpGuide').remove().then(() => { alert('🗑 已清空操作指南。'); $('help-text-input').value = ''; currentHelpImages = []; renderHelpImagePreview(); });
+}
+
 function switchPage(pageId, btn){
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const page = $(pageId + '-page'); if(page) page.classList.add('active');
     document.querySelectorAll('.nav-tabs .nav-btn').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active');
     if(pageId === 'cart'){ renderCart(); if(currentMember){ $('customer-name').value = currentMember.name || ''; $('customer-phone').value = currentMember.phone || ''; } }
     if(pageId === 'orders') renderCustomerOrders(); if(pageId === 'store') renderProducts(); if(pageId === 'member') updateMemberUI();
-    if(pageId === 'bank') renderBankPage(); window.scrollTo({ top:0, behavior:'smooth' });
+    if(pageId === 'bank') renderBankPage(); if(pageId === 'help') renderHelpPage();
+    window.scrollTo({ top:0, behavior:'smooth' });
 }
 
 function switchAdminSubTab(sectionId, btn){
@@ -650,6 +722,7 @@ function switchAdminSubTab(sectionId, btn){
     if(sectionId === 'super-settings-section') updateStorageInfo();
     if(sectionId === 'add-product-section') populateCategoryDropdowns();
     if(sectionId === 'bank-settings-section') populateBankAdminForm();
+    if(sectionId === 'help-settings-section') populateHelpAdminForm();
 }
 
 function renderCategories(){ const bar = $('category-bar'); let html = `<div class="category-tab ${currentCategory === 'all' ? 'active' : ''}" onclick="selectCategory('all')">全部 All</div>`; Object.entries(categories).forEach(([id, name]) => { html += `<div class="category-tab ${currentCategory === id ? 'active' : ''}" onclick="selectCategory('${id}')">${esc(name)}</div>`; }); bar.innerHTML = html; }
@@ -787,7 +860,7 @@ function verifyAdminLogin(){
         if(pw === superPw){ isAdmin = true; isSuperAdmin = true; } else if(pw === adminPw){ isAdmin = true; isSuperAdmin = false; } else { alert('❌ Wrong password.'); return; }
         $('admin-login-box').style.display = 'none'; $('admin-dashboard').style.display = 'block'; $('super-tab-btn').style.display = isSuperAdmin ? 'inline-block' : 'none'; $('admin-title').textContent = isSuperAdmin ? 'Admin Panel — Super Admin' : 'Admin Panel';
         sessionStorage.setItem('lexstore_admin', isSuperAdmin ? 'super' : 'admin'); $('admin-password-input').value = '';
-        renderAdminProducts(); renderAdminOrders(); renderAdminCategories(); renderAdminMembers(); renderWithdrawRequests(); populateCategoryDropdowns(); populateBankAdminForm();
+        renderAdminProducts(); renderAdminOrders(); renderAdminCategories(); renderAdminMembers(); renderWithdrawRequests(); populateCategoryDropdowns(); populateBankAdminForm(); populateHelpAdminForm();
     }).catch(err => alert('Connection error: ' + err.message));
 }
 function adminLogout(){ isAdmin = false; isSuperAdmin = false; sessionStorage.removeItem('lexstore_admin'); $('admin-dashboard').style.display = 'none'; $('admin-login-box').style.display = 'block'; document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active')); $('orders-section').classList.add('active'); document.querySelectorAll('.admin-sub-btn').forEach((b,i) => b.classList.toggle('active', i === 0)); }
@@ -808,7 +881,7 @@ function renderAdminOrders(){
     }).join(''); updateStorageInfo();
 }
 
-// ⭐ 按 Complete 为主结算佣金：只要上线本月有购买，无论前后均计算 1%
+// ⭐ 按 Complete 为主结算佣金
 function updateOrderStatus(orderId, newStatus) {
     if (newStatus === 'complete') {
         db.ref('orders').once('value').then(snap => {
@@ -898,14 +971,15 @@ function removeImageSlot(btn){ const container = $('image-slots-container'); if(
 function resetProductForm(){ $('new-prod-name').value = ''; $('new-prod-price').value = ''; $('new-prod-cost').value = ''; $('new-prod-stock').value = 100; $('new-prod-unit').value = 'pcs'; $('new-prod-model').value = ''; $('new-prod-size').value = ''; const catSel = $('new-prod-category'); if(catSel) catSel.value = ''; const container = $('image-slots-container'); container.innerHTML = `<div class="img-slot-row"><span style="font-size:12px; font-weight:bold; color:#666;">#1</span><input type="file" class="new-prod-file-slot" accept="image/*" style="flex:1;"></div>`; bindFileInput(container.querySelector('input')); }
 function addNewProduct(){ const name = $('new-prod-name').value.trim(); const price = parseFloat($('new-prod-price').value); const cost = parseFloat($('new-prod-cost').value); const cat = $('new-prod-category').value; const unit = $('new-prod-unit').value; const stock = parseInt($('new-prod-stock').value); const model = $('new-prod-model').value.trim(); const size = $('new-prod-size').value.trim(); if(!name){ alert('Please enter the product name.'); return; } if(isNaN(price) || price < 0){ alert('Please enter a valid selling price.'); return; } const images = Array.from(document.querySelectorAll('.new-prod-file-slot')).map(inp => inp.dataset.dataUrl).filter(Boolean); const newProduct = { name, price, cost: isNaN(cost) ? 0 : cost, category: cat, unit, stock: isNaN(stock) ? 0 : stock, model, size, images, createdAt: Date.now() }; db.ref('products').push(newProduct).then(() => { alert('✅ Product added: ' + name); resetProductForm(); switchAdminSubTab('products-list-section', document.querySelectorAll('.admin-sub-btn')[1]); }).catch(err => alert('Error saving product: ' + err.message)); }
 function savePasswords(){ const a = $('new-admin-pw').value.trim(); const s = $('new-super-pw').value.trim(); if(!a && !s){ alert('Enter at least one new password.'); return; } const updates = {}; if(a) updates.adminPassword = a; if(s) updates.superPassword = s; db.ref('settings').update(updates).then(() => { alert('✅ Password(s) updated.'); $('new-admin-pw').value = ''; $('new-super-pw').value = ''; }).catch(err => alert('Error: ' + err.message)); }
-function exportDataJson(){ const payload = { exportedAt: new Date().toISOString(), products, categories, members, orders: allOrders, withdrawals }; download(JSON.stringify(payload, null, 2), `lexstore_backup_${Date.now()}.json`, 'application/json'); }
-function importDataJson(event){ const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = e => { try { const data = JSON.parse(e.target.result); if(!data.products && !data.orders){ alert('Invalid backup file.'); return; } if(!confirm('⚠️ This will REPLACE all current data. Continue?')) return; const updates = {}; updates.products = data.products || {}; updates.orders = data.orders || {}; updates.categories = data.categories || {}; updates.members = data.members || {}; updates.withdrawals = data.withdrawals || {}; db.ref().update(updates).then(() => alert('✅ Backup restored.')).catch(err => alert('Error: ' + err.message)); } catch(err){ alert('Invalid JSON file.'); } event.target.value = ''; }; reader.readAsText(file); }
+function exportDataJson(){ const payload = { exportedAt: new Date().toISOString(), products, categories, members, orders: allOrders, withdrawals, helpInfo }; download(JSON.stringify(payload, null, 2), `lexstore_backup_${Date.now()}.json`, 'application/json'); }
+function importDataJson(event){ const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = e => { try { const data = JSON.parse(e.target.result); if(!data.products && !data.orders){ alert('Invalid backup file.'); return; } if(!confirm('⚠️ This will REPLACE all current data. Continue?')) return; const updates = {}; updates.products = data.products || {}; updates.orders = data.orders || {}; updates.categories = data.categories || {}; updates.members = data.members || {}; updates.withdrawals = data.withdrawals || {}; updates.helpGuide = data.helpInfo || {}; db.ref().update(updates).then(() => alert('✅ Backup restored.')).catch(err => alert('Error: ' + err.message)); } catch(err){ alert('Invalid JSON file.'); } event.target.value = ''; }; reader.readAsText(file); }
 function clearAllProducts(){ if(!confirm('⚠️ Delete ALL products permanently?')) return; if(!confirm('Are you absolutely sure?')) return; db.ref('products').remove().then(() => alert('🗑 All products deleted.')).catch(err => alert('Error: ' + err.message)); }
 function updateStorageInfo(){ const sp = $('storage-products'); const so = $('storage-orders'); const sc = $('storage-categories'); const sm = $('storage-members'); if(sp) sp.textContent = Object.keys(products).length; if(so) so.textContent = Object.keys(allOrders || {}).length; if(sc) sc.textContent = Object.keys(categories).length; if(sm) sm.textContent = Object.keys(members).length; }
 
 db.ref('products').on('value', snap => { products = snap.val() || {}; renderProducts(); if(isAdmin) renderAdminProducts(); updateStorageInfo(); if(urlProductToOpen && products[urlProductToOpen]){ openProductModal(urlProductToOpen); urlProductToOpen = null; } }, err => console.error('Products listener error:', err));
 db.ref('categories').on('value', snap => { categories = snap.val() || {}; renderCategories(); renderProducts(); if(isAdmin){ renderAdminCategories(); populateCategoryDropdowns(); } updateStorageInfo(); }, err => console.error('Categories listener error:', err));
 db.ref('settings/bankInfo').on('value', snap => { bankInfo = snap.val() || {}; if (document.getElementById('bank-page') && document.getElementById('bank-page').classList.contains('active')) renderBankPage(); if (isAdmin && document.getElementById('bank-settings-section') && document.getElementById('bank-settings-section').classList.contains('active')) populateBankAdminForm(); }, err => console.error('Bank info listener error:', err));
+db.ref('settings/helpGuide').on('value', snap => { helpInfo = snap.val() || {}; if (document.getElementById('help-page') && document.getElementById('help-page').classList.contains('active')) renderHelpPage(); if (isAdmin && document.getElementById('help-settings-section') && document.getElementById('help-settings-section').classList.contains('active')) populateHelpAdminForm(); }, err => console.error('Help guide listener error:', err));
 db.ref('members').on('value', snap => { members = snap.val() || {}; if(isAdmin) renderAdminMembers(); updateStorageInfo(); if(currentMember){ const phoneLast4 = currentMember.phone.slice(-4); renderMyDownlines(phoneLast4); } }, err => console.error('Members listener error:', err));
 db.ref('orders').on('value', snap => { allOrders = snap.val() || {}; renderAdminOrders(); updateStorageInfo(); if(currentMember){ const phoneLast4 = currentMember.phone.slice(-4); renderMyDownlines(phoneLast4); } }, err => console.error('Orders listener error:', err));
 db.ref('withdrawals').on('value', snap => { withdrawals = snap.val() || {}; if (isAdmin) renderWithdrawRequests(); if (currentMember) renderMyDownlines(currentMember.phone.slice(-4)); }, err => console.error('Withdrawals listener error:', err));
