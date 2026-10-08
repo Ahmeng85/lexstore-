@@ -8,15 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyArWWVX5abPo-zZ-OJcR6M45eRikqFZNMA",
-            authDomain: "lexstore-55d84.firebaseapp.com",
-            databaseURL: "https://lexstore-55d84-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "lexstore-55d84",
-            storageBucket: "lexstore-55d84.firebasestorage.app",
-            messagingSenderId: "149887218467",
-            appId: "1:149887218467:web:891e5af721129f97225296"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyArWWVX5abPo-zZ-OJcR6M45eRikqFZNMA", authDomain: "lexstore-55d84.firebaseapp.com", databaseURL: "https://lexstore-55d84-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "lexstore-55d84", storageBucket: "lexstore-55d84.firebasestorage.app", messagingSenderId: "149887218467", appId: "1:149887218467:web:891e5af721129f97225296" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
     </script>
@@ -304,13 +296,15 @@
                 <p>Share your exclusive link with friends. When someone registers, you earn 1% commission on all their future purchases! *Requirement: You must purchase at least once in the current month to qualify for the commission.*</p>
                 <div class="aff-link" id="member-aff-link">Generating link...</div>
                 
-                <!-- 新增：Total 提成显示 -->
                 <div style="margin-top:15px; padding:12px; background:#fff; border-radius:6px; border:1px solid #c8e6c9; text-align:center;">
                     <h5 style="color:#27ae60; margin-bottom:5px; font-size:14px;">📊 My Stats</h5>
-                    <div style="font-size:15px; font-weight:bold; color:#e67e22;">Total Commission: <span id="my-total-commission">RM 0.00</span></div>
+                    <div style="font-size:15px; font-weight:bold; color:#e67e22;">Available Balance: <span id="my-total-commission">RM 0.00</span></div>
+                    <div style="font-size:12px; color:#888; margin-top:5px;">Total Earned: RM <span id="my-total-earned">0.00</span> | Withdrawn: RM <span id="my-total-withdrawn">0.00</span></div>
+                    <button class="btn" style="margin-top:10px; background:#e74c3c; color:#fff; padding:10px; font-size:14px; width:100%; border:none; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="requestWithdraw()">💸 Withdraw</button>
+                    <button class="btn" style="margin-top:8px; background:#3498db; color:#fff; padding:8px; font-size:13px; width:100%; border:none; border-radius:6px; cursor:pointer;" onclick="showMyWithdrawHistory()">📜 View Withdrawal History</button>
+                    <div id="my-withdraw-history-box" style="display:none; margin-top:10px; text-align:left; max-height:150px; overflow-y:auto; border-top:1px solid #eee; padding-top:10px;"></div>
                 </div>
 
-                <!-- 新增：我的下线列表 -->
                 <div id="my-downline-list" style="margin-top:15px; border-top:1px dashed #c8e6c9; padding-top:10px;"></div>
                 
                 <button class="btn-aff-share" onclick="copyAffiliateLink()" style="margin-top:15px;">Share to earn 1%</button>
@@ -337,6 +331,7 @@
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('add-product-section', this)">➕ Add Products</button>
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('categories-section', this)">🏷 Categories</button>
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('members-section', this)">👥 Members</button>
+                <button class="admin-sub-btn" onclick="switchAdminSubTab('withdraw-section', this)">💸 Withdraw Requests</button>
                 <button class="admin-sub-btn" onclick="switchAdminSubTab('bank-settings-section', this)">🏦 Bank Settings</button>
                 <button class="admin-sub-btn" id="super-tab-btn" onclick="switchAdminSubTab('super-settings-section', this)" style="display:none;">🔐 Super Admin Settings</button>
             </div>
@@ -404,6 +399,16 @@
                 <div class="stats"><div class="stat-card" style="background: #fff8e1; color: #e67e22;" id="total-members-card">Total Members: 0</div></div>
                 <div style="overflow-x:auto;">
                     <table><thead><tr><th>Register Date</th><th>Name</th><th>Contact</th></tr></thead><tbody id="members-tbody"><tr><td colspan="3" style="text-align:center; color:#888;">暂无会员</td></tr></tbody></table>
+                </div>
+            </div>
+            <div id="withdraw-section" class="admin-section">
+                <h3 style="color: #e67e22; font-size: 16px; margin-bottom: 15px;">💸 Withdrawal Requests</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Approving a withdrawal will deduct the amount from the member's available balance.</p>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead><tr><th>Date</th><th>Member</th><th>Phone</th><th>Amount (RM)</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody id="withdraw-tbody"><tr><td colspan="6" style="text-align:center; color:#888;">No withdrawal requests yet.</td></tr></tbody>
+                    </table>
                 </div>
             </div>
             <div id="bank-settings-section" class="admin-section">
@@ -500,15 +505,13 @@
         <img id="lightbox-content" src="" alt="Product Image">
     </div>
 <script>
-const WHATSAPP_NUMBER   = '60102862797';
-const DELIVERY_FEE      = 5;
+const WHATSAPP_NUMBER = '60102862797';
+const DELIVERY_FEE = 5;
 const FREE_DELIVERY_THRESHOLD = 50;
-let DEFAULT_ADMIN_PW  = 'admin123';
-let DEFAULT_SUPER_PW  = 'admin123';
-
+let DEFAULT_ADMIN_PW = 'admin123';
+let DEFAULT_SUPER_PW = 'admin123';
 const UNITS = [ { v:'pcs', t:'pcs (个)' }, { v:'pack', t:'pack (包)' }, { v:'set', t:'set (套)' }, { v:'bottle', t:'bottle (瓶)' }, { v:'bag', t:'bag (袋)' }, { v:'kg', t:'kg (公斤)' }, { v:'gram', t:'gram (克)' }, { v:'m', t:'m (米)' }, { v:'cm', t:'cm (厘米)' }, { v:'unit', t:'unit (单位)' } ];
-
-let products = {}; let allOrders = {}; let categories = {}; let members = {}; let cart = {};
+let products = {}; let allOrders = {}; let categories = {}; let members = {}; let cart = {}; let withdrawals = {};
 let isAdmin = false; let isSuperAdmin = false;
 let currentModalId = null; let currentModalImgs = []; let urlProductToOpen = null;
 let currentShareProductId = null; let currentReceiptId = null;
@@ -525,10 +528,7 @@ function parseSpec(str){ if(!str || typeof str !== 'string') return []; return s
 function download(content, filename, type){ const blob = new Blob([content], { type }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 1500); }
 async function sha256(str){ const buf = new TextEncoder().encode(str); const hashBuf = await crypto.subtle.digest('SHA-256', buf); return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join(''); }
 
-function switchMemberTab(tab){
-    if(tab === 'login'){ $('tab-login').classList.add('active'); $('tab-register').classList.remove('active'); $('member-login-form').style.display = 'flex'; $('member-register-form').style.display = 'none'; }
-    else { $('tab-login').classList.remove('active'); $('tab-register').classList.add('active'); $('member-login-form').style.display = 'none'; $('member-register-form').style.display = 'flex'; }
-}
+function switchMemberTab(tab){ if(tab === 'login'){ $('tab-login').classList.add('active'); $('tab-register').classList.remove('active'); $('member-login-form').style.display = 'flex'; $('member-register-form').style.display = 'none'; } else { $('tab-login').classList.remove('active'); $('tab-register').classList.add('active'); $('member-login-form').style.display = 'none'; $('member-register-form').style.display = 'flex'; } }
 function phoneKey(phone){ return phone.replace(/[\s\+\-\(\)]/g, '').toLowerCase(); }
 
 async function memberRegister(){
@@ -578,45 +578,54 @@ function updateMemberUI(){
     }
 }
 
+function calculateBalance(refCode) {
+    let totalEarned = 0;
+    for (let id in allOrders) { const o = allOrders[id]; if (o.affiliateRef === refCode && o.commission) totalEarned += Number(o.commission); }
+    let totalWithdrawn = 0;
+    for (let id in withdrawals) { const w = withdrawals[id]; if (w.memberPhone && w.memberPhone.endsWith(refCode) && (w.status === 'approved' || w.status === 'pending')) totalWithdrawn += Number(w.amount); }
+    return { totalEarned, totalWithdrawn, balance: totalEarned - totalWithdrawn };
+}
+
 function renderMyDownlines(refCode) {
-    // 1. 计算 Total 提成
-    let totalComm = 0;
-    for (let id in allOrders) {
-        const o = allOrders[id];
-        // 找出所有推荐人是当前会员的订单，并且有提成金额的
-        if (o.affiliateRef === refCode && o.commission) {
-            totalComm += Number(o.commission);
-        }
-    }
-    const totalEl = $('my-total-commission');
-    if (totalEl) totalEl.textContent = 'RM ' + fmt(totalComm);
-
-    // 2. 渲染下线列表
-    const container = $('my-downline-list');
-    if (!container) return;
+    const stats = calculateBalance(refCode);
+    const totalEl = $('my-total-commission'); if (totalEl) totalEl.textContent = 'RM ' + fmt(stats.balance);
+    const earnedEl = $('my-total-earned'); if (earnedEl) earnedEl.textContent = fmt(stats.totalEarned);
+    const withdrawnEl = $('my-total-withdrawn'); if (withdrawnEl) withdrawnEl.textContent = fmt(stats.totalWithdrawn);
+    
+    const container = $('my-downline-list'); if (!container) return;
     const myDownlines = Object.values(members || {}).filter(m => m.referredBy === refCode);
-    
-    if (myDownlines.length === 0) {
-        container.innerHTML = '<div style="font-size:12px; color:#777; text-align:center; padding:10px 0;">You have no downlines yet.<br>还没有下线。</div>';
-        return;
-    }
-    
-    let html = `<div style="font-size:13px; font-weight:bold; margin-bottom:8px; color:#27ae60;">👥 My Downlines (${myDownlines.length})</div>`;
-    html += `<div style="max-height: 150px; overflow-y: auto; background:#fff; border-radius:6px; padding:5px; border:1px solid #eee;">`;
-    myDownlines.forEach(m => {
-        html += `<div style="display:flex; justify-content:space-between; font-size:12px; padding:6px 5px; border-bottom:1px solid #f0f0f0;"><span style="font-weight:bold;">${esc(m.name)}</span><span style="color:#888;">${esc(m.createdDate ? m.createdDate.split(',')[0] : '')}</span></div>`;
-    });
-    html += `</div>`;
-    container.innerHTML = html;
+    if (myDownlines.length === 0) { container.innerHTML = '<div style="font-size:12px; color:#777; text-align:center; padding:10px 0;">You have no downlines yet.<br>还没有下线。</div>'; return; }
+    let html = `<div style="font-size:13px; font-weight:bold; margin-bottom:8px; color:#27ae60;">👥 My Downlines (${myDownlines.length})</div><div style="max-height: 150px; overflow-y: auto; background:#fff; border-radius:6px; padding:5px; border:1px solid #eee;">`;
+    myDownlines.forEach(m => { html += `<div style="display:flex; justify-content:space-between; font-size:12px; padding:6px 5px; border-bottom:1px solid #f0f0f0;"><span style="font-weight:bold;">${esc(m.name)}</span><span style="color:#888;">${esc(m.createdDate ? m.createdDate.split(',')[0] : '')}</span></div>`; });
+    html += `</div>`; container.innerHTML = html;
 }
 
-function renderBankPage() {
-    const box = $('bank-content'); if (!box) return;
-    if (!bankInfo.companyName && !bankInfo.bankDetails && !bankInfo.qrImage) { box.innerHTML = '<p style="text-align:center; color:#888;">No bank details provided yet.</p>'; return; }
-    let qrHtml = bankInfo.qrImage ? `<img src="${bankInfo.qrImage}" class="qr-img" onclick="openLightbox(this.src)">` : '<p style="color:#888; margin-top:10px;">No QR Code uploaded.</p>';
-    box.innerHTML = `<h2>${esc(bankInfo.companyName || 'LEXSTORE HARDWARE')}</h2><div class="bank-detail">${esc(bankInfo.bankDetails || 'Bank details not set.')}</div><div style="margin-top:20px;"><h4 style="margin-bottom:10px; color:#555; font-size:15px;">Scan to Pay / 扫码支付</h4>${qrHtml}</div>`;
+function requestWithdraw() {
+    if (!currentMember) return;
+    const refCode = currentMember.phone.slice(-4);
+    const pendingWithdraw = Object.values(withdrawals || {}).find(w => w.memberPhone === currentMember.phone && w.status === 'pending');
+    if (pendingWithdraw) { alert('⚠️ You already have a pending withdrawal request. Please wait for Admin to approve it.'); return; }
+    const stats = calculateBalance(refCode);
+    if (stats.balance <= 0) { alert('⚠️ You have no available balance to withdraw.'); return; }
+    if (!confirm(`Confirm withdraw RM ${fmt(stats.balance)}?`)) return;
+    const now = Date.now();
+    db.ref('withdrawals').push({ memberPhone: currentMember.phone, memberName: currentMember.name, amount: stats.balance, status: 'pending', date: new Date(now).toLocaleString(), ts: now })
+      .then(() => alert('✅ Withdrawal request submitted! Admin will process it shortly.')).catch(err => alert('Error: ' + err.message));
 }
 
+function showMyWithdrawHistory() {
+    const box = $('my-withdraw-history-box');
+    if (box.style.display === 'none') {
+        box.style.display = 'block';
+        const myWithdrawals = Object.values(withdrawals || {}).filter(w => w.memberPhone === currentMember.phone).sort((a,b) => (b.ts||0) - (a.ts||0));
+        if (myWithdrawals.length === 0) { box.innerHTML = '<div style="text-align:center; color:#888; font-size:12px;">No withdrawal records.</div>'; return; }
+        let html = '<div style="font-size:12px; font-weight:bold; margin-bottom:5px;">History:</div>';
+        myWithdrawals.forEach(w => { const statusColor = w.status === 'approved' ? '#27ae60' : '#e67e22'; html += `<div style="display:flex; justify-content:space-between; font-size:11px; padding:4px 0; border-bottom:1px solid #eee;"><span>${esc(w.date)}</span><span>RM ${fmt(w.amount)}</span><span style="color:${statusColor}; font-weight:bold;">${w.status.toUpperCase()}</span></div>`; });
+        box.innerHTML = html;
+    } else { box.style.display = 'none'; }
+}
+
+function renderBankPage() { const box = $('bank-content'); if (!box) return; if (!bankInfo.companyName && !bankInfo.bankDetails && !bankInfo.qrImage) { box.innerHTML = '<p style="text-align:center; color:#888;">No bank details provided yet.</p>'; return; } let qrHtml = bankInfo.qrImage ? `<img src="${bankInfo.qrImage}" class="qr-img" onclick="openLightbox(this.src)">` : '<p style="color:#888; margin-top:10px;">No QR Code uploaded.</p>'; box.innerHTML = `<h2>${esc(bankInfo.companyName || 'LEXSTORE HARDWARE')}</h2><div class="bank-detail">${esc(bankInfo.bankDetails || 'Bank details not set.')}</div><div style="margin-top:20px;"><h4 style="margin-bottom:10px; color:#555; font-size:15px;">Scan to Pay / 扫码支付</h4>${qrHtml}</div>`; }
 function populateBankAdminForm() { if (!$('bank-company-name')) return; $('bank-company-name').value = bankInfo.companyName || ''; $('bank-details').value = bankInfo.bankDetails || ''; currentQrBase64 = bankInfo.qrImage || ''; const preview = $('qr-preview'); if (currentQrBase64) preview.innerHTML = `<img src="${currentQrBase64}" style="width:150px; border-radius:8px; border:1px solid #ddd;">`; else preview.innerHTML = ''; }
 function handleQrUpload(event) { const file = event.target.files[0]; if (!file) return; if (!file.type.startsWith('image/')) { alert('请选择图片文件'); return; } readAndCompressImage(file, 500, 0.8).then(dataUrl => { currentQrBase64 = dataUrl; $('qr-preview').innerHTML = `<img src="${dataUrl}" style="width:150px; border-radius:8px; border:1px solid #ddd;">`; }).catch(() => alert('图片读取失败。')); event.target.value = ''; }
 function saveBankSettings() { const companyName = $('bank-company-name').value.trim(); const bankDetails = $('bank-details').value.trim(); db.ref('settings/bankInfo').set({ companyName, bankDetails, qrImage: currentQrBase64 }).then(() => alert('✅ Bank settings saved successfully!')).catch(err => alert('Error: ' + err.message)); }
@@ -627,8 +636,7 @@ function switchPage(pageId, btn){
     document.querySelectorAll('.nav-tabs .nav-btn').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active');
     if(pageId === 'cart'){ renderCart(); if(currentMember){ $('customer-name').value = currentMember.name || ''; $('customer-phone').value = currentMember.phone || ''; } }
     if(pageId === 'orders') renderCustomerOrders(); if(pageId === 'store') renderProducts(); if(pageId === 'member') updateMemberUI();
-    if(pageId === 'bank') renderBankPage();
-    window.scrollTo({ top:0, behavior:'smooth' });
+    if(pageId === 'bank') renderBankPage(); window.scrollTo({ top:0, behavior:'smooth' });
 }
 
 function switchAdminSubTab(sectionId, btn){
@@ -638,6 +646,7 @@ function switchAdminSubTab(sectionId, btn){
     if(sectionId === 'products-list-section') renderAdminProducts();
     if(sectionId === 'categories-section') renderAdminCategories();
     if(sectionId === 'members-section') renderAdminMembers();
+    if(sectionId === 'withdraw-section') renderWithdrawRequests();
     if(sectionId === 'super-settings-section') updateStorageInfo();
     if(sectionId === 'add-product-section') populateCategoryDropdowns();
     if(sectionId === 'bank-settings-section') populateBankAdminForm();
@@ -686,11 +695,7 @@ function closeProductModal(){ $('product-modal').style.display = 'none'; current
 function changeModalQty(delta){ const input = $('modal-qty'); let v = parseInt(input.value) || 1; v += delta; if(v < 1) v = 1; const stock = Number(products[currentModalId]?.stock); if(!isNaN(stock) && v > stock) v = stock; input.value = v; }
 function addToCartFromModal(){ if(!currentModalId) return; addToCart(currentModalId, parseInt($('modal-qty').value) || 1); closeProductModal(); }
 
-function shareAffiliateProduct(id) {
-    if (!id) return;
-    if (!currentMember) { alert('⚠️ 请先注册成为会员！\n\n只有注册会员，Admin 才能通过您的手机号联系您结算 1% 提成。'); switchPage('member', document.getElementById('member-nav-btn')); return; }
-    currentShareProductId = id; $('fb-share-modal').style.display = 'flex';
-}
+function shareAffiliateProduct(id) { if (!id) return; if (!currentMember) { alert('⚠️ 请先注册成为会员！\n\n只有注册会员，Admin 才能通过您的手机号联系您结算 1% 提成。'); switchPage('member', document.getElementById('member-nav-btn')); return; } currentShareProductId = id; $('fb-share-modal').style.display = 'flex'; }
 function closeFbShareModal() { $('fb-share-modal').style.display = 'none'; currentShareProductId = null; }
 
 function downloadPoster() {
@@ -700,35 +705,18 @@ function downloadPoster() {
     ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 800, 800);
     const img = new Image(); img.crossOrigin = "anonymous";
     img.onload = function() {
-        const maxW = 600, maxH = 600; let w = img.width, h = img.height;
-        if (w > maxW) { h = h * maxW / w; w = maxW; } if (h > maxH) { w = w * maxH / h; h = maxH; }
+        const maxW = 600, maxH = 600; let w = img.width, h = img.height; if (w > maxW) { h = h * maxW / w; w = maxW; } if (h > maxH) { w = w * maxH / h; h = maxH; }
         const x = (800 - w) / 2; const y = 80; ctx.drawImage(img, x, y, w, h);
         ctx.fillStyle = '#111'; ctx.font = 'bold 36px Arial'; ctx.textAlign = 'center'; ctx.fillText('LEXSTORE HARDWARE', 400, 750);
         ctx.fillStyle = '#333'; ctx.font = 'bold 28px Arial'; ctx.fillText(p.name.length > 30 ? p.name.substring(0, 30) + '...' : p.name, 400, 720);
         ctx.fillStyle = '#ee4d2d'; ctx.font = 'bold 48px Arial'; ctx.fillText('RM ' + fmt(p.price), 400, 680);
         try { canvas.toBlob(function(blob) { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'LEXSTORE_' + p.name + '_海报.jpg'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); }, 'image/jpeg', 0.9); } 
         catch (e) { alert('如果海报下载失败，请长按下方图片保存原图。'); const a = document.createElement('a'); a.href = imgSrc; a.download = 'LEXSTORE_' + p.name + '.jpg'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
-    };
-    img.onerror = function() { alert('图片加载失败，无法生成海报。'); }; img.src = imgSrc;
+    }; img.onerror = function() { alert('图片加载失败，无法生成海报。'); }; img.src = imgSrc;
 }
 
-function copyShareText() {
-    const p = products[currentShareProductId]; if (!p) return;
-    const baseUrl = window.location.href.split('?')[0];
-    const refCode = currentMember ? currentMember.phone.slice(-4) : '';
-    const productUrl = baseUrl + '?product=' + currentShareProductId + '&ref=' + encodeURIComponent(refCode);
-    const text = `【LEXSTORE HARDWARE 五金店】\n\n📌 ${productUrl}\n\n产品：${p.name}\n价格：RM ${fmt(p.price)}\n单位：${p.unit || 'pcs'}\n\n快来逛逛吧！`;
-    navigator.clipboard.writeText(text).then(() => { alert('✅ 文案已复制！'); }).catch(() => { const textarea = document.createElement('textarea'); textarea.value = text; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); document.body.removeChild(textarea); alert('✅ 文案已复制！'); });
-}
-
-function openFbPublish() {
-    const baseUrl = window.location.href.split('?')[0];
-    const refCode = currentMember ? currentMember.phone.slice(-4) : '';
-    const productUrl = baseUrl + '?product=' + currentShareProductId + '&ref=' + encodeURIComponent(refCode);
-    const fbUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(productUrl);
-    window.open(fbUrl, '_blank', 'width=600,height=500');
-}
-
+function copyShareText() { const p = products[currentShareProductId]; if (!p) return; const baseUrl = window.location.href.split('?')[0]; const refCode = currentMember ? currentMember.phone.slice(-4) : ''; const productUrl = baseUrl + '?product=' + currentShareProductId + '&ref=' + encodeURIComponent(refCode); const text = `【LEXSTORE HARDWARE 五金店】\n\n📌 ${productUrl}\n\n产品：${p.name}\n价格：RM ${fmt(p.price)}\n单位：${p.unit || 'pcs'}\n\n快来逛逛吧！`; navigator.clipboard.writeText(text).then(() => { alert('✅ 文案已复制！'); }).catch(() => { const textarea = document.createElement('textarea'); textarea.value = text; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); document.body.removeChild(textarea); alert('✅ 文案已复制！'); }); }
+function openFbPublish() { const baseUrl = window.location.href.split('?')[0]; const refCode = currentMember ? currentMember.phone.slice(-4) : ''; const productUrl = baseUrl + '?product=' + currentShareProductId + '&ref=' + encodeURIComponent(refCode); const fbUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(productUrl); window.open(fbUrl, '_blank', 'width=600,height=500'); }
 function copyAffiliateLink() { const link = $('member-aff-link').textContent; if(!link || link.includes('正在生成')) { alert('链接还没准备好，请稍后重试。'); return; } navigator.clipboard.writeText(link).then(() => { alert('✅ 专属推广链接已复制！\n\n发给朋友注册，他们以后买东西你就能赚 1%！'); }).catch(() => { alert('复制失败，请长按链接手动复制。'); }); }
 function checkUrlForProduct() { const params = new URLSearchParams(window.location.search); urlProductToOpen = params.get('product'); }
 function openLightbox(src){ if(!src) return; $('lightbox-content').src = src; $('lightbox-modal').style.display = 'flex'; }
@@ -738,104 +726,58 @@ function loadCart(){ try { cart = JSON.parse(localStorage.getItem('lexstore_cart
 function saveCart(){ localStorage.setItem('lexstore_cart', JSON.stringify(cart)); updateCartBadge(); }
 function updateCartBadge(){ const count = Object.values(cart).reduce((s, it) => s + (it.qty || 0), 0); const badge = $('cart-badge'); if(count > 0){ badge.textContent = count; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
 
-function addToCart(id, qtyOverride){
-    const p = products[id]; if(!p){ alert('Product not found.'); return; }
-    const stock = Number(p.stock); let qty = qtyOverride || parseInt($('qty-' + id)?.value) || 1; const existing = cart[id]?.qty || 0;
-    if(!isNaN(stock) && stock > 0 && existing + qty > stock){ const allow = stock - existing; if(allow <= 0){ alert('⚠️ 已到达库存上限。'); return; } alert(`⚠️ 库存只剩 ${stock} 个，购物车已有 ${existing} 个，只能再加 ${allow} 个。`); qty = allow; }
-    cart[id] = { id, name: p.name, price: Number(p.price) || 0, unit: p.unit || 'pcs', qty: existing + qty, img: getImages(p)[0] || '' };
-    saveCart(); renderCart(); alert(`✅ "${p.name}" added to cart.`);
-}
+function addToCart(id, qtyOverride){ const p = products[id]; if(!p){ alert('Product not found.'); return; } const stock = Number(p.stock); let qty = qtyOverride || parseInt($('qty-' + id)?.value) || 1; const existing = cart[id]?.qty || 0; if(!isNaN(stock) && stock > 0 && existing + qty > stock){ const allow = stock - existing; if(allow <= 0){ alert('⚠️ 已到达库存上限。'); return; } alert(`⚠️ 库存只剩 ${stock} 个，购物车已有 ${existing} 个，只能再加 ${allow} 个。`); qty = allow; } cart[id] = { id, name: p.name, price: Number(p.price) || 0, unit: p.unit || 'pcs', qty: existing + qty, img: getImages(p)[0] || '' }; saveCart(); renderCart(); alert(`✅ "${p.name}" added to cart.`); }
 function changeCartQty(id, delta){ if(!cart[id]) return; let v = cart[id].qty + delta; if(v < 1) v = 1; const stock = Number(products[id]?.stock); if(!isNaN(stock)){ if(stock <= 0){ alert('⚠️ 此产品已无库存，将从购物车移除。'); delete cart[id]; saveCart(); renderCart(); return; } if(v > stock){ alert('⚠️ 已到达库存上限。'); v = stock; } } cart[id].qty = v; saveCart(); renderCart(); }
 function removeFromCart(id){ delete cart[id]; saveCart(); renderCart(); }
 
 function renderCart(){
-    const box = $('cart-items'); const ids = Object.keys(cart);
-    if(!ids.length){ box.innerHTML = '<p>Your cart is empty.</p>'; $('cart-summary-box').style.display = 'none'; $('checkout-container').style.display = 'none'; return; }
-    box.innerHTML = ids.map(id => {
-        const it = cart[id]; const line = it.price * it.qty; let imgSrc = it.img;
-        if (!imgSrc && products[id]) imgSrc = getImages(products[id])[0] || '';
-        const thumb = imgSrc ? `<img src="${imgSrc}" class="cart-item-img" style="cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : `<div class="cart-item-img" style="display:flex; align-items:center; justify-content:center; font-size:10px; color:#aaa;">无图</div>`;
-        return `<div class="cart-item"><div style="display:flex; align-items:center; gap:10px;">${thumb}<div><strong>${esc(it.name)}</strong><br><span style="font-size:13px;color:#888;">RM ${fmt(it.price)} / ${esc(it.unit)}</span></div></div><div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end;"><button class="qty-btn" onclick="changeCartQty('${id}',-1)">−</button><span style="min-width:26px; text-align:center; font-weight:bold;">${it.qty}</span><button class="qty-btn" onclick="changeCartQty('${id}',1)">+</button><span style="min-width:90px; text-align:right; font-weight:bold; color:#ee4d2d;">RM ${fmt(line)}</span><button class="btn-del-slot" onclick="removeFromCart('${id}')">✕</button></div></div>`;
-    }).join('');
+    const box = $('cart-items'); const ids = Object.keys(cart); if(!ids.length){ box.innerHTML = '<p>Your cart is empty.</p>'; $('cart-summary-box').style.display = 'none'; $('checkout-container').style.display = 'none'; return; }
+    box.innerHTML = ids.map(id => { const it = cart[id]; const line = it.price * it.qty; let imgSrc = it.img; if (!imgSrc && products[id]) imgSrc = getImages(products[id])[0] || ''; const thumb = imgSrc ? `<img src="${imgSrc}" class="cart-item-img" style="cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : `<div class="cart-item-img" style="display:flex; align-items:center; justify-content:center; font-size:10px; color:#aaa;">无图</div>`; return `<div class="cart-item"><div style="display:flex; align-items:center; gap:10px;">${thumb}<div><strong>${esc(it.name)}</strong><br><span style="font-size:13px;color:#888;">RM ${fmt(it.price)} / ${esc(it.unit)}</span></div></div><div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end;"><button class="qty-btn" onclick="changeCartQty('${id}',-1)">−</button><span style="min-width:26px; text-align:center; font-weight:bold;">${it.qty}</span><button class="qty-btn" onclick="changeCartQty('${id}',1)">+</button><span style="min-width:90px; text-align:right; font-weight:bold; color:#ee4d2d;">RM ${fmt(line)}</span><button class="btn-del-slot" onclick="removeFromCart('${id}')">✕</button></div></div>`; }).join('');
     $('cart-summary-box').style.display = 'block'; $('checkout-container').style.display = 'block'; updateTotals();
 }
-
-function updateTotals(){
-    let subtotal = 0; Object.values(cart).forEach(it => subtotal += it.price * it.qty);
-    const method = $('checkout-method').value; let fee = 0;
-    if (method === 'Delivery') fee = (subtotal >= FREE_DELIVERY_THRESHOLD) ? 0 : DELIVERY_FEE;
-    $('subtotal-display').textContent = 'Subtotal: RM ' + fmt(subtotal); $('shipping-display').textContent = 'Delivery Fee: RM ' + fmt(fee); $('total-price').textContent = 'Total: RM ' + fmt(subtotal + fee);
-    return { subtotal, fee, total: subtotal + fee };
-}
+function updateTotals(){ let subtotal = 0; Object.values(cart).forEach(it => subtotal += it.price * it.qty); const method = $('checkout-method').value; let fee = 0; if (method === 'Delivery') fee = (subtotal >= FREE_DELIVERY_THRESHOLD) ? 0 : DELIVERY_FEE; $('subtotal-display').textContent = 'Subtotal: RM ' + fmt(subtotal); $('shipping-display').textContent = 'Delivery Fee: RM ' + fmt(fee); $('total-price').textContent = 'Total: RM ' + fmt(subtotal + fee); return { subtotal, fee, total: subtotal + fee }; }
 function toggleAddressField(){ const method = $('checkout-method').value; const address = $('customer-address'); if(method === 'Self Pickup'){ address.style.display = 'none'; address.required = false; address.value = ''; } else { address.style.display = 'block'; address.required = true; } updateTotals(); }
 
 function submitOrder(){
     const ids = Object.keys(cart); if(!ids.length){ alert('Your cart is empty.'); return; }
     const name = $('customer-name').value.trim(); const phone = $('customer-phone').value.trim(); const method = $('checkout-method').value; const address = $('customer-address').value.trim();
     if(!name){ alert('Please enter your name.'); return; } if(!phone){ alert('Please enter your phone number.'); return; } if(method === 'Delivery' && !address){ alert('Please enter your delivery address.'); return; }
-    const totals = updateTotals();
-    const items = ids.map(id => { const it = cart[id]; return { name: it.name, qty: it.qty, unit: it.unit, price: it.price, line: it.price * it.qty, img: it.img || '' }; });
-    const now = Date.now();
-    
-    // 1% 提成逻辑 (需本月有购买记录)
-    let referrer = currentMember ? currentMember.referredBy : '';
-    let refPhone = '';
-    let commission = 0;
+    const totals = updateTotals(); const items = ids.map(id => { const it = cart[id]; return { name: it.name, qty: it.qty, unit: it.unit, price: it.price, line: it.price * it.qty, img: it.img || '' }; }); const now = Date.now();
+    let referrer = currentMember ? currentMember.referredBy : ''; let refPhone = ''; let commission = 0;
     if (referrer) {
+        const nowDate = new Date(); const currentMonth = nowDate.getMonth(); const currentYear = nowDate.getFullYear(); let isActive = false;
+        for (let id in allOrders) { const o = allOrders[id]; if (o.memberPhone && o.memberPhone.endsWith(referrer)) { const oDate = new Date(o.ts); if (oDate.getMonth() === currentMonth && oDate.getFullYear() === currentYear) { isActive = true; break; } } }
+        if (isActive) { refPhone = referrer; commission = totals.total * 0.01; } else { refPhone = referrer; }
+    }
+    const order = { ts: now, date: new Date(now).toLocaleString(), name, phone, method, address: method === 'Delivery' ? address : 'Self Pickup at store', items, subtotal: totals.subtotal, fee: totals.fee, total: totals.total, status: 'pending', memberPhone: currentMember ? currentMember.phone : '', affiliateRef: refPhone, commission: commission };
+    db.ref('orders').push(order).catch(err => console.warn('Order cloud save failed:', err)); saveOrderLocally(order);
+    
+    // ⭐ 关键修复：上线补单，自动补算之前已完成订单的佣金
+    if (currentMember) {
+        const phoneLast4 = currentMember.phone.slice(-4);
         const nowDate = new Date();
         const currentMonth = nowDate.getMonth();
         const currentYear = nowDate.getFullYear();
-        let isActive = false;
-        for (let id in allOrders) {
-            const o = allOrders[id];
-            if (o.memberPhone && o.memberPhone.endsWith(referrer)) {
+        
+        for (let oid in allOrders) {
+            const o = allOrders[oid];
+            if (o.affiliateRef === phoneLast4 && o.status === 'complete' && (!o.commission || o.commission === 0)) {
                 const oDate = new Date(o.ts);
                 if (oDate.getMonth() === currentMonth && oDate.getFullYear() === currentYear) {
-                    isActive = true;
-                    break;
+                    const comm = Number(o.total) * 0.01;
+                    db.ref('orders/' + oid).update({ commission: comm });
                 }
             }
         }
-        if (isActive) { refPhone = referrer; commission = totals.total * 0.01; } 
-        else { refPhone = referrer; } // 记录推荐人但未达标，不给提成
     }
 
-    const order = {
-        ts: now, date: new Date(now).toLocaleString(),
-        name, phone, method, address: method === 'Delivery' ? address : 'Self Pickup at store',
-        items, subtotal: totals.subtotal, fee: totals.fee, total: totals.total, status: 'pending',
-        memberPhone: currentMember ? currentMember.phone : '',
-        affiliateRef: refPhone, commission: commission
-    };
-    
-    db.ref('orders').push(order).catch(err => console.warn('Order cloud save failed:', err));
-    saveOrderLocally(order);
-    const lines = []; lines.push('*🏪 LEXSTORE HARDWARE - NEW ORDER*'); lines.push('────────────────────'); lines.push(`👤 Name: ${name}`); lines.push(`📞 Phone: ${phone}`);
-    lines.push(`🚚 Method: ${method === 'Delivery' ? 'Delivery (送货上门)' : 'Self Pickup (到店自取)'}`); if(method === 'Delivery') lines.push(`📍 Address: ${address}`);
-    lines.push('────────────────────'); items.forEach((it, i) => { lines.push(`${i+1}. ${it.name}`); lines.push(`   ${it.qty} ${it.unit} × RM ${fmt(it.price)} = RM ${fmt(it.line)}`); });
-    lines.push('────────────────────'); lines.push(`Subtotal: RM ${fmt(totals.subtotal)}`); if(totals.fee > 0) lines.push(`Delivery Fee: RM ${fmt(totals.fee)}`);
-    lines.push(`*TOTAL: RM ${fmt(totals.total)}*`); lines.push('────────────────────'); lines.push('Thank you! 🙏');
+    const lines = []; lines.push('*🏪 LEXSTORE HARDWARE - NEW ORDER*'); lines.push('────────────────────'); lines.push(`👤 Name: ${name}`); lines.push(`📞 Phone: ${phone}`); lines.push(`🚚 Method: ${method === 'Delivery' ? 'Delivery (送货上门)' : 'Self Pickup (到店自取)'}`); if(method === 'Delivery') lines.push(`📍 Address: ${address}`); lines.push('────────────────────'); items.forEach((it, i) => { lines.push(`${i+1}. ${it.name}`); lines.push(`   ${it.qty} ${it.unit} × RM ${fmt(it.price)} = RM ${fmt(it.line)}`); }); lines.push('────────────────────'); lines.push(`Subtotal: RM ${fmt(totals.subtotal)}`); if(totals.fee > 0) lines.push(`Delivery Fee: RM ${fmt(totals.fee)}`); lines.push(`*TOTAL: RM ${fmt(totals.total)}*`); lines.push('────────────────────'); lines.push('Thank you! 🙏');
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
-    cart = {}; saveCart(); renderCart(); $('customer-name').value = ''; $('customer-phone').value = ''; $('customer-address').value = '';
-    alert('✅ Order submitted! Please send the WhatsApp message to confirm.');
+    cart = {}; saveCart(); renderCart(); $('customer-name').value = ''; $('customer-phone').value = ''; $('customer-address').value = ''; alert('✅ Order submitted! Please send the WhatsApp message to confirm.');
 }
 function saveOrderLocally(order){ let mine = []; try { mine = JSON.parse(localStorage.getItem('lexstore_my_orders') || '[]'); } catch(e){} mine.unshift(order); localStorage.setItem('lexstore_my_orders', JSON.stringify(mine.slice(0, 100))); }
 
-function renderCustomerOrders(){
-    const tbody = $('customer-orders-tbody'); let mine = [];
-    try { mine = JSON.parse(localStorage.getItem('lexstore_my_orders') || '[]'); } catch(e){}
-    if(!mine.length){ tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">You have no past orders yet.</td></tr>'; return; }
-    tbody.innerHTML = mine.map(o => {
-        const itemsHtml = normalizeItems(o.items).map(i => {
-            let imgSrc = i.img; if (!imgSrc && products[i.id]) imgSrc = getImages(products[i.id])[0] || '';
-            const thumb = imgSrc ? `<img src="${imgSrc}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : '';
-            const qty = Number(i.qty) || 1; const unit = (!i.unit || i.unit === 'undefined') ? 'pcs' : i.unit; const price = Number(i.price) || 0;
-            const lineAmount = (i.line !== undefined && i.line !== null) ? Number(i.line) : (price * qty);
-            return `<div style="display:flex; align-items:center; margin-bottom:5px;">${thumb}<span>${esc(i.name)} × ${qty} ${esc(unit)} — ${fmt(lineAmount)}</span></div>`;
-        }).join('');
-        return `<tr><td>${esc(o.date)}</td><td><strong>${esc(o.method)}</strong><br><span style="font-size:12px; color:#888;">${esc(o.name)} • ${esc(o.phone)}<br>${esc(o.address || '')}</span></td><td>${itemsHtml}</td><td style="font-weight:bold; color:#ee4d2d;">${fmt(o.total)}</td></tr>`;
-    }).join('');
-}
+function renderCustomerOrders(){ const tbody = $('customer-orders-tbody'); let mine = []; try { mine = JSON.parse(localStorage.getItem('lexstore_my_orders') || '[]'); } catch(e){} if(!mine.length){ tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">You have no past orders yet.</td></tr>'; return; } tbody.innerHTML = mine.map(o => { const itemsHtml = normalizeItems(o.items).map(i => { let imgSrc = i.img; if (!imgSrc && products[i.id]) imgSrc = getImages(products[i.id])[0] || ''; const thumb = imgSrc ? `<img src="${imgSrc}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : ''; const qty = Number(i.qty) || 1; const unit = (!i.unit || i.unit === 'undefined') ? 'pcs' : i.unit; const price = Number(i.price) || 0; const lineAmount = (i.line !== undefined && i.line !== null) ? Number(i.line) : (price * qty); return `<div style="display:flex; align-items:center; margin-bottom:5px;">${thumb}<span>${esc(i.name)} × ${qty} ${esc(unit)} — ${fmt(lineAmount)}</span></div>`; }).join(''); return `<tr><td>${esc(o.date)}</td><td><strong>${esc(o.method)}</strong><br><span style="font-size:12px; color:#888;">${esc(o.name)} • ${esc(o.phone)}<br>${esc(o.address || '')}</span></td><td>${itemsHtml}</td><td style="font-weight:bold; color:#ee4d2d;">${fmt(o.total)}</td></tr>`; }).join(''); }
 function clearCustomerOrders(){ if(!confirm('Clear your local order history?')) return; localStorage.removeItem('lexstore_my_orders'); renderCustomerOrders(); }
 
 function verifyAdminLogin(){
@@ -845,34 +787,67 @@ function verifyAdminLogin(){
         if(pw === superPw){ isAdmin = true; isSuperAdmin = true; } else if(pw === adminPw){ isAdmin = true; isSuperAdmin = false; } else { alert('❌ Wrong password.'); return; }
         $('admin-login-box').style.display = 'none'; $('admin-dashboard').style.display = 'block'; $('super-tab-btn').style.display = isSuperAdmin ? 'inline-block' : 'none'; $('admin-title').textContent = isSuperAdmin ? 'Admin Panel — Super Admin' : 'Admin Panel';
         sessionStorage.setItem('lexstore_admin', isSuperAdmin ? 'super' : 'admin'); $('admin-password-input').value = '';
-        renderAdminProducts(); renderAdminOrders(); renderAdminCategories(); renderAdminMembers(); populateCategoryDropdowns(); populateBankAdminForm();
+        renderAdminProducts(); renderAdminOrders(); renderAdminCategories(); renderAdminMembers(); renderWithdrawRequests(); populateCategoryDropdowns(); populateBankAdminForm();
     }).catch(err => alert('Connection error: ' + err.message));
 }
 function adminLogout(){ isAdmin = false; isSuperAdmin = false; sessionStorage.removeItem('lexstore_admin'); $('admin-dashboard').style.display = 'none'; $('admin-login-box').style.display = 'block'; document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active')); $('orders-section').classList.add('active'); document.querySelectorAll('.admin-sub-btn').forEach((b,i) => b.classList.toggle('active', i === 0)); }
 function restoreAdminSession(){ const s = sessionStorage.getItem('lexstore_admin'); if(s){ isAdmin = true; isSuperAdmin = (s === 'super'); $('admin-login-box').style.display = 'none'; $('admin-dashboard').style.display = 'block'; $('super-tab-btn').style.display = isSuperAdmin ? 'inline-block' : 'none'; $('admin-title').textContent = isSuperAdmin ? 'Admin Panel — Super Admin' : 'Admin Panel'; } }
 
 function renderAdminOrders(){
-    const tbody = $('orders-tbody');
-    const list = Object.entries(allOrders || {}).map(([id, o]) => ({ id, ...o })).sort((a,b) => (b.ts||0) - (a.ts||0));
+    const tbody = $('orders-tbody'); const list = Object.entries(allOrders || {}).map(([id, o]) => ({ id, ...o })).sort((a,b) => (b.ts||0) - (a.ts||0));
     let sales = 0; list.forEach(o => sales += Number(o.total) || 0);
     $('total-orders-card').textContent = 'Total Orders: ' + list.length; $('total-sales-card').textContent = 'Total Sales: RM ' + fmt(sales);
     if(!list.length){ tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">No orders yet.</td></tr>'; return; }
     tbody.innerHTML = list.map(o => {
-        const status = o.status || 'pending';
-        let statusClass = 'status-pending';
+        const status = o.status || 'pending'; let statusClass = 'status-pending';
         if (status === 'complete') statusClass = 'status-complete'; else if (status === 'cash') statusClass = 'status-cash'; else if (status === 'qrcode') statusClass = 'status-qrcode'; else if (status === 'cancel') statusClass = 'status-cancel';
         const itemsHtml = normalizeItems(o.items).map(i => { let imgSrc = i.img; if (!imgSrc && products[i.id]) imgSrc = getImages(products[i.id])[0] || ''; const thumb = imgSrc ? `<img src="${imgSrc}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${imgSrc}')">` : ''; const qty = Number(i.qty) || 1; const unit = (!i.unit || i.unit === 'undefined') ? 'pcs' : i.unit; const price = Number(i.price) || 0; const lineAmount = (i.line !== undefined && i.line !== null) ? Number(i.line) : (price * qty); return `<div style="display:flex; align-items:center; margin-bottom:5px;">${thumb}<span>${esc(i.name)} × ${qty} ${esc(unit)} — ${fmt(lineAmount)}</span></div>`; }).join('');
         const refPhone = o.affiliateRef || ''; let commHtml = '<span style="color:#aaa;">—</span>';
-        if (refPhone) {
-            const comm = o.commission !== undefined ? Number(o.commission) : 0;
-            if (comm > 0) { commHtml = `<span style="color:#e67e22; font-weight:bold;">📞 尾号 ${refPhone}</span><br><span style="font-size:11px; color:#27ae60;">提成: RM ${comm.toFixed(2)}</span>`; }
-            else { commHtml = `<span style="color:#e67e22; font-weight:bold;">📞 尾号 ${refPhone}</span><br><span style="font-size:11px; color:#c0392b;">无提成 (本月未购买)</span>`; }
-        }
+        if (refPhone) { const comm = o.commission !== undefined ? Number(o.commission) : 0; if (comm > 0) { commHtml = `<span style="color:#e67e22; font-weight:bold;">📞 尾号 ${refPhone}</span><br><span style="font-size:11px; color:#27ae60;">提成: RM ${comm.toFixed(2)}</span>`; } else { commHtml = `<span style="color:#e67e22; font-weight:bold;">📞 尾号 ${refPhone}</span><br><span style="font-size:11px; color:#c0392b;">无提成 (本月未购买)</span>`; } }
         return `<tr onclick="openReceipt('${o.id}')"><td><span style="font-size:12px; color:#2ecc71; font-weight:bold; display:block; margin-bottom:6px;">${esc(o.date || new Date(o.ts||0).toLocaleString())}</span><strong>${esc(o.method)}</strong><br><span style="font-size:12px; color:#555;">${esc(o.name)}<br>📞 ${esc(o.phone)}<br>📍 ${esc(o.address || '-')}</span></td><td>${itemsHtml}</td><td style="font-weight:bold; color:#ee4d2d; white-space:nowrap;">${fmt(o.total)}</td><td>${commHtml}</td><td onclick="event.stopPropagation()"><select class="status-select ${statusClass}" onchange="updateOrderStatus('${o.id}', this.value)"><option value="pending" ${status === 'pending' ? 'selected' : ''}>Pending</option><option value="complete" ${status === 'complete' ? 'selected' : ''}>Complete</option><option value="cash" ${status === 'cash' ? 'selected' : ''}>Cash</option><option value="qrcode" ${status === 'qrcode' ? 'selected' : ''}>QR Code</option><option value="cancel" ${status === 'cancel' ? 'selected' : ''}>Cancel</option></select></td></tr>`;
-    }).join('');
-    updateStorageInfo();
+    }).join(''); updateStorageInfo();
 }
-function updateOrderStatus(orderId, newStatus) { db.ref('orders/' + orderId).update({ status: newStatus }).then(() => { renderAdminOrders(); }).catch(err => { alert('Failed to update status: ' + err.message); }); }
+
+// ⭐ 按 Complete 为主结算佣金：只要上线本月有购买，无论前后均计算 1%
+function updateOrderStatus(orderId, newStatus) {
+    if (newStatus === 'complete') {
+        db.ref('orders').once('value').then(snap => {
+            const latestOrders = snap.val() || {}; const o = latestOrders[orderId];
+            if (o && o.affiliateRef) {
+                const nowDate = new Date(); const currentMonth = nowDate.getMonth(); const currentYear = nowDate.getFullYear(); let isActive = false;
+                for (let id in latestOrders) { if (id === orderId) continue; const ord = latestOrders[id]; if (ord.memberPhone && ord.memberPhone.endsWith(o.affiliateRef) && ord.ts) { const oDate = new Date(ord.ts); if (oDate.getMonth() === currentMonth && oDate.getFullYear() === currentYear) { isActive = true; break; } } }
+                const newCommission = isActive ? (Number(o.total) * 0.01) : 0;
+                db.ref('orders/' + orderId).update({ status: newStatus, commission: newCommission })
+                  .then(() => { renderAdminOrders(); if(currentMember){ renderMyDownlines(currentMember.phone.slice(-4)); } })
+                  .catch(err => { alert('Failed to update status: ' + err.message); });
+                return;
+            }
+            db.ref('orders/' + orderId).update({ status: newStatus }).then(() => { renderAdminOrders(); }).catch(err => { alert('Failed to update status: ' + err.message); });
+        }).catch(err => alert('Failed to check orders: ' + err.message));
+    } else {
+        db.ref('orders/' + orderId).update({ status: newStatus }).then(() => { renderAdminOrders(); }).catch(err => { alert('Failed to update status: ' + err.message); });
+    }
+}
+
+function renderWithdrawRequests() {
+    const tbody = $('withdraw-tbody'); if (!tbody) return;
+    const list = Object.values(withdrawals || {}).sort((a,b) => (b.ts||0) - (a.ts||0));
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No withdrawal requests yet.</td></tr>'; return; }
+    tbody.innerHTML = list.map(w => {
+        const isPending = w.status === 'pending';
+        const actionBtn = isPending ? `<button class="btn-icon-action" style="background:#2ecc71; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="approveWithdraw('${w.id}')">✅ Approve</button>` : `<span style="color:#27ae60; font-weight:bold;">Approved</span>`;
+        const statusColor = w.status === 'approved' ? '#27ae60' : '#e67e22';
+        return `<tr><td>${esc(w.date)}</td><td>${esc(w.memberName)}</td><td>${esc(w.memberPhone)}</td><td style="font-weight:bold;">RM ${fmt(w.amount)}</td><td style="color:${statusColor}; font-weight:bold;">${w.status.toUpperCase()}</td><td>${actionBtn}</td></tr>`;
+    }).join('');
+}
+
+function approveWithdraw(id) {
+    if (!confirm('Are you sure you want to approve this withdrawal?')) return;
+    db.ref('withdrawals/' + id).update({ status: 'approved' })
+      .then(() => { alert('✅ Withdrawal approved! Balance updated.'); renderWithdrawRequests(); if(currentMember) renderMyDownlines(currentMember.phone.slice(-4)); })
+      .catch(err => alert('Error: ' + err.message));
+}
+
 function renderAdminMembers(){ const tbody = $('members-tbody'); const list = Object.entries(members || {}).map(([id, m]) => ({ id, ...m })).sort((a,b) => (b.createdAt||0) - (a.createdAt||0)); $('total-members-card').textContent = 'Total Members: ' + list.length; if(!list.length){ tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">暂无会员</td></tr>'; return; } tbody.innerHTML = list.map(m => `<tr><td>${esc(m.createdDate || new Date(m.createdAt||0).toLocaleString())}</td><td>${esc(m.name)}</td><td>${esc(m.phone)} ${m.referredBy ? `<br><span style="font-size:11px; color:#e67e22;">推荐人: 尾号 ${m.referredBy}</span>` : ''}</td></tr>`).join(''); updateStorageInfo(); }
 
 function openReceipt(orderId) {
@@ -888,12 +863,7 @@ function openReceipt(orderId) {
 }
 function renderReceiptItems(items) {
     const container = $('receipt-items-container'); const itemArr = normalizeItems(items);
-    container.innerHTML = itemArr.map((it, idx) => {
-        const qty = Number(it.qty) || 1; const price = Number(it.price) || 0; const subtotal = qty * price; let itemName = it.name;
-        if (!itemName || itemName === 'undefined' || itemName.trim() === '') itemName = 'Item';
-        return `<div class="receipt-item-row"><div style="flex:2; display:flex; align-items:center; gap:5px; min-width:100px;"><input type="text" class="item-name" value="${esc(itemName)}" placeholder="Description" oninput="updateReceiptTotals()" id="rec-item-name-${idx}" style="flex:1; min-width:50px;"></div><input type="number" class="item-qty" value="${qty}" min="1" placeholder="Qty" oninput="updateReceiptTotals()" id="rec-item-qty-${idx}" style="flex:0.8; min-width:40px; text-align:center;"><input type="number" class="item-price" value="${price}" step="any" placeholder="Price" oninput="updateReceiptTotals()" id="rec-item-price-${idx}" style="flex:1; min-width:60px; text-align:center;"><span class="item-subtotal" id="rec-item-subtotal-${idx}" style="flex:1; min-width:60px; text-align:right;">${fmt(subtotal)}</span><button class="btn-remove" onclick="removeReceiptItem(${idx})">✕</button></div>`;
-    }).join('');
-    updateReceiptTotals();
+    container.innerHTML = itemArr.map((it, idx) => { const qty = Number(it.qty) || 1; const price = Number(it.price) || 0; const subtotal = qty * price; let itemName = it.name; if (!itemName || itemName === 'undefined' || itemName.trim() === '') itemName = 'Item'; return `<div class="receipt-item-row"><div style="flex:2; display:flex; align-items:center; gap:5px; min-width:100px;"><input type="text" class="item-name" value="${esc(itemName)}" placeholder="Description" oninput="updateReceiptTotals()" id="rec-item-name-${idx}" style="flex:1; min-width:50px;"></div><input type="number" class="item-qty" value="${qty}" min="1" placeholder="Qty" oninput="updateReceiptTotals()" id="rec-item-qty-${idx}" style="flex:0.8; min-width:40px; text-align:center;"><input type="number" class="item-price" value="${price}" step="any" placeholder="Price" oninput="updateReceiptTotals()" id="rec-item-price-${idx}" style="flex:1; min-width:60px; text-align:center;"><span class="item-subtotal" id="rec-item-subtotal-${idx}" style="flex:1; min-width:60px; text-align:right;">${fmt(subtotal)}</span><button class="btn-remove" onclick="removeReceiptItem(${idx})">✕</button></div>`; }).join(''); updateReceiptTotals();
 }
 function addReceiptItem() { const container = $('receipt-items-container'); const idx = container.children.length; const html = `<div class="receipt-item-row"><div style="flex:2; display:flex; align-items:center; gap:5px; min-width:100px;"><input type="text" class="item-name" value="" placeholder="Description" oninput="updateReceiptTotals()" id="rec-item-name-${idx}" style="flex:1; min-width:50px;"></div><input type="number" class="item-qty" value="1" min="1" placeholder="Qty" oninput="updateReceiptTotals()" id="rec-item-qty-${idx}" style="flex:0.8; min-width:40px; text-align:center;"><input type="number" class="item-price" value="0" step="any" placeholder="Price" oninput="updateReceiptTotals()" id="rec-item-price-${idx}" style="flex:1; min-width:60px; text-align:center;"><span class="item-subtotal" id="rec-item-subtotal-${idx}" style="flex:1; min-width:60px; text-align:right;">0.00</span><button class="btn-remove" onclick="removeReceiptItem(${idx})">✕</button></div>`; container.insertAdjacentHTML('beforeend', html); updateReceiptTotals(); }
 function removeReceiptItem(idx) { const el = document.getElementById('rec-item-name-' + idx); if (el) el.parentElement.remove(); updateReceiptTotals(); }
@@ -914,12 +884,7 @@ function saveAndShareCopy() {
 function fallbackDownload(url, filename, btn, originalText) { const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 1500); btn.innerHTML = originalText; btn.disabled = false; alert('✅ 图片已保存！请打开 WhatsApp 发送给顾客。'); }
 
 function clearOrders(){ if(!isAdmin) return; if(!confirm('⚠️ Delete ALL orders permanently?')) return; db.ref('orders').remove().then(() => alert('✅ All orders cleared.')).catch(err => alert('Error: ' + err.message)); }
-function exportOrdersExcel(){
-    const list = Object.entries(allOrders || {}).map(([id, o]) => ({ id, ...o })).sort((a,b) => (b.ts||0) - (a.ts||0)); if(!list.length){ alert('No orders to export.'); return; }
-    const rows = [['Date','Customer','Phone','Method','Address','Items','Subtotal','Delivery Fee','Total (RM)','Status','Member Phone','推荐人 (提成)']];
-    list.forEach(o => { const items = normalizeItems(o.items).map(i => `${i.name} x${i.qty} ${i.unit||'pcs'} @${fmt(i.price)}`).join(' | '); const comm = o.affiliateRef ? `尾号 ${o.affiliateRef} (RM ${(Number(o.commission)||0).toFixed(2)})` : '-'; rows.push([o.date || new Date(o.ts||0).toLocaleString(), o.name, o.phone, o.method, o.address || '-', items, fmt(o.subtotal), fmt(o.fee), fmt(o.total), o.status || 'pending', o.memberPhone || '-', comm]); });
-    const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g,'""')}"`).join(',')).join('\r\n'); download('\uFEFF' + csv, `lexstore_orders_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
-}
+function exportOrdersExcel(){ const list = Object.entries(allOrders || {}).map(([id, o]) => ({ id, ...o })).sort((a,b) => (b.ts||0) - (a.ts||0)); if(!list.length){ alert('No orders to export.'); return; } const rows = [['Date','Customer','Phone','Method','Address','Items','Subtotal','Delivery Fee','Total (RM)','Status','Member Phone','推荐人 (提成)']]; list.forEach(o => { const items = normalizeItems(o.items).map(i => `${i.name} x${i.qty} ${i.unit||'pcs'} @${fmt(i.price)}`).join(' | '); const comm = o.affiliateRef ? `尾号 ${o.affiliateRef} (RM ${(Number(o.commission)||0).toFixed(2)})` : '-'; rows.push([o.date || new Date(o.ts||0).toLocaleString(), o.name, o.phone, o.method, o.address || '-', items, fmt(o.subtotal), fmt(o.fee), fmt(o.total), o.status || 'pending', o.memberPhone || '-', comm]); }); const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g,'""')}"`).join(',')).join('\r\n'); download('\uFEFF' + csv, `lexstore_orders_${Date.now()}.csv`, 'text/csv;charset=utf-8;'); }
 function unitOptions(selected){ return UNITS.map(u => `<option value="${u.v}" ${u.v === selected ? 'selected' : ''}>${u.t}</option>`).join(''); }
 function renderAdminProducts(){ const tbody = $('admin-products-tbody'); const keys = Object.keys(products); if(!keys.length){ tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888;">No products yet.</td></tr>'; updateStorageInfo(); return; } tbody.innerHTML = keys.map(id => { const p = products[id]; const img = getImages(p)[0] || ''; return `<tr><td style="text-align:center;">${img ? `<img src="${img}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${img}')">` : '<span style="color:#aaa;">—</span>'}<br><button class="btn-change-img" onclick="triggerImageUpload('${id}')">🖼 换图</button><input type="file" id="admin-img-input-${id}" accept="image/*" style="display:none;" onchange="handleAdminImageUpload(event, '${id}')"></td><td><input type="text" id="ap-name-${id}" value="${esc(p.name)}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td><input type="number" step="any" id="ap-price-${id}" value="${p.price ?? ''}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td><input type="number" step="any" id="ap-cost-${id}" value="${p.cost ?? ''}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td><select id="ap-cat-${id}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;">${categoryOptionsHtml(p.category)}</select></td><td><select id="ap-unit-${id}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;">${unitOptions(p.unit || 'pcs')}</select></td><td><input type="number" id="ap-stock-${id}" value="${p.stock ?? 0}" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:6px;"></td><td style="white-space:nowrap; text-align:center;"><button class="btn-icon-action" title="Save" onclick="saveProductRow('${id}')">💾</button><button class="btn-icon-action delete" title="Delete" onclick="deleteProduct('${id}')">🗑</button></td></tr>`; }).join(''); updateStorageInfo(); }
 function triggerImageUpload(id) { const input = document.getElementById('admin-img-input-' + id); if (input) input.click(); }
@@ -933,8 +898,8 @@ function removeImageSlot(btn){ const container = $('image-slots-container'); if(
 function resetProductForm(){ $('new-prod-name').value = ''; $('new-prod-price').value = ''; $('new-prod-cost').value = ''; $('new-prod-stock').value = 100; $('new-prod-unit').value = 'pcs'; $('new-prod-model').value = ''; $('new-prod-size').value = ''; const catSel = $('new-prod-category'); if(catSel) catSel.value = ''; const container = $('image-slots-container'); container.innerHTML = `<div class="img-slot-row"><span style="font-size:12px; font-weight:bold; color:#666;">#1</span><input type="file" class="new-prod-file-slot" accept="image/*" style="flex:1;"></div>`; bindFileInput(container.querySelector('input')); }
 function addNewProduct(){ const name = $('new-prod-name').value.trim(); const price = parseFloat($('new-prod-price').value); const cost = parseFloat($('new-prod-cost').value); const cat = $('new-prod-category').value; const unit = $('new-prod-unit').value; const stock = parseInt($('new-prod-stock').value); const model = $('new-prod-model').value.trim(); const size = $('new-prod-size').value.trim(); if(!name){ alert('Please enter the product name.'); return; } if(isNaN(price) || price < 0){ alert('Please enter a valid selling price.'); return; } const images = Array.from(document.querySelectorAll('.new-prod-file-slot')).map(inp => inp.dataset.dataUrl).filter(Boolean); const newProduct = { name, price, cost: isNaN(cost) ? 0 : cost, category: cat, unit, stock: isNaN(stock) ? 0 : stock, model, size, images, createdAt: Date.now() }; db.ref('products').push(newProduct).then(() => { alert('✅ Product added: ' + name); resetProductForm(); switchAdminSubTab('products-list-section', document.querySelectorAll('.admin-sub-btn')[1]); }).catch(err => alert('Error saving product: ' + err.message)); }
 function savePasswords(){ const a = $('new-admin-pw').value.trim(); const s = $('new-super-pw').value.trim(); if(!a && !s){ alert('Enter at least one new password.'); return; } const updates = {}; if(a) updates.adminPassword = a; if(s) updates.superPassword = s; db.ref('settings').update(updates).then(() => { alert('✅ Password(s) updated.'); $('new-admin-pw').value = ''; $('new-super-pw').value = ''; }).catch(err => alert('Error: ' + err.message)); }
-function exportDataJson(){ const payload = { exportedAt: new Date().toISOString(), products, categories, members, orders: allOrders }; download(JSON.stringify(payload, null, 2), `lexstore_backup_${Date.now()}.json`, 'application/json'); }
-function importDataJson(event){ const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = e => { try { const data = JSON.parse(e.target.result); if(!data.products && !data.orders){ alert('Invalid backup file.'); return; } if(!confirm('⚠️ This will REPLACE all current data. Continue?')) return; const updates = {}; updates.products = data.products || {}; updates.orders = data.orders || {}; updates.categories = data.categories || {}; updates.members = data.members || {}; db.ref().update(updates).then(() => alert('✅ Backup restored.')).catch(err => alert('Error: ' + err.message)); } catch(err){ alert('Invalid JSON file.'); } event.target.value = ''; }; reader.readAsText(file); }
+function exportDataJson(){ const payload = { exportedAt: new Date().toISOString(), products, categories, members, orders: allOrders, withdrawals }; download(JSON.stringify(payload, null, 2), `lexstore_backup_${Date.now()}.json`, 'application/json'); }
+function importDataJson(event){ const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = e => { try { const data = JSON.parse(e.target.result); if(!data.products && !data.orders){ alert('Invalid backup file.'); return; } if(!confirm('⚠️ This will REPLACE all current data. Continue?')) return; const updates = {}; updates.products = data.products || {}; updates.orders = data.orders || {}; updates.categories = data.categories || {}; updates.members = data.members || {}; updates.withdrawals = data.withdrawals || {}; db.ref().update(updates).then(() => alert('✅ Backup restored.')).catch(err => alert('Error: ' + err.message)); } catch(err){ alert('Invalid JSON file.'); } event.target.value = ''; }; reader.readAsText(file); }
 function clearAllProducts(){ if(!confirm('⚠️ Delete ALL products permanently?')) return; if(!confirm('Are you absolutely sure?')) return; db.ref('products').remove().then(() => alert('🗑 All products deleted.')).catch(err => alert('Error: ' + err.message)); }
 function updateStorageInfo(){ const sp = $('storage-products'); const so = $('storage-orders'); const sc = $('storage-categories'); const sm = $('storage-members'); if(sp) sp.textContent = Object.keys(products).length; if(so) so.textContent = Object.keys(allOrders || {}).length; if(sc) sc.textContent = Object.keys(categories).length; if(sm) sm.textContent = Object.keys(members).length; }
 
@@ -943,12 +908,12 @@ db.ref('categories').on('value', snap => { categories = snap.val() || {}; render
 db.ref('settings/bankInfo').on('value', snap => { bankInfo = snap.val() || {}; if (document.getElementById('bank-page') && document.getElementById('bank-page').classList.contains('active')) renderBankPage(); if (isAdmin && document.getElementById('bank-settings-section') && document.getElementById('bank-settings-section').classList.contains('active')) populateBankAdminForm(); }, err => console.error('Bank info listener error:', err));
 db.ref('members').on('value', snap => { members = snap.val() || {}; if(isAdmin) renderAdminMembers(); updateStorageInfo(); if(currentMember){ const phoneLast4 = currentMember.phone.slice(-4); renderMyDownlines(phoneLast4); } }, err => console.error('Members listener error:', err));
 db.ref('orders').on('value', snap => { allOrders = snap.val() || {}; renderAdminOrders(); updateStorageInfo(); if(currentMember){ const phoneLast4 = currentMember.phone.slice(-4); renderMyDownlines(phoneLast4); } }, err => console.error('Orders listener error:', err));
+db.ref('withdrawals').on('value', snap => { withdrawals = snap.val() || {}; if (isAdmin) renderWithdrawRequests(); if (currentMember) renderMyDownlines(currentMember.phone.slice(-4)); }, err => console.error('Withdrawals listener error:', err));
 
 document.addEventListener('DOMContentLoaded', () => {
     loadCart(); loadMemberSession(); updateCartBadge(); updateMemberUI(); renderCategories(); renderProducts(); renderCart(); renderCustomerOrders(); restoreAdminSession(); populateCategoryDropdowns();
     bindFileInput(document.querySelector('.new-prod-file-slot')); checkUrlForProduct();
-    const urlParams = new URLSearchParams(window.location.search);
-    const ref = urlParams.get('ref');
+    const urlParams = new URLSearchParams(window.location.search); const ref = urlParams.get('ref');
     if (ref) { localStorage.setItem('lexstore_affiliate_ref', ref); affiliateRef = ref; } else { affiliateRef = localStorage.getItem('lexstore_affiliate_ref'); }
     $('admin-password-input').addEventListener('keydown', e => { if(e.key === 'Enter') verifyAdminLogin(); });
     document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closeProductModal(); closeLightbox(); closeFbShareModal(); } });
