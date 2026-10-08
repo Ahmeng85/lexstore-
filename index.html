@@ -507,8 +507,11 @@
             <h2 id="modal-name" style="margin-bottom:6px; color:#111; font-size:20px;"></h2><p id="modal-price" style="color:#ee4d2d; font-weight:800; font-size:24px;"></p><p id="modal-unit" style="font-size:13px; color:#666; margin-bottom:15px;"></p>
             <div id="modal-specs-area"></div>
             <div class="qty-container"><button class="qty-btn" onclick="changeModalQty(-1)">−</button><input class="qty-input" type="number" id="modal-qty" value="1" min="1"><button class="qty-btn" onclick="changeModalQty(1)">+</button></div>
-            <button class="btn" id="modal-add-btn" onclick="addToCartFromModal()" style="padding:15px; font-size:16px; background:#2ecc71; color:#fff;">🛒 Add to Cart</button>
-            <button class="btn" onclick="shareAffiliateProduct(currentModalId)" style="margin-top: 10px; background:#e67e22; color:#fff; padding:10px; font-size:14px; width:100%; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">💰 分享赚 1% 提成</button>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn" id="modal-add-btn" onclick="addToCartFromModal()" style="flex: 1; padding:15px; font-size:16px; background:#2ecc71; color:#fff; border-radius:6px; font-weight:bold; cursor:pointer; border:none;">🛒 Add to Cart</button>
+                <button class="btn" onclick="shareAffiliateProduct(currentModalId)" style="flex: 1; background:#e67e22; color:#fff; padding:15px; font-size:16px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">💰 Share to earn 1%</button>
+            </div>
         </div>
     </div>
 
