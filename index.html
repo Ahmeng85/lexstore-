@@ -202,10 +202,10 @@
     <div id="store-page" class="page active">
         <div class="member-banner" id="member-banner" onclick="switchPage('member', document.getElementById('member-nav-btn'))">
             <div class="member-banner-text">
-                <span class="banner-title">👤 会员登录 / 注册</span>
-                <span class="banner-subtitle">登录后结账自动填入姓名和电话，享有更多便利！</span>
+                <span class="banner-title">👤 Member Login / Register</span>
+                <span class="banner-subtitle">Log in to auto-fill your name and phone number at checkout!</span>
             </div>
-            <button class="member-banner-btn">立即登录 / 注册 →</button>
+            <button class="member-banner-btn">Login / Register Now →</button>
         </div>
         <div class="category-bar" id="category-bar"></div>
         <div class="product-grid" id="product-grid"></div>
@@ -592,7 +592,12 @@ function updateMemberUI(){
         navBtn.textContent = '👤 Hi, ' + currentMember.name;
         $('member-not-logged-in').style.display = 'none'; $('member-logged-in').style.display = 'block';
         $('member-display-name').textContent = currentMember.name; $('member-display-phone').textContent = currentMember.phone;
-        if(banner) { banner.classList.add('logged-in'); banner.querySelector('.banner-title').textContent = '✅ 欢迎回来，' + currentMember.name + '！'; banner.querySelector('.banner-subtitle').textContent = '点击前往会员中心查看账户信息。'; banner.querySelector('.member-banner-btn').textContent = '会员中心 →'; }
+        if(banner) { 
+            banner.classList.add('logged-in'); 
+            banner.querySelector('.banner-title').textContent = '✅ Welcome back, ' + currentMember.name + '!'; 
+            banner.querySelector('.banner-subtitle').textContent = 'Click to visit the Member Center and view your account info.'; 
+            banner.querySelector('.member-banner-btn').textContent = 'Member Center →'; 
+        }
         const phoneLast4 = currentMember.phone.slice(-4);
         const affLink = window.location.href.split('?')[0] + '?ref=' + encodeURIComponent(phoneLast4);
         const affEl = $('member-aff-link'); if (affEl) affEl.textContent = affLink;
@@ -600,7 +605,12 @@ function updateMemberUI(){
     } else {
         navBtn.textContent = '👤 Login / Register';
         $('member-not-logged-in').style.display = 'block'; $('member-logged-in').style.display = 'none';
-        if(banner) { banner.classList.remove('logged-in'); banner.querySelector('.banner-title').textContent = '👤 会员登录 / 注册'; banner.querySelector('.banner-subtitle').textContent = '登录后结账自动填入姓名和电话，享有更多便利！'; banner.querySelector('.member-banner-btn').textContent = '立即登录 / 注册 →'; }
+        if(banner) { 
+            banner.classList.remove('logged-in'); 
+            banner.querySelector('.banner-title').textContent = '👤 Member Login / Register'; 
+            banner.querySelector('.banner-subtitle').textContent = 'Log in to auto-fill your name and phone number at checkout!'; 
+            banner.querySelector('.member-banner-btn').textContent = 'Login / Register Now →'; 
+        }
     }
 }
 
@@ -998,3 +1008,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
+
+    
